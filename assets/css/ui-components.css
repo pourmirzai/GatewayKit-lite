@@ -1,0 +1,628 @@
+/*!
+ * GatewayKit - UI Kit (Components)
+ * Scope: Namespaced component styles + safe WP Admin mappings
+ * Depends on: assets/css/ui-kit.css (tokens & base)
+ * Note: Pure CSS only. Removed any non-standard properties (e.g., "composes").
+ */
+
+/**
+ * Table of Contents
+ *
+ * 1.  Buttons & Focus States
+ * 2.  Tabs
+ * 3.  Cards
+ * 4.  Badges
+ * 5.  Tables
+ * 6.  Forms
+ * 7.  Alerts
+ * 8.  Payment Result Page
+ * 9.  Receipt Table & Details
+ * 10. Print Styles
+ * 11. Mobile Responsive
+ * 12. Copy Button & Receipt Code
+ */
+
+/* Buttons: base styles for gatewaykit and WP core buttons within gatewaykit scope */
+.gatewaykit-ui .gatewaykit-ui-btn,
+.gatewaykit-ui .button,
+.gatewaykit-ui a.button,
+.gatewaykit-ui .button-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.75rem; /* 44px minimum touch target */
+  min-width: 2.75rem; /* Ensure square touch targets */
+  padding-inline: 0.875rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-gatewaykit-border);
+  background: var(--accent);
+  color: var(--foreground);
+  font-weight: var(--gatewaykit-font-weight-medium);
+  box-shadow: var(--gatewaykit-shadow-sm);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.02s ease;
+  position: relative;
+}
+.gatewaykit-ui .gatewaykit-ui-btn:hover,
+.gatewaykit-ui .button:hover,
+.gatewaykit-ui a.button:hover,
+.gatewaykit-ui .button-secondary:hover {
+  background: color-mix(in oklab, var(--accent) 85%, black 15%);
+}
+.gatewaykit-ui .gatewaykit-ui-btn:active,
+.gatewaykit-ui .button:active,
+.gatewaykit-ui a.button:active,
+.gatewaykit-ui .button-secondary:active {
+  transform: translateY(0.5px);
+}
+
+/* Enhanced focus styles for accessibility */
+.gatewaykit-ui .gatewaykit-ui-btn:focus-visible,
+.gatewaykit-ui .button:focus-visible,
+.gatewaykit-ui a.button:focus-visible,
+.gatewaykit-ui .button-secondary:focus-visible {
+  outline: 2px solid var(--color-gatewaykit-primary);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+}
+
+.gatewaykit-ui .gatewaykit-ui-btn[disabled],
+.gatewaykit-ui .gatewaykit-ui-btn:disabled,
+.gatewaykit-ui .button[disabled],
+.gatewaykit-ui .button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Button variants */
+.gatewaykit-ui .gatewaykit-ui-btn--primary,
+.gatewaykit-ui .button-primary,
+.gatewaykit-ui .page-title-action {
+  background: var(--gatewaykit-action-green);
+  color: var(--gatewaykit-action-green-contrast);
+  border-color: color-mix(in oklab, var(--gatewaykit-action-green) 70%, black 30%);
+}
+.gatewaykit-ui .gatewaykit-ui-btn--primary:hover,
+.gatewaykit-ui .button-primary:hover,
+.gatewaykit-ui .page-title-action:hover {
+  background: var(--gatewaykit-action-green-dark);
+}
+
+.gatewaykit-ui .gatewaykit-ui-btn--secondary {
+  background: var(--secondary);
+  color: var(--secondary-foreground);
+}
+
+.gatewaykit-ui .gatewaykit-ui-btn--outline {
+  background: transparent;
+  color: var(--foreground);
+  border-color: var(--color-gatewaykit-border);
+}
+
+.gatewaykit-ui .gatewaykit-ui-btn--ghost {
+  background: transparent;
+  color: var(--foreground);
+  border-color: transparent;
+}
+
+.gatewaykit-ui .gatewaykit-ui-btn--destructive {
+  background: var(--color-gatewaykit-danger);
+  color: #fff;
+  border-color: color-mix(in oklab, var(--color-gatewaykit-danger) 70%, black 30%);
+}
+
+/* Gradient button variant to match header/section accents */
+.gatewaykit-ui .gatewaykit-ui-btn--gradient {
+  background: var(--gatewaykit-gradient-primary);
+  color: #fff;
+  border-color: transparent;
+}
+.gatewaykit-ui .gatewaykit-ui-btn--gradient:hover {
+  filter: brightness(0.98);
+}
+
+/* Button sizes */
+.gatewaykit-ui .gatewaykit-ui-btn--sm { height: 2rem; padding-inline: 0.625rem; border-radius: var(--radius-sm); font-size: var(--text-sm); }
+.gatewaykit-ui .gatewaykit-ui-btn--md { height: 2.375rem; padding-inline: 0.875rem; }
+.gatewaykit-ui .gatewaykit-ui-btn--lg { height: 2.75rem; padding-inline: 1rem; border-radius: var(--radius-lg); font-size: var(--text-lg); }
+.gatewaykit-ui .gatewaykit-ui-btn--icon { width: 2.375rem; height: 2.375rem; padding: 0; }
+
+/* Tabs */
+.gatewaykit-ui .gatewaykit-ui-tabs { display: block; }
+.gatewaykit-ui .gatewaykit-ui-tabs__list {
+  display: flex;
+  gap: var(--gatewaykit-space-2);
+  border-bottom: 1px solid var(--color-gatewaykit-border);
+  margin-bottom: var(--gatewaykit-space-3);
+}
+.gatewaykit-ui .gatewaykit-ui-tabs__tab {
+  height: 2.5rem; /* Larger touch target */
+  min-width: 44px; /* Minimum touch target */
+  padding-inline: 0.875rem;
+  border-radius: 0;
+  border: none;
+  background: transparent;
+  color: var(--foreground);
+  cursor: pointer;
+  font-size: var(--text-sm);
+  font-weight: var(--gatewaykit-font-weight-medium);
+  border-bottom: 3px solid transparent;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.gatewaykit-ui .gatewaykit-ui-tabs__tab:hover {
+  background: var(--color-gatewaykit-light-bg);
+}
+
+.gatewaykit-ui .gatewaykit-ui-tabs__tab:focus-visible {
+  outline: 2px solid var(--color-gatewaykit-primary);
+  outline-offset: -2px;
+  background: var(--color-gatewaykit-light-bg);
+}
+
+.gatewaykit-ui .gatewaykit-ui-tabs__tab[aria-selected="true"],
+.gatewaykit-ui .gatewaykit-ui-tabs__tab[data-state="active"] {
+  border-bottom-color: var(--color-gatewaykit-primary);
+  color: var(--color-gatewaykit-primary);
+  font-weight: 600;
+}
+.gatewaykit-ui .gatewaykit-ui-tabs__panel { display: none; }
+.gatewaykit-ui .gatewaykit-ui-tabs__panel[data-state="active"] { display: block; }
+
+/* Cards */
+.gatewaykit-ui .gatewaykit-ui-card {
+  background: var(--card);
+  color: var(--card-foreground);
+  border: 1px solid var(--color-gatewaykit-border);
+  border-radius: var(--radius);
+  box-shadow: var(--gatewaykit-shadow-sm);
+  overflow: hidden;
+}
+.gatewaykit-ui .gatewaykit-ui-card__header {
+  padding: var(--gatewaykit-space-4);
+  border-bottom: 1px solid var(--color-gatewaykit-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gatewaykit-space-3);
+}
+.gatewaykit-ui .gatewaykit-ui-card__title {
+  font-size: var(--text-lg);
+  font-weight: var(--gatewaykit-font-weight-medium);
+  color: var(--color-gatewaykit-dark-text);
+  margin: 0;
+}
+.gatewaykit-ui .gatewaykit-ui-card__desc {
+  font-size: var(--text-sm);
+  color: var(--color-gatewaykit-medium-text);
+  margin: 0;
+}
+.gatewaykit-ui .gatewaykit-ui-card__action { display: inline-flex; gap: var(--gatewaykit-space-2); }
+.gatewaykit-ui .gatewaykit-ui-card__content { padding: var(--gatewaykit-space-4); }
+.gatewaykit-ui .gatewaykit-ui-card__footer {
+  padding: var(--gatewaykit-space-3) var(--gatewaykit-space-4);
+  border-top: 1px solid var(--color-gatewaykit-border);
+}
+
+/* Badges: base */
+.gatewaykit-ui .gatewaykit-ui-badge,
+.gatewaykit-ui .gatewaykit-status-badge,
+.gatewaykit-ui .gatewaykit-status-completed,
+.gatewaykit-ui .gatewaykit-status-pending,
+.gatewaykit-ui .gatewaykit-status-processing,
+.gatewaykit-ui .gatewaykit-status-failed,
+.gatewaykit-ui .gatewaykit-status-cancelled {
+  display: inline-block;
+  padding: 0.375rem 0.625rem; /* Larger for better touch */
+  min-height: 32px; /* Minimum touch target */
+  border-radius: 999px;
+  font-size: 0.75rem; /* Slightly larger */
+  font-weight: var(--gatewaykit-font-weight-medium);
+  line-height: 1.4;
+  border: 1px solid var(--color-gatewaykit-border);
+  background: var(--color-gatewaykit-light-bg);
+  color: var(--color-gatewaykit-dark-text);
+  white-space: nowrap;
+}
+
+/* Badge modifiers (palette aligned with new designs) */
+.gatewaykit-ui .gatewaykit-ui-badge--success,
+.gatewaykit-ui .gatewaykit-status-completed { background: var(--gatewaykit-status-success-bg); color: var(--gatewaykit-status-success-fg); border-color: var(--gatewaykit-status-success-brd); }
+.gatewaykit-ui .gatewaykit-ui-badge--warning,
+.gatewaykit-ui .gatewaykit-status-pending { background: var(--gatewaykit-status-warning-bg); color: var(--gatewaykit-status-warning-fg); border-color: var(--gatewaykit-status-warning-brd); }
+.gatewaykit-ui .gatewaykit-ui-badge--danger,
+.gatewaykit-ui .gatewaykit-status-failed { background: var(--gatewaykit-status-danger-bg); color: var(--gatewaykit-status-danger-fg); border-color: var(--gatewaykit-status-danger-brd); }
+.gatewaykit-ui .gatewaykit-ui-badge--info,
+.gatewaykit-ui .gatewaykit-status-processing { background: var(--gatewaykit-status-info-bg); color: var(--gatewaykit-status-info-fg); border-color: var(--gatewaykit-status-info-brd); }
+.gatewaykit-ui .gatewaykit-ui-badge--neutral,
+.gatewaykit-ui .gatewaykit-status-cancelled { background: var(--gatewaykit-status-neutral-bg); color: var(--gatewaykit-status-neutral-fg); border-color: var(--gatewaykit-status-neutral-brd); }
+
+/* Tables: enhance WP list table visuals within gatewaykit scope */
+.gatewaykit-ui .wp-list-table {
+  border: 1px solid var(--color-gatewaykit-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.gatewaykit-ui .wp-list-table thead tr {
+  background: var(--gatewaykit-gradient-primary);
+}
+.gatewaykit-ui .wp-list-table thead th {
+  background: transparent;
+  color: #ffffff;
+  font-weight: var(--gatewaykit-font-weight-medium);
+  border-bottom: 1px solid color-mix(in oklab, #9b59f5 40%, var(--color-gatewaykit-border) 60%);
+}
+.gatewaykit-ui .wp-list-table tbody td {
+  color: var(--color-gatewaykit-dark-text);
+}
+
+/* Improved stripes & hover to match UI */
+.gatewaykit-ui .wp-list-table.striped tbody tr:nth-child(odd) {
+  background: color-mix(in oklab, var(--color-gatewaykit-light-bg) 85%, white 15%);
+}
+.gatewaykit-ui .wp-list-table.striped tbody tr:hover {
+  background: color-mix(in oklab, var(--color-gatewaykit-light-bg) 80%, #fefefe 20%);
+}
+.gatewaykit-ui .tablenav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-block: var(--gatewaykit-space-3);
+}
+.gatewaykit-ui .tablenav .actions select,
+.gatewaykit-ui .tablenav .actions input[type="date"] {
+  background: var(--input-background);
+  border: 1px solid var(--color-gatewaykit-border);
+  border-radius: var(--radius-sm);
+  padding: var(--gatewaykit-space-2) var(--gatewaykit-space-3);
+}
+
+/* Forms: normalize inputs within gatewaykit scope */
+.gatewaykit-ui .form-table th {
+  color: var(--color-gatewaykit-dark-text);
+}
+.gatewaykit-ui .form-table td .regular-text,
+.gatewaykit-ui .form-table td input[type="text"],
+.gatewaykit-ui .form-table td input[type="password"],
+.gatewaykit-ui .form-table td select,
+.gatewaykit-ui .form-table td textarea {
+  background: var(--input-background);
+  border: 1px solid var(--color-gatewaykit-border);
+  border-radius: var(--radius-sm);
+  padding: var(--gatewaykit-space-2) var(--gatewaykit-space-3);
+}
+
+/* Alerts */
+.gatewaykit-ui .gatewaykit-ui-alert {
+  padding: var(--gatewaykit-space-3);
+  border: 1px solid var(--color-gatewaykit-border);
+  border-radius: var(--radius);
+  background: var(--color-gatewaykit-light-bg);
+  color: var(--color-gatewaykit-dark-text);
+}
+.gatewaykit-ui .gatewaykit-ui-alert--success { background: #d4edda; color: #155724; border-color: #c3e6cb; }
+.gatewaykit-ui .gatewaykit-ui-alert--warning { background: #fff3cd; color: #856404; border-color: #ffeeba; }
+.gatewaykit-ui .gatewaykit-ui-alert--danger  { background: #f8d7da; color: #721c24; border-color: #f5c6cb; }
+.gatewaykit-ui .gatewaykit-ui-alert--info    { background: #cce5ff; color: #004085; border-color: #b8daff; }
+
+/* Payment Result Page Styles */
+.gatewaykit-ui .gatewaykit-payment-result {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: var(--gatewaykit-space-4);
+}
+
+.gatewaykit-ui .gatewaykit-payment-result-card {
+  margin-bottom: var(--gatewaykit-space-4);
+}
+
+.gatewaykit-ui .gatewaykit-payment-status {
+  display: flex;
+  align-items: center;
+  gap: var(--gatewaykit-space-3);
+  margin-bottom: var(--gatewaykit-space-4);
+}
+
+.gatewaykit-ui .gatewaykit-payment-icon {
+  font-size: var(--text-xl);
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--color-gatewaykit-light-bg);
+  border: 2px solid var(--color-gatewaykit-border);
+}
+
+.gatewaykit-ui .gatewaykit-payment-success .gatewaykit-payment-icon {
+  background: var(--gatewaykit-status-success-bg);
+  border-color: var(--gatewaykit-status-success-brd);
+  color: var(--gatewaykit-status-success-fg);
+}
+
+.gatewaykit-ui .gatewaykit-payment-error .gatewaykit-payment-icon {
+  background: var(--gatewaykit-status-danger-bg);
+  border-color: var(--gatewaykit-status-danger-brd);
+  color: var(--gatewaykit-status-danger-fg);
+}
+
+.gatewaykit-ui .gatewaykit-payment-pending .gatewaykit-payment-icon {
+  background: var(--gatewaykit-status-warning-bg);
+  border-color: var(--gatewaykit-status-warning-brd);
+  color: var(--gatewaykit-status-warning-fg);
+}
+
+/* Receipt Table Styles */
+.gatewaykit-ui .gatewaykit-receipt-title,
+.gatewaykit-ui .gatewaykit-details-title {
+  font-size: var(--text-lg);
+  font-weight: var(--gatewaykit-font-weight-medium);
+  color: var(--color-gatewaykit-dark-text);
+  margin: var(--gatewaykit-space-4) 0 var(--gatewaykit-space-3);
+  padding-bottom: var(--gatewaykit-space-2);
+  border-bottom: 2px solid var(--color-gatewaykit-border);
+}
+
+.gatewaykit-ui .gatewaykit-receipt-table,
+.gatewaykit-ui .gatewaykit-details-table,
+.gatewaykit-ui .gatewaykit-unified-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: var(--gatewaykit-space-4);
+  background: var(--card);
+  border: 1px solid var(--color-gatewaykit-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--gatewaykit-shadow-sm);
+}
+
+.gatewaykit-ui .gatewaykit-receipt-table tbody,
+.gatewaykit-ui .gatewaykit-details-table tbody,
+.gatewaykit-ui .gatewaykit-unified-table tbody {
+  background: var(--card);
+}
+
+.gatewaykit-ui .gatewaykit-receipt-row,
+.gatewaykit-ui .gatewaykit-detail-row,
+.gatewaykit-ui .gatewaykit-unified-row {
+  border-bottom: 1px solid var(--color-gatewaykit-border);
+}
+
+.gatewaykit-ui .gatewaykit-receipt-row:last-child,
+.gatewaykit-ui .gatewaykit-detail-row:last-child,
+.gatewaykit-ui .gatewaykit-unified-row:last-child {
+  border-bottom: none;
+}
+
+.gatewaykit-ui .gatewaykit-receipt-label,
+.gatewaykit-ui .gatewaykit-detail-label,
+.gatewaykit-ui .gatewaykit-unified-label {
+  padding: var(--gatewaykit-space-3) var(--gatewaykit-space-4);
+  font-weight: var(--gatewaykit-font-weight-medium);
+  color: var(--color-gatewaykit-dark-text);
+  background: var(--color-gatewaykit-light-bg);
+  width: 40%;
+  vertical-align: top;
+  text-align: left;
+}
+
+.gatewaykit-ui .gatewaykit-receipt-value,
+.gatewaykit-ui .gatewaykit-detail-value,
+.gatewaykit-ui .gatewaykit-unified-value {
+  padding: var(--gatewaykit-space-3) var(--gatewaykit-space-4);
+  color: var(--color-gatewaykit-medium-text);
+  background: var(--card);
+}
+
+/* Special styling for amount row */
+.gatewaykit-ui .gatewaykit-amount-row .gatewaykit-receipt-label,
+.gatewaykit-ui .gatewaykit-amount-row .gatewaykit-receipt-value {
+  font-weight: var(--gatewaykit-font-weight-medium);
+  color: var(--color-gatewaykit-success);
+}
+
+.gatewaykit-ui .gatewaykit-amount-value {
+  font-size: var(--text-lg);
+  font-weight: var(--gatewaykit-font-weight-medium);
+}
+
+/* Transaction ID styling */
+.gatewaykit-ui .gatewaykit-transaction-id {
+  font-family: monospace;
+  font-size: var(--text-sm);
+  background: var(--color-gatewaykit-light-bg);
+  padding: var(--gatewaykit-space-1) var(--gatewaykit-space-2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-gatewaykit-border);
+}
+
+/* Gateway name styling */
+.gatewaykit-ui .gatewaykit-gateway-name {
+  font-weight: var(--gatewaykit-font-weight-medium);
+  color: var(--color-gatewaykit-primary);
+}
+
+/* Print Styles - !important is required here to override screen styles and
+   force clean black-on-white output for printed receipts (standard practice). */
+@media print {
+  .gatewaykit-ui .gatewaykit-payment-result {
+    max-width: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .gatewaykit-ui .gatewaykit-ui-card {
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+
+  .gatewaykit-ui .gatewaykit-print-receipt {
+    display: none !important;
+  }
+
+  .gatewaykit-ui .gatewaykit-receipt-title,
+  .gatewaykit-ui .gatewaykit-details-title {
+    color: #000 !important;
+    border-bottom-color: #000 !important;
+  }
+
+  .gatewaykit-ui .gatewaykit-receipt-label,
+  .gatewaykit-ui .gatewaykit-detail-label,
+  .gatewaykit-ui .gatewaykit-unified-label {
+    background: #f5f5f5 !important;
+    color: #000 !important;
+    font-weight: bold !important;
+  }
+
+  .gatewaykit-ui .gatewaykit-receipt-value,
+  .gatewaykit-ui .gatewaykit-detail-value,
+  .gatewaykit-ui .gatewaykit-unified-value {
+    color: #000 !important;
+  }
+
+  .gatewaykit-ui .gatewaykit-amount-value {
+    font-size: 1.2em !important;
+    font-weight: bold !important;
+    color: #000 !important;
+  }
+
+  .gatewaykit-ui .gatewaykit-transaction-id {
+    background: #fff !important;
+    border: 1px solid #ccc !important;
+  }
+
+  .gatewaykit-ui .gatewaykit-gateway-name {
+    color: #000 !important;
+    font-weight: bold !important;
+  }
+
+  /* Hide unnecessary elements when printing */
+  .gatewaykit-ui .gatewaykit-ui-card__action {
+    display: none !important;
+  }
+
+  /* Hide transaction details when printing receipt only */
+  .gatewaykit-ui .gatewaykit-transaction-details {
+    display: none !important;
+  }
+
+  /* Hide payment status when printing receipt only */
+  .gatewaykit-ui .gatewaykit-payment-status {
+    display: none !important;
+  }
+
+  /* Ensure good print layout */
+  .gatewaykit-ui .gatewaykit-receipt-table,
+  .gatewaykit-ui .gatewaykit-details-table,
+  .gatewaykit-ui .gatewaykit-unified-table {
+    page-break-inside: avoid;
+  }
+
+  .gatewaykit-ui .gatewaykit-payment-result-card {
+    page-break-inside: avoid;
+    margin-bottom: 2cm;
+  }
+
+  /* Print only receipt styles */
+  @media print {
+    .gatewaykit-ui .gatewaykit-payment-result:not(.print-receipt-only) .gatewaykit-transaction-details,
+    .gatewaykit-ui .gatewaykit-payment-result:not(.print-receipt-only) .gatewaykit-payment-status {
+      display: block !important;
+    }
+  }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .gatewaykit-ui .gatewaykit-payment-result {
+    padding: var(--gatewaykit-space-2);
+  }
+
+  .gatewaykit-ui .gatewaykit-receipt-label,
+  .gatewaykit-ui .gatewaykit-detail-label,
+  .gatewaykit-ui .gatewaykit-unified-label {
+    width: 50%;
+    padding: var(--gatewaykit-space-2) var(--gatewaykit-space-3);
+  }
+
+  .gatewaykit-ui .gatewaykit-receipt-value,
+  .gatewaykit-ui .gatewaykit-detail-value,
+  .gatewaykit-ui .gatewaykit-unified-value {
+    padding: var(--gatewaykit-space-2) var(--gatewaykit-space-3);
+  }
+
+  .gatewaykit-ui .gatewaykit-payment-status {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--gatewaykit-space-2);
+  }
+
+  .gatewaykit-ui .gatewaykit-ui-card__header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--gatewaykit-space-2);
+  }
+
+  .gatewaykit-ui .gatewaykit-ui-card__action {
+    align-self: center;
+  }
+}
+
+/* Copy Button Styles */
+.gatewaykit-ui .gatewaykit-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--color-gatewaykit-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-gatewaykit-light-bg);
+  color: var(--color-gatewaykit-dark-text);
+  font-size: 0.75rem;
+  font-weight: var(--gatewaykit-font-weight-medium);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  margin-left: var(--gatewaykit-space-2);
+  vertical-align: middle;
+}
+
+.gatewaykit-ui .gatewaykit-copy-btn:hover {
+  background: var(--color-gatewaykit-primary);
+  color: #fff;
+  border-color: var(--color-gatewaykit-primary);
+}
+
+.gatewaykit-ui .gatewaykit-copy-btn--success {
+  background: var(--gatewaykit-status-success-bg);
+  color: var(--gatewaykit-status-success-fg);
+  border-color: var(--gatewaykit-status-success-brd);
+}
+
+.gatewaykit-ui .gatewaykit-copy-btn--error {
+  background: var(--gatewaykit-status-danger-bg);
+  color: var(--gatewaykit-status-danger-fg);
+  border-color: var(--gatewaykit-status-danger-brd);
+}
+
+/* Receipt Code Container */
+.gatewaykit-ui .gatewaykit-receipt-code {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--gatewaykit-space-2);
+  font-family: monospace;
+  font-weight: var(--gatewaykit-font-weight-medium);
+  background: var(--color-gatewaykit-light-bg);
+  padding: var(--gatewaykit-space-1) var(--gatewaykit-space-2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-gatewaykit-border);
+}
+
+/* Responsive tweaks */
+@media (max-width: 900px) {
+  .gatewaykit-ui .gatewaykit-ui-card__header { flex-direction: column; align-items: flex-start; gap: var(--gatewaykit-space-2); }
+  .gatewaykit-ui .tablenav { flex-direction: column; gap: var(--gatewaykit-space-2); }
+}

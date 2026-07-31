@@ -1,0 +1,315 @@
+/*!
+ * GatewayKit - UI Kit (Tokens & Base)
+ * Scope: Namespaced, dependency-free CSS tokens and base utilities
+ * Source of truth: UI/src/styles/globals.css
+ * Notes:
+ * - Do NOT alter plugin logic; this file only provides styles and tokens
+ * - Components rules live in assets/css/ui-components.css
+ * - Minimal base utilities are namespaced to avoid conflicts
+ */
+
+/* Root tokens: consolidated from UI/src/styles/globals.css + gatewaykit palette */
+:root {
+  /* Base scale */
+  --font-size: 16px;
+
+  /* Semantic colors */
+  --background: #ffffff;
+  --foreground: oklch(0.145 0 0);
+  --card: #ffffff;
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: #030213;
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.95 0.0058 264.53);
+  --secondary-foreground: #030213;
+  --muted: #ececf0;
+  --muted-foreground: #717182;
+  --accent: #e9ebef;
+  --accent-foreground: #030213;
+  --destructive: #d4183d;
+  --destructive-foreground: #ffffff;
+  --border: rgba(0, 0, 0, 0.1);
+  --input: transparent;
+  --input-background: #f3f3f5;
+  --switch-background: #cbced4;
+  --ring: oklch(0.708 0 0);
+
+  /* Charts */
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+
+  /* Radius */
+  --radius: 0.625rem; /* 10px */
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  /* Sidebar */
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: #030213;
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+
+  /* gatewaykit Plugin color palette (updated for better contrast and accessibility) */
+  --gatewaykit-primary-color: #88027F; /* Better contrast ratio */
+  --gatewaykit-primary-dark: #003049;
+  --gatewaykit-primary-light: #A78BFA;
+  --gatewaykit-accent-color: #E9D5FF;
+  --gatewaykit-success-color: #059669; /* Better contrast */
+  --gatewaykit-warning-color: #D97706; /* Better contrast */
+  --gatewaykit-danger-color: #DC2626; /* Better contrast */
+  --gatewaykit-info-color: #0891B2; /* Better contrast */
+  --gatewaykit-light-bg: #F9FAFB;
+  --gatewaykit-dark-text: #111827;
+  --gatewaykit-medium-text: #6B7280;
+  --gatewaykit-border-color: #E5E7EB;
+
+  /* Derived gatewaykit token aliases */
+  --color-gatewaykit-primary: var(--gatewaykit-primary-color);
+  --color-gatewaykit-primary-dark: var(--gatewaykit-primary-dark);
+  --color-gatewaykit-primary-light: var(--gatewaykit-primary-light);
+  --color-gatewaykit-accent: var(--gatewaykit-accent-color);
+  --color-gatewaykit-success: var(--gatewaykit-success-color);
+  --color-gatewaykit-warning: var(--gatewaykit-warning-color);
+  --color-gatewaykit-danger: var(--gatewaykit-danger-color);
+  --color-gatewaykit-info: var(--gatewaykit-info-color);
+  --color-gatewaykit-light-bg: var(--gatewaykit-light-bg);
+  --color-gatewaykit-dark-text: var(--gatewaykit-dark-text);
+  --color-gatewaykit-medium-text: var(--gatewaykit-medium-text);
+  --color-gatewaykit-border: var(--gatewaykit-border-color);
+
+  /* UI v2 tokens: actions, gradients, statuses (from new designs) */
+  --gatewaykit-action-green: #16a34a;           /* primary action (e.g., Save) */
+  --gatewaykit-action-green-dark: #12893e;      /* hover/active */
+  --gatewaykit-action-green-contrast: #ffffff;  /* text/icon on action green */
+
+  /* Gradient surfaces for headers/blocks (updated with new colors) */
+  --gatewaykit-gradient-primary: linear-gradient(135deg, #A78BFA 0%, #8B5CF6 40%, #7C3AED 75%, #88027F 100%);
+  --gatewaykit-gradient-soft: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(124, 58, 237, 0.06) 100%);
+
+  /* Status palettes (badges/alerts) - updated for better contrast */
+  --gatewaykit-status-success-bg: #D1FAE5;
+  --gatewaykit-status-success-fg: #065F46;
+  --gatewaykit-status-success-brd: #6EE7B7;
+
+  --gatewaykit-status-warning-bg: #FEF3C7;
+  --gatewaykit-status-warning-fg: #92400E;
+  --gatewaykit-status-warning-brd: #FCD34D;
+
+  --gatewaykit-status-danger-bg: #FEE2E2;
+  --gatewaykit-status-danger-fg: #991B1B;
+  --gatewaykit-status-danger-brd: #FCA5A5;
+
+  --gatewaykit-status-info-bg: #DBEAFE;
+  --gatewaykit-status-info-fg: #1E40AF;
+  --gatewaykit-status-info-brd: #93C5FD;
+
+  --gatewaykit-status-neutral-bg: var(--color-gatewaykit-light-bg);
+  --gatewaykit-status-neutral-fg: var(--color-gatewaykit-dark-text);
+  --gatewaykit-status-neutral-brd: var(--color-gatewaykit-border);
+
+  /* Typography */
+  --gatewaykit-font-weight-normal: 400;
+  --gatewaykit-font-weight-medium: 500;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+
+  /* Spacing scale (4px grid) */
+  --gatewaykit-space-1: 0.25rem;  /* 4px */
+  --gatewaykit-space-2: 0.5rem;   /* 8px */
+  --gatewaykit-space-3: 0.75rem;  /* 12px */
+  --gatewaykit-space-4: 1rem;     /* 16px */
+  --gatewaykit-space-5: 1.25rem;  /* 20px */
+  --gatewaykit-space-6: 1.5rem;   /* 24px */
+  --gatewaykit-space-7: 1.75rem;  /* 28px */
+  --gatewaykit-space-8: 2rem;     /* 32px */
+
+  /* Shadows */
+  --gatewaykit-shadow-sm: 0 1px 2px rgba(0,0,0,0.06);
+  --gatewaykit-shadow-md: 0 2px 8px rgba(0,0,0,0.08);
+  --gatewaykit-shadow-lg: 0 4px 16px rgba(0,0,0,0.12);
+}
+
+/* Dark mode tokens (mirrors UI/src/styles/globals.css .dark) */
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.145 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.145 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.985 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.396 0.141 25.723);
+  --destructive-foreground: oklch(0.637 0.237 25.331);
+  --border: oklch(0.269 0 0);
+  --input: oklch(0.269 0 0);
+  --ring: oklch(0.439 0 0);
+
+  /* Dark-specific chart and sidebar */
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(0.269 0 0);
+  --sidebar-ring: oklch(0.439 0 0);
+}
+
+/* Base: preserve WP Admin defaults; apply within .gatewaykit-ui scope only */
+html {
+  font-size: var(--font-size);
+}
+
+/* Namespaced base container for plugin pages; add to top-level wrappers in views */
+.gatewaykit-ui {
+  color: var(--foreground);
+  background-color: var(--background);
+}
+
+/* Base typography (minimal, safe) */
+.gatewaykit-ui h1 { font-size: var(--text-2xl); font-weight: var(--gatewaykit-font-weight-medium); line-height: 1.5; margin: 0 0 var(--gatewaykit-space-4); color: var(--color-gatewaykit-dark-text); }
+.gatewaykit-ui h2 { font-size: var(--text-xl);  font-weight: var(--gatewaykit-font-weight-medium); line-height: 1.5; margin: var(--gatewaykit-space-2) 0 var(--gatewaykit-space-3); color: var(--color-gatewaykit-dark-text); }
+.gatewaykit-ui h3 { font-size: var(--text-lg);  font-weight: var(--gatewaykit-font-weight-medium); line-height: 1.5; margin: var(--gatewaykit-space-2) 0 var(--gatewaykit-space-2); color: var(--color-gatewaykit-dark-text); }
+.gatewaykit-ui p  { font-size: var(--text-base); font-weight: var(--gatewaykit-font-weight-normal); line-height: 1.6; margin: 0 0 var(--gatewaykit-space-3); color: var(--color-gatewaykit-medium-text); }
+.gatewaykit-ui label,
+.gatewaykit-ui button,
+.gatewaykit-ui input { font-size: var(--text-base); line-height: 1.5; }
+
+/* Focus ring & accessibility */
+.gatewaykit-ui :where(a, button, input, select, textarea) {
+  outline: none;
+}
+.gatewaykit-ui :where(a, button, input, select, textarea):focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent);
+  border-radius: var(--radius-sm);
+}
+
+/* Base layout utilities */
+.gatewaykit-ui .gatewaykit-ui-container {
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: var(--gatewaykit-space-4);
+}
+
+.gatewaykit-ui .gatewaykit-ui-section {
+  background: var(--card);
+  color: var(--card-foreground);
+  border: 1px solid var(--color-gatewaykit-border);
+  border-radius: var(--radius);
+  padding: var(--gatewaykit-space-5);
+  box-shadow: var(--gatewaykit-shadow-sm);
+  margin-block-end: var(--gatewaykit-space-4);
+}
+
+/* Muted panels */
+.gatewaykit-ui .gatewaykit-ui-panel-muted {
+  background: var(--color-gatewaykit-light-bg);
+  border-color: var(--color-gatewaykit-border);
+}
+
+/* Text utilities (subset) */
+.gatewaykit-ui .gatewaykit-ui-text-muted { color: var(--color-gatewaykit-medium-text); }
+.gatewaykit-ui .gatewaykit-ui-text-accent { color: var(--color-gatewaykit-accent); }
+.gatewaykit-ui .gatewaykit-ui-text-success { color: var(--color-gatewaykit-success); }
+.gatewaykit-ui .gatewaykit-ui-text-warning { color: var(--color-gatewaykit-warning); }
+.gatewaykit-ui .gatewaykit-ui-text-danger { color: var(--color-gatewaykit-danger); }
+.gatewaykit-ui .gatewaykit-ui-text-info { color: var(--color-gatewaykit-info); }
+
+/* Spacing utilities (subset) */
+.gatewaykit-ui .gatewaykit-ui-mb-1 { margin-block-end: var(--gatewaykit-space-1); }
+.gatewaykit-ui .gatewaykit-ui-mb-2 { margin-block-end: var(--gatewaykit-space-2); }
+.gatewaykit-ui .gatewaykit-ui-mb-3 { margin-block-end: var(--gatewaykit-space-3); }
+.gatewaykit-ui .gatewaykit-ui-mb-4 { margin-block-end: var(--gatewaykit-space-4); }
+.gatewaykit-ui .gatewaykit-ui-mb-5 { margin-block-end: var(--gatewaykit-space-5); }
+.gatewaykit-ui .gatewaykit-ui-mb-6 { margin-block-end: var(--gatewaykit-space-6); }
+
+.gatewaykit-ui .gatewaykit-ui-p-3 { padding: var(--gatewaykit-space-3); }
+.gatewaykit-ui .gatewaykit-ui-p-4 { padding: var(--gatewaykit-space-4); }
+.gatewaykit-ui .gatewaykit-ui-p-5 { padding: var(--gatewaykit-space-5); }
+
+/* Border radius utilities */
+.gatewaykit-ui .gatewaykit-ui-rounded-sm { border-radius: var(--radius-sm); }
+.gatewaykit-ui .gatewaykit-ui-rounded   { border-radius: var(--radius-md); }
+.gatewaykit-ui .gatewaykit-ui-rounded-lg{ border-radius: var(--radius-lg); }
+.gatewaykit-ui .gatewaykit-ui-rounded-xl{ border-radius: var(--radius-xl); }
+
+/* Shadow utilities */
+.gatewaykit-ui .gatewaykit-ui-shadow-sm { box-shadow: var(--gatewaykit-shadow-sm); }
+.gatewaykit-ui .gatewaykit-ui-shadow-md { box-shadow: var(--gatewaykit-shadow-md); }
+.gatewaykit-ui .gatewaykit-ui-shadow-lg { box-shadow: var(--gatewaykit-shadow-lg); }
+
+/* Gradient utilities and helpers (used across pages) */
+.gatewaykit-ui .gatewaykit-ui-gradient-primary { background: var(--gatewaykit-gradient-primary); color: #fff; }
+.gatewaykit-ui .gatewaykit-ui-surface-soft { background: var(--gatewaykit-gradient-soft); }
+.gatewaykit-ui .gatewaykit-ui-header-gradient { background: var(--gatewaykit-gradient-primary); color: #fff; }
+.gatewaykit-ui .gatewaykit-ui-divider { height: 1px; background: var(--color-gatewaykit-border); border: 0; margin-block: var(--gatewaykit-space-3); }
+.gatewaykit-ui .gatewaykit-ui-chip { display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.25rem 0.5rem; border-radius: 999px; font-size: 0.75rem; border: 1px solid var(--color-gatewaykit-border); background: var(--color-gatewaykit-light-bg); color: var(--color-gatewaykit-dark-text); }
+
+/* Form base (non-invasive; respects .form-table structure) */
+.gatewaykit-ui .form-table th {
+  color: var(--color-gatewaykit-dark-text);
+  font-weight: var(--gatewaykit-font-weight-medium);
+}
+.gatewaykit-ui .form-table td p.description {
+  color: var(--color-gatewaykit-medium-text);
+}
+.gatewaykit-ui input[type="text"],
+.gatewaykit-ui input[type="password"],
+.gatewaykit-ui select,
+.gatewaykit-ui textarea {
+  background: var(--input-background);
+  border: 1px solid var(--color-gatewaykit-border);
+  border-radius: var(--radius-sm);
+  padding: var(--gatewaykit-space-2) var(--gatewaykit-space-3);
+}
+
+/* Table base (targets WP list table safely via wrapper usage) */
+.gatewaykit-ui .wp-list-table {
+  border-color: var(--color-gatewaykit-border);
+}
+.gatewaykit-ui .wp-list-table th {
+  background: var(--color-gatewaykit-light-bg);
+  color: var(--color-gatewaykit-dark-text);
+  font-weight: var(--gatewaykit-font-weight-medium);
+}
+.gatewaykit-ui .wp-list-table td {
+  color: var(--color-gatewaykit-dark-text);
+}
+
+/* Backward-compat: status badges retain original classes and receive unified visuals in ui-components.css
+   (No styles here to avoid duplication; see assets/css/ui-components.css) */
+
+/* RTL adjustments: prefer logical properties; add overrides when needed */
+body.rtl .gatewaykit-ui .gatewaykit-ui-container { padding-inline: var(--gatewaykit-space-4); }
+body.rtl .gatewaykit-ui .form-table th { text-align: end; }
+body.rtl .gatewaykit-ui .gatewaykit-ui-section { direction: rtl; }

@@ -1,0 +1,241 @@
+/**
+ * GatewayKit Pro Forms — shared styles for optional-payment animation
+ * and Payment Info summary. Ships in Lite assets; inert without Pro.
+ *
+ * @package GatewayKit
+ */
+
+/* Feature C: Optional Payment slide-in animation */
+@keyframes gatewaykit-slide-in {
+	from {
+		opacity: 0;
+		transform: translateY( -10px );
+	}
+	to {
+		opacity: 1;
+		transform: translateY( 0 );
+	}
+}
+
+.gatewaykit-no-payment-animation {
+	animation: gatewaykit-slide-in 0.3s ease-out;
+}
+
+/* Feature D: Payment Summary — a cart-like read-only breakdown.
+   Fills the full width Elementor allocates to the field column. */
+.gatewaykit-payment-summary {
+	width: 100%;
+	max-width: 100%;
+	box-sizing: border-box;
+	display: block;
+	color: inherit;
+	font: inherit;
+	border: 1px solid currentColor;
+	border-radius: 8px;
+	padding: 18px 20px;
+	margin: 0;
+}
+
+/* Ensure the box stretches inside whatever wrapper Elementor places it in. */
+.elementor-field-type-gatewaykit_payment_info .elementor-field,
+.elementor-field-type-gatewaykit_payment_info .gatewaykit-payment-summary {
+	width: 100%;
+	max-width: 100%;
+}
+
+.gatewaykit-payment-summary .gatewaykit-summary-label {
+	display: block;
+	font-weight: 600;
+	font-size: 1.05em;
+	margin-bottom: 14px;
+}
+
+/* Cart layout */
+.gatewaykit-payment-summary .gatewaykit-summary-cart {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.gatewaykit-payment-summary .gatewaykit-summary-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	gap: 12px;
+	font-size: 0.95em;
+	padding: 5px 0;
+}
+
+.gatewaykit-payment-summary .gatewaykit-summary-row-label {
+	opacity: 0.75;
+}
+
+.gatewaykit-payment-summary .gatewaykit-summary-row-value {
+	font-weight: 500;
+	white-space: nowrap;
+}
+
+/* Subtotal row */
+.gatewaykit-payment-summary .gatewaykit-summary-subtotal .gatewaykit-summary-amount {
+	font-weight: 600;
+}
+
+/* Discount row */
+.gatewaykit-payment-summary .gatewaykit-summary-discount {
+	color: #16a34a;
+}
+
+.gatewaykit-payment-summary .gatewaykit-summary-discount .gatewaykit-summary-row-label {
+	font-weight: 500;
+	opacity: 1;
+}
+
+.gatewaykit-payment-summary .gatewaykit-summary-discount-code {
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.gatewaykit-payment-summary .gatewaykit-summary-discount-amount {
+	font-weight: 600;
+}
+
+/* Divider */
+.gatewaykit-payment-summary .gatewaykit-summary-divider {
+	border-top: 1px dashed currentColor;
+	opacity: 0.2;
+	margin: 6px 0;
+}
+
+/* Total row */
+.gatewaykit-payment-summary .gatewaykit-summary-total {
+	font-weight: 700;
+	font-size: 1.1em;
+	padding-top: 6px;
+}
+
+.gatewaykit-payment-summary .gatewaykit-summary-total .gatewaykit-summary-row-label {
+	opacity: 1;
+}
+
+/* Gateway row */
+.gatewaykit-payment-summary .gatewaykit-summary-gateway {
+	opacity: 0.65;
+	font-size: 0.9em;
+	padding-top: 4px;
+	margin-top: 2px;
+}
+
+.gatewaykit-payment-summary .gatewaykit-summary-gateway .gatewaykit-summary-row-value {
+	font-weight: 400;
+}
+
+/* Description */
+.gatewaykit-payment-summary .gatewaykit-summary-description {
+	opacity: 0.55;
+	font-size: 0.85em;
+	margin-top: 12px;
+}
+
+/* Legacy single-line summary (kept for backward compat) */
+.gatewaykit-payment-summary .gatewaykit-summary-details {
+	font-weight: 500;
+}
+
+/* Muted text helper */
+.gatewaykit-summary-muted {
+	opacity: 0.5;
+	font-style: italic;
+}
+
+/* Editor placeholder — dims the whole panel so the user knows it's a mock */
+.gatewaykit-payment-summary.gatewaykit-editor-placeholder,
+.gatewaykit-dc-field.gatewaykit-editor-placeholder {
+	opacity: 0.6;
+}
+
+.gatewaykit-editor-placeholder .gatewaykit-dc-input,
+.gatewaykit-editor-placeholder .gatewaykit-dc-apply {
+	pointer-events: none;
+}
+
+/* Dark mode */
+@media ( prefers-color-scheme: dark ) {
+	.gatewaykit-payment-summary .gatewaykit-summary-discount {
+		color: #4ade80;
+	}
+}
+
+/* ─────────────────────────────────────────────────────────────── */
+/* Discount Code field (dedicated Elementor form field type)       */
+/* ─────────────────────────────────────────────────────────────── */
+
+.gatewaykit-dc-field {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+}
+
+.gatewaykit-dc-input {
+	flex: 1 1 160px;
+	padding: 8px 12px;
+	border: 1px solid currentColor;
+	border-radius: 4px;
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	font-size: 0.95em;
+}
+
+.gatewaykit-dc-input::placeholder {
+	opacity: 0.5;
+}
+
+.gatewaykit-dc-apply {
+	flex: 0 0 auto;
+	padding: 8px 18px;
+	border: 1px solid currentColor;
+	border-radius: 4px;
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	font-weight: 600;
+	font-size: 0.95em;
+	cursor: pointer;
+	transition: opacity 0.15s ease;
+}
+
+.gatewaykit-dc-apply:hover {
+	opacity: 0.75;
+}
+
+.gatewaykit-dc-apply:disabled {
+	opacity: 0.4;
+	cursor: not-allowed;
+}
+
+.gatewaykit-dc-msg {
+	width: 100%;
+	font-size: 0.88em;
+	padding: 4px 0;
+	display: none;
+}
+
+.gatewaykit-dc-msg.gatewaykit-dc-success {
+	color: #16a34a;
+}
+
+.gatewaykit-dc-msg.gatewaykit-dc-error {
+	color: #dc2626;
+}
+
+@media ( prefers-color-scheme: dark ) {
+	.gatewaykit-dc-msg.gatewaykit-dc-success {
+		color: #4ade80;
+	}
+
+	.gatewaykit-dc-msg.gatewaykit-dc-error {
+		color: #f87171;
+	}
+}

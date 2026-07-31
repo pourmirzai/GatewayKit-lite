@@ -1,0 +1,24 @@
+{
+	"name": "pourmirzai/gatewaykit",
+	"description": "GatewayKit – Payment Gateway for Elementor Forms (Lite + Pro add-on). Freemius WordPress SDK is the only Composer dependency and is shipped inside both plugin ZIPs (vendor/freemius/wordpress-sdk).",
+	"type": "wordpress-plugin",
+	"license": "GPL-2.0-or-later",
+	"require": {
+		"freemius/wordpress-sdk": "^2.13",
+		"dompdf/dompdf": "^2.0"
+	},
+	"scripts": {
+		"post-autoload-dump": [
+			"php bin/patch-freemius-sdk.php"
+		]
+	},
+	"config": {
+		"platform": {
+			"php": "7.4"
+		},
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		}
+	},
+	"prefer-stable": true
+}

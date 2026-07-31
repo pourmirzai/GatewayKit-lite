@@ -1,0 +1,42 @@
+/*!
+ * GatewayKit - Elementor Editor Styles
+ * Scope: Payment gateway control styling inside the Elementor editor canvas
+ *
+ * Table of Contents
+ * 1. CSS Custom Properties (Color Scheme)
+ * 2. Editor Control Styles
+ */
+
+/* CSS Custom Properties for gatewaykit Color Scheme */
+:root {
+    --gatewaykit-primary-color: #C96FD1;
+    --gatewaykit-primary-dark: #b85bc4;
+    --gatewaykit-primary-light: #d98ddf;
+    --gatewaykit-accent-color: #e8a8f0;
+    --gatewaykit-success-color: #28a745;
+    --gatewaykit-warning-color: #ffc107;
+    --gatewaykit-danger-color: #dc3545;
+    --gatewaykit-info-color: #17a2b8;
+    --gatewaykit-light-bg: #f8f9fa;
+    --gatewaykit-dark-text: #23282d;
+    --gatewaykit-medium-text: #666;
+    --gatewaykit-border-color: #e9ecef;
+}
+
+/* Make the amount field wider */
+.elementor-control-gatewaykit_amount input[type="number"] {
+    width: 100% !important;
+    max-width: none !important;
+    box-sizing: border-box;
+}
+
+/* Style GatewayKit controls with brand colors */
+.elementor-control-gatewaykit_amount input[type="number"] {
+    border-color: var(--gatewaykit-primary-color) !important;
+    box-shadow: inset 0 1px 2px rgba(201, 111, 209, 0.1) !important;
+}
+
+.elementor-control-gatewaykit_amount input[type="number"]:focus {
+    border-color: var(--gatewaykit-primary-dark) !important;
+    box-shadow: 0 0 0 2px rgba(201, 111, 209, 0.2) !important;
+}

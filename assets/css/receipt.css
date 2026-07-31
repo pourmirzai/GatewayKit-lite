@@ -1,0 +1,628 @@
+/**
+ * GatewayKit Receipt – Screen + Print styles.
+ *
+ * Depends on: assets/css/ui-kit.css (tokens loaded via gatewaykit-ui-kit).
+ * Scope: All selectors are scoped under .gatewaykit-ui to avoid conflicts.
+ */
+
+/* ==========================================================================
+   1. Page Layout
+   ========================================================================== */
+
+.gatewaykit-ui .gk-receipt-page {
+	max-width: 600px;
+	margin: 0 auto;
+	padding: var(--gatewaykit-space-6, 1.5rem) var(--gatewaykit-space-4, 1rem);
+}
+
+/* ==========================================================================
+   2. Status Banner
+   ========================================================================== */
+
+.gatewaykit-ui .gk-receipt-banner {
+	text-align: center;
+	padding-bottom: var(--gatewaykit-space-6, 1.5rem);
+	margin-bottom: var(--gatewaykit-space-6, 1.5rem);
+	border-bottom: 1px solid var(--color-gatewaykit-border, #e5e7eb);
+}
+
+/* Icon circle */
+.gatewaykit-ui .gk-receipt-banner__icon {
+	width: 72px;
+	height: 72px;
+	margin: 0 auto var(--gatewaykit-space-5, 1.25rem);
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 50%;
+	transition: transform 0.2s ease;
+}
+
+.gatewaykit-ui .gk-receipt-banner__icon svg {
+	width: 36px;
+	height: 36px;
+}
+
+/* Status variants */
+.gatewaykit-ui .gk-receipt-banner--success .gk-receipt-banner__icon {
+	background: var(--gatewaykit-status-success-bg, #d1fae5);
+	color: var(--gatewaykit-status-success-fg, #065f46);
+	box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.12);
+}
+
+.gatewaykit-ui .gk-receipt-banner--error .gk-receipt-banner__icon {
+	background: var(--gatewaykit-status-danger-bg, #fee2e2);
+	color: var(--gatewaykit-status-danger-fg, #991b1b);
+	box-shadow: 0 0 0 6px rgba(239, 68, 68, 0.12);
+}
+
+.gatewaykit-ui .gk-receipt-banner--pending .gk-receipt-banner__icon {
+	background: var(--gatewaykit-status-warning-bg, #fef3c7);
+	color: var(--gatewaykit-status-warning-fg, #92400e);
+	box-shadow: 0 0 0 6px rgba(245, 158, 11, 0.12);
+}
+
+.gatewaykit-ui .gk-receipt-banner--unknown .gk-receipt-banner__icon {
+	background: var(--color-gatewaykit-light-bg, #f9fafb);
+	color: var(--color-gatewaykit-medium-text, #6b7280);
+	box-shadow: 0 0 0 6px rgba(107, 114, 128, 0.1);
+}
+
+/* Title */
+.gatewaykit-ui .gk-receipt-banner__title {
+	font-size: var(--text-xl, 1.25rem);
+	font-weight: 600;
+	color: var(--color-gatewaykit-dark-text, #111827);
+	margin: 0 0 var(--gatewaykit-space-4, 1rem);
+	line-height: 1.4;
+}
+
+/* Actions row */
+.gatewaykit-ui .gk-receipt-banner__actions {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--gatewaykit-space-3, 0.75rem);
+	flex-wrap: wrap;
+}
+
+/* ==========================================================================
+   3. Buttons (receipt-specific overrides)
+   ========================================================================== */
+
+.gatewaykit-ui .gk-receipt-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	height: 2.625rem;
+	padding-inline: 1.125rem;
+	border-radius: var(--radius, 0.625rem);
+	font-size: var(--text-sm, 0.875rem);
+	font-weight: 500;
+	cursor: pointer;
+	text-decoration: none;
+	transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.02s ease;
+	border: 1px solid transparent;
+	line-height: 1;
+	white-space: nowrap;
+}
+
+.gatewaykit-ui .gk-receipt-btn:active {
+	transform: translateY(0.5px);
+}
+
+.gatewaykit-ui .gk-receipt-btn:focus-visible {
+	outline: 2px solid var(--color-gatewaykit-primary, #88027f);
+	outline-offset: 2px;
+	box-shadow: 0 0 0 4px rgba(136, 2, 127, 0.1);
+}
+
+/* Primary (Download Invoice) */
+.gatewaykit-ui .gk-receipt-btn--primary {
+	background: var(--gatewaykit-action-green, #16a34a);
+	color: var(--gatewaykit-action-green-contrast, #fff);
+	border-color: color-mix(in oklab, var(--gatewaykit-action-green, #16a34a) 70%, black 30%);
+	box-shadow: var(--gatewaykit-shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.06));
+}
+
+.gatewaykit-ui .gk-receipt-btn--primary:hover {
+	background: var(--gatewaykit-action-green-dark, #12893e);
+}
+
+/* Outline (Print Receipt) */
+.gatewaykit-ui .gk-receipt-btn--outline {
+	background: transparent;
+	color: var(--color-gatewaykit-dark-text, #111827);
+	border-color: var(--color-gatewaykit-border, #e5e7eb);
+}
+
+.gatewaykit-ui .gk-receipt-btn--outline:hover {
+	background: var(--color-gatewaykit-light-bg, #f9fafb);
+	border-color: color-mix(in oklab, var(--color-gatewaykit-border, #e5e7eb) 70%, black 30%);
+}
+
+/* ==========================================================================
+   4. Receipt Card
+   ========================================================================== */
+
+.gatewaykit-ui .gk-receipt-card {
+	background: var(--card, #fff);
+	border: 1px solid var(--color-gatewaykit-border, #e5e7eb);
+	border-radius: var(--radius-lg, 0.625rem);
+	box-shadow: var(--gatewaykit-shadow-md, 0 2px 8px rgba(0, 0, 0, 0.08));
+	overflow: hidden;
+}
+
+/* Card header */
+.gatewaykit-ui .gk-receipt-card__header {
+	padding: var(--gatewaykit-space-4, 1rem) var(--gatewaykit-space-5, 1.25rem);
+	border-bottom: 1px solid var(--color-gatewaykit-border, #e5e7eb);
+	background: var(--color-gatewaykit-light-bg, #f9fafb);
+}
+
+.gatewaykit-ui .gk-receipt-card__title {
+	font-size: var(--text-base, 1rem);
+	font-weight: 600;
+	color: var(--color-gatewaykit-dark-text, #111827);
+	margin: 0;
+	line-height: 1.4;
+}
+
+/* Card body */
+.gatewaykit-ui .gk-receipt-card__body {
+	padding: 0;
+}
+
+/* ==========================================================================
+   5. Receipt Table
+   ========================================================================== */
+
+.gatewaykit-ui .gk-receipt-table {
+	width: 100%;
+	border-collapse: collapse;
+	table-layout: fixed;
+}
+
+.gatewaykit-ui .gk-receipt-table tr:not(:last-child) {
+	border-bottom: 1px solid var(--color-gatewaykit-border, #e5e7eb);
+}
+
+/* Label cell */
+.gatewaykit-ui .gk-receipt-table td:first-child {
+	padding: var(--gatewaykit-space-3, 0.75rem) var(--gatewaykit-space-5, 1.25rem);
+	font-weight: 500;
+	color: var(--color-gatewaykit-dark-text, #111827);
+	background: var(--color-gatewaykit-light-bg, #f9fafb);
+	width: 38%;
+	vertical-align: top;
+	font-size: var(--text-sm, 0.875rem);
+	letter-spacing: 0.01em;
+}
+
+/* Value cell */
+.gatewaykit-ui .gk-receipt-table td:last-child {
+	padding: var(--gatewaykit-space-3, 0.75rem) var(--gatewaykit-space-5, 1.25rem);
+	color: var(--color-gatewaykit-medium-text, #6b7280);
+	background: var(--card, #fff);
+	font-size: var(--text-sm, 0.875rem);
+	word-break: break-word;
+}
+
+/* ==========================================================================
+   6. Field Variants
+   ========================================================================== */
+
+/* Amount row — the most important number */
+.gatewaykit-ui .gk-receipt-table .gk-field--amount td {
+	font-weight: 600;
+	color: var(--gatewaykit-status-success-fg, #065f46);
+}
+
+.gatewaykit-ui .gk-receipt-table .gk-field--amount td:last-child {
+	font-size: var(--text-lg, 1.125rem);
+	font-weight: 700;
+	color: var(--gatewaykit-action-green, #16a34a);
+}
+
+/* Gateway row */
+.gatewaykit-ui .gk-receipt-table .gk-field--gateway td:last-child {
+	font-weight: 600;
+	color: var(--gatewaykit-primary-color, #88027f);
+}
+
+/* Description row */
+.gatewaykit-ui .gk-receipt-table .gk-field--description td:last-child {
+	color: var(--color-gatewaykit-medium-text, #6b7280);
+	font-style: italic;
+}
+
+/* Discount rows */
+.gatewaykit-ui .gk-receipt-table .gk-field--discount td:last-child {
+	color: var(--gatewaykit-status-danger-fg, #991b1b);
+	font-weight: 500;
+}
+
+.gatewaykit-ui .gk-receipt-table .gk-field--original td {
+	text-decoration: line-through;
+	opacity: 0.6;
+}
+
+.gatewaykit-ui .gk-receipt-table .gk-field--original td:last-child {
+	text-decoration: line-through;
+}
+
+/* Free order note */
+.gatewaykit-ui .gk-receipt-table .gk-field--free-note td:last-child {
+	color: var(--gatewaykit-status-warning-fg, #92400e);
+	font-weight: 500;
+}
+
+/* ==========================================================================
+   7. Receipt Code
+   ========================================================================== */
+
+.gatewaykit-ui .gk-receipt-code {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--gatewaykit-space-2, 0.5rem);
+	font-family: 'SF Mono', 'Cascadia Code', 'Consolas', 'Liberation Mono', monospace;
+	font-size: var(--text-sm, 0.875rem);
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	background: var(--color-gatewaykit-light-bg, #f9fafb);
+	padding: 0.375rem 0.75rem;
+	border-radius: var(--radius-sm, 0.375rem);
+	border: 1px solid var(--color-gatewaykit-border, #e5e7eb);
+	color: var(--color-gatewaykit-dark-text, #111827);
+	word-break: break-all;
+}
+
+/* ==========================================================================
+   8. Copy Button
+   ========================================================================== */
+
+.gatewaykit-ui .gk-receipt-copy {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.375rem;
+	padding: 0.3125rem 0.625rem;
+	border: 1px solid var(--color-gatewaykit-border, #e5e7eb);
+	border-radius: var(--radius-sm, 0.375rem);
+	background: var(--card, #fff);
+	color: var(--color-gatewaykit-medium-text, #6b7280);
+	font-size: 0.75rem;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.15s ease;
+	margin-inline-start: var(--gatewaykit-space-2, 0.5rem);
+	vertical-align: middle;
+	line-height: 1;
+	white-space: nowrap;
+}
+
+.gatewaykit-ui .gk-receipt-copy:hover {
+	background: var(--color-gatewaykit-primary, #88027f);
+	color: #fff;
+	border-color: var(--color-gatewaykit-primary, #88027f);
+}
+
+.gatewaykit-ui .gk-receipt-copy:focus-visible {
+	outline: 2px solid var(--color-gatewaykit-primary, #88027f);
+	outline-offset: 2px;
+}
+
+.gatewaykit-ui .gk-receipt-copy--success {
+	background: var(--gatewaykit-status-success-bg, #d1fae5);
+	color: var(--gatewaykit-status-success-fg, #065f46);
+	border-color: var(--gatewaykit-status-success-brd, #6ee7b7);
+}
+
+.gatewaykit-ui .gk-receipt-copy--error {
+	background: var(--gatewaykit-status-danger-bg, #fee2e2);
+	color: var(--gatewaykit-status-danger-fg, #991b1b);
+	border-color: var(--gatewaykit-status-danger-brd, #fca5a5);
+}
+
+/* ==========================================================================
+   9. Status Badge (inside receipt table)
+   ========================================================================== */
+
+.gatewaykit-ui .gk-receipt-status-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.375rem;
+	padding: 0.3125rem 0.75rem;
+	border-radius: 999px;
+	font-size: 0.8125rem;
+	font-weight: 600;
+	line-height: 1.3;
+	letter-spacing: 0.01em;
+}
+
+.gatewaykit-ui .gk-receipt-status-badge--completed {
+	background: var(--gatewaykit-status-success-bg, #d1fae5);
+	color: var(--gatewaykit-status-success-fg, #065f46);
+}
+
+.gatewaykit-ui .gk-receipt-status-badge--failed {
+	background: var(--gatewaykit-status-danger-bg, #fee2e2);
+	color: var(--gatewaykit-status-danger-fg, #991b1b);
+}
+
+.gatewaykit-ui .gk-receipt-status-badge--pending {
+	background: var(--gatewaykit-status-warning-bg, #fef3c7);
+	color: var(--gatewaykit-status-warning-fg, #92400e);
+}
+
+/* ==========================================================================
+   10. Receipt Input Form
+   ========================================================================== */
+
+.gatewaykit-ui .gk-receipt-input {
+	text-align: center;
+	padding: var(--gatewaykit-space-8, 2rem) var(--gatewaykit-space-4, 1rem);
+}
+
+.gatewaykit-ui .gk-receipt-input__icon {
+	width: 64px;
+	height: 64px;
+	margin: 0 auto var(--gatewaykit-space-5, 1.25rem);
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 50%;
+	background: var(--gatewaykit-gradient-soft, linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(124, 58, 237, 0.06)));
+	color: var(--color-gatewaykit-primary, #88027f);
+}
+
+.gatewaykit-ui .gk-receipt-input__icon svg {
+	width: 28px;
+	height: 28px;
+}
+
+.gatewaykit-ui .gk-receipt-input__title {
+	font-size: var(--text-xl, 1.25rem);
+	font-weight: 600;
+	color: var(--color-gatewaykit-dark-text, #111827);
+	margin: 0 0 var(--gatewaykit-space-2, 0.5rem);
+}
+
+.gatewaykit-ui .gk-receipt-input__desc {
+	font-size: var(--text-sm, 0.875rem);
+	color: var(--color-gatewaykit-medium-text, #6b7280);
+	margin: 0 0 var(--gatewaykit-space-6, 1.5rem);
+	line-height: 1.5;
+}
+
+.gatewaykit-ui .gk-receipt-input__form {
+	display: flex;
+	gap: var(--gatewaykit-space-2, 0.5rem);
+	max-width: 400px;
+	margin: 0 auto;
+}
+
+.gatewaykit-ui .gk-receipt-input__field {
+	flex: 1;
+	height: 2.75rem;
+	padding: 0 var(--gatewaykit-space-3, 0.75rem);
+	background: var(--input-background, #f3f3f5);
+	border: 1px solid var(--color-gatewaykit-border, #e5e7eb);
+	border-radius: var(--radius, 0.625rem);
+	font-size: var(--text-base, 1rem);
+	font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+	letter-spacing: 0.08em;
+	text-align: center;
+	text-transform: uppercase;
+	color: var(--color-gatewaykit-dark-text, #111827);
+	transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.gatewaykit-ui .gk-receipt-input__field::placeholder {
+	letter-spacing: 0.12em;
+	color: var(--color-gatewaykit-medium-text, #6b7280);
+	text-transform: none;
+}
+
+.gatewaykit-ui .gk-receipt-input__field:focus {
+	outline: none;
+	border-color: var(--color-gatewaykit-primary, #88027f);
+	box-shadow: 0 0 0 3px rgba(136, 2, 127, 0.1);
+}
+
+/* ==========================================================================
+   11. Error State
+   ========================================================================== */
+
+.gatewaykit-ui .gk-receipt-error {
+	max-width: 600px;
+	margin: var(--gatewaykit-space-6, 1.5rem) auto;
+	padding: var(--gatewaykit-space-4, 1rem) var(--gatewaykit-space-5, 1.25rem);
+	background: var(--gatewaykit-status-danger-bg, #fee2e2);
+	color: var(--gatewaykit-status-danger-fg, #991b1b);
+	border: 1px solid var(--gatewaykit-status-danger-brd, #fca5a5);
+	border-radius: var(--radius, 0.625rem);
+	font-size: var(--text-sm, 0.875rem);
+	text-align: center;
+	line-height: 1.5;
+}
+
+/* ==========================================================================
+   12. Print Styles
+   ========================================================================== */
+
+@media print {
+	/* Hide everything outside the receipt */
+	body * {
+		visibility: hidden !important;
+	}
+
+	.gatewaykit-ui .gk-receipt-page,
+	.gatewaykit-ui .gk-receipt-page * {
+		visibility: visible !important;
+	}
+
+	.gatewaykit-ui .gk-receipt-page {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 100%;
+		max-width: none;
+		padding: 0;
+		margin: 0;
+	}
+
+	/* Hide interactive elements */
+	.gatewaykit-ui .gk-receipt-banner__actions,
+	.gatewaykit-ui .gk-receipt-copy {
+		display: none !important;
+	}
+
+	/* Simplify banner */
+	.gatewaykit-ui .gk-receipt-banner {
+		border-bottom: 2px solid #000;
+		padding-bottom: 1rem;
+		margin-bottom: 1rem;
+	}
+
+	.gatewaykit-ui .gk-receipt-banner__icon {
+		box-shadow: none;
+		background: #f5f5f5 !important;
+		color: #000 !important;
+	}
+
+	.gatewaykit-ui .gk-receipt-banner__icon svg {
+		stroke: #000 !important;
+	}
+
+	.gatewaykit-ui .gk-receipt-banner__title {
+		color: #000 !important;
+		font-size: 1.25rem;
+	}
+
+	/* Simplify card */
+	.gatewaykit-ui .gk-receipt-card {
+		box-shadow: none;
+		border: 1px solid #ccc;
+	}
+
+	.gatewaykit-ui .gk-receipt-card__header {
+		background: #f5f5f5 !important;
+		border-bottom: 1px solid #ccc;
+	}
+
+	.gatewaykit-ui .gk-receipt-card__title {
+		color: #000 !important;
+	}
+
+	/* Table */
+	.gatewaykit-ui .gk-receipt-table td:first-child {
+		background: #f5f5f5 !important;
+		color: #000 !important;
+		font-weight: bold;
+	}
+
+	.gatewaykit-ui .gk-receipt-table td:last-child {
+		color: #000 !important;
+	}
+
+	.gatewaykit-ui .gk-receipt-table tr:not(:last-child) {
+		border-bottom-color: #ccc !important;
+	}
+
+	/* Amount */
+	.gatewaykit-ui .gk-receipt-table .gk-field--amount td {
+		color: #000 !important;
+	}
+
+	.gatewaykit-ui .gk-receipt-table .gk-field--amount td:last-child {
+		color: #000 !important;
+		font-weight: bold;
+		font-size: 1.125rem;
+	}
+
+	/* Gateway */
+	.gatewaykit-ui .gk-receipt-table .gk-field--gateway td:last-child {
+		color: #000 !important;
+		font-weight: bold;
+	}
+
+	/* Description normal style */
+	.gatewaykit-ui .gk-receipt-table .gk-field--description td:last-child {
+		font-style: normal;
+	}
+
+	/* Badge */
+	.gatewaykit-ui .gk-receipt-status-badge {
+		border: 1px solid #000;
+		background: #fff !important;
+		color: #000 !important;
+	}
+
+	/* Receipt code */
+	.gatewaykit-ui .gk-receipt-code {
+		background: #f5f5f5 !important;
+		border-color: #ccc;
+		color: #000 !important;
+	}
+
+	/* Page break */
+	.gatewaykit-ui .gk-receipt-card {
+		page-break-inside: avoid;
+	}
+}
+
+/* ==========================================================================
+   13. Responsive
+   ========================================================================== */
+
+@media (max-width: 600px) {
+	.gatewaykit-ui .gk-receipt-page {
+		padding: var(--gatewaykit-space-4, 1rem) var(--gatewaykit-space-3, 0.75rem);
+	}
+
+	.gatewaykit-ui .gk-receipt-banner__icon {
+		width: 60px;
+		height: 60px;
+	}
+
+	.gatewaykit-ui .gk-receipt-banner__icon svg {
+		width: 30px;
+		height: 30px;
+	}
+
+	.gatewaykit-ui .gk-receipt-banner__title {
+		font-size: var(--text-lg, 1.125rem);
+	}
+
+	.gatewaykit-ui .gk-receipt-banner__actions {
+		flex-direction: column;
+		width: 100%;
+	}
+
+	.gatewaykit-ui .gk-receipt-btn {
+		width: 100%;
+		justify-content: center;
+	}
+
+	.gatewaykit-ui .gk-receipt-card__header {
+		padding: var(--gatewaykit-space-3, 0.75rem) var(--gatewaykit-space-4, 1rem);
+	}
+
+	.gatewaykit-ui .gk-receipt-table td:first-child,
+	.gatewaykit-ui .gk-receipt-table td:last-child {
+		padding: var(--gatewaykit-space-3, 0.75rem) var(--gatewaykit-space-4, 1rem);
+	}
+
+	.gatewaykit-ui .gk-receipt-table td:first-child {
+		width: 42%;
+	}
+
+	.gatewaykit-ui .gk-receipt-input__form {
+		flex-direction: column;
+	}
+
+	.gatewaykit-ui .gk-receipt-input__field {
+		text-align: left;
+	}
+}

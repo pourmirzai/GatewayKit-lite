@@ -1,0 +1,384 @@
+/*!
+ * GatewayKit - Validation & Loading States
+ * Enhanced form validation feedback and loading indicators
+ */
+
+/**
+ * Table of Contents
+ *
+ * 1.  Validation Error Styles
+ * 2.  Loading States
+ * 3.  Success / Info / Warning States
+ * 4.  Enhanced Button States
+ * 5.  Enhanced Form Field States
+ * 6.  Progress Indicators
+ * 7.  Animations
+ * 8.  Responsive Adjustments
+ * 9.  Accessibility (High Contrast & Reduced Motion)
+ */
+
+/* Validation Error Styles */
+.gatewaykit-field-error {
+    border-color: var(--gatewaykit-danger-color) !important;
+    background-color: var(--gatewaykit-status-danger-bg) !important;
+    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.1) !important;
+    outline: 1px solid var(--gatewaykit-danger-color) !important;
+    outline-offset: 1px !important;
+}
+
+.gatewaykit-field-error-message {
+    color: var(--gatewaykit-danger-color);
+    font-size: 12px;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.gatewaykit-field-error-message::before {
+    content: '⚠';
+    font-size: 14px;
+    color: var(--gatewaykit-danger-color);
+}
+
+.gatewaykit-validation-error {
+    background: var(--gatewaykit-status-danger-bg);
+    border: 1px solid var(--gatewaykit-status-danger-brd);
+    border-radius: var(--gatewaykit-border-radius);
+    padding: 16px 20px;
+    margin: 20px 0;
+    position: relative;
+}
+
+.gatewaykit-validation-error h4 {
+    color: var(--gatewaykit-danger-color);
+    margin: 0 0 12px 0;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.gatewaykit-validation-error h4::before {
+    content: '❌';
+    font-size: 18px;
+}
+
+.gatewaykit-validation-error ul {
+    margin: 0;
+    padding-left: 20px;
+    color: var(--gatewaykit-danger-color);
+}
+
+.gatewaykit-validation-error li {
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+/* Loading States */
+.gatewaykit-loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    border-radius: var(--gatewaykit-border-radius);
+    backdrop-filter: blur(2px);
+}
+
+.gatewaykit-loading-content {
+    text-align: center;
+    padding: 20px;
+    max-width: 300px;
+}
+
+.gatewaykit-spinner {
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid var(--gatewaykit-primary-color);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: gatewaykit-spin 1s linear infinite;
+    margin: 0 auto 16px;
+}
+
+.gatewaykit-loading-text {
+    color: var(--gatewaykit-dark-text);
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: 12px;
+}
+
+/* Success States */
+.gatewaykit-success-message {
+    background: var(--gatewaykit-status-success-bg);
+    border: 1px solid var(--gatewaykit-status-success-brd);
+    border-radius: var(--gatewaykit-border-radius);
+    padding: 16px 20px;
+    margin: 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--gatewaykit-status-success-fg);
+}
+
+.gatewaykit-success-message::before {
+    content: '✅';
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+/* Info States */
+.gatewaykit-info-message {
+    background: var(--gatewaykit-status-info-bg);
+    border: 1px solid var(--gatewaykit-status-info-brd);
+    border-radius: var(--gatewaykit-border-radius);
+    padding: 16px 20px;
+    margin: 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--gatewaykit-status-info-fg);
+}
+
+.gatewaykit-info-message::before {
+    content: 'ℹ️';
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+/* Warning States */
+.gatewaykit-warning-message {
+    background: var(--gatewaykit-status-warning-bg);
+    border: 1px solid var(--gatewaykit-status-warning-brd);
+    border-radius: var(--gatewaykit-border-radius);
+    padding: 16px 20px;
+    margin: 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--gatewaykit-status-warning-fg);
+}
+
+.gatewaykit-warning-message::before {
+    content: '⚠️';
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+/* Enhanced Button States */
+.gatewaykit-ui-btn.loading {
+    position: relative;
+    color: transparent !important;
+    pointer-events: none;
+}
+
+.gatewaykit-ui-btn.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 16px;
+    height: 16px;
+    margin: -8px 0 0 -8px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: gatewaykit-spin 0.8s linear infinite;
+}
+
+.gatewaykit-ui-btn.success {
+    background: var(--gatewaykit-success-color) !important;
+    border-color: var(--gatewaykit-success-color) !important;
+    color: white !important;
+}
+
+.gatewaykit-ui-btn.error {
+    background: var(--gatewaykit-danger-color) !important;
+    border-color: var(--gatewaykit-danger-color) !important;
+    color: white !important;
+}
+
+/* Enhanced Form Field States */
+.gatewaykit-ui-input-wrapper {
+    position: relative;
+    margin-bottom: 16px;
+}
+
+.gatewaykit-ui-input-wrapper.has-error input,
+.gatewaykit-ui-input-wrapper.has-error select,
+.gatewaykit-ui-input-wrapper.has-error textarea {
+    border-color: var(--gatewaykit-danger-color) !important;
+    background-color: var(--gatewaykit-status-danger-bg) !important;
+}
+
+.gatewaykit-ui-input-wrapper.has-success input,
+.gatewaykit-ui-input-wrapper.has-success select,
+.gatewaykit-ui-input-wrapper.has-success textarea {
+    border-color: var(--gatewaykit-success-color) !important;
+    background-color: var(--gatewaykit-status-success-bg) !important;
+}
+
+.gatewaykit-ui-input-wrapper .field-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: var(--gatewaykit-medium-text);
+}
+
+.gatewaykit-ui-input-wrapper.has-error .field-icon {
+    color: var(--gatewaykit-danger-color);
+}
+
+.gatewaykit-ui-input-wrapper.has-success .field-icon {
+    color: var(--gatewaykit-success-color);
+}
+
+/* Progress Indicators */
+.gatewaykit-progress-bar {
+    width: 100%;
+    height: 4px;
+    background: var(--gatewaykit-light-bg);
+    border-radius: 2px;
+    overflow: hidden;
+    margin: 16px 0;
+}
+
+.gatewaykit-progress-bar-fill {
+    height: 100%;
+    background: var(--gatewaykit-primary-color);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+    position: relative;
+}
+
+.gatewaykit-progress-bar-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: gatewaykit-progress-shine 1.5s infinite;
+}
+
+/* Animations */
+@keyframes gatewaykit-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes gatewaykit-progress-shine {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+@keyframes gatewaykit-fade-in {
+    from { 
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes gatewaykit-slide-down {
+    from {
+        max-height: 0;
+        opacity: 0;
+    }
+    to {
+        max-height: 200px;
+        opacity: 1;
+    }
+}
+
+/* Apply animations */
+.gatewaykit-validation-error,
+.gatewaykit-success-message,
+.gatewaykit-info-message,
+.gatewaykit-warning-message {
+    animation: gatewaykit-fade-in 0.3s ease-out;
+}
+
+.gatewaykit-loading-overlay {
+    animation: gatewaykit-fade-in 0.2s ease-out;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+    .gatewaykit-validation-error,
+    .gatewaykit-success-message,
+    .gatewaykit-info-message,
+    .gatewaykit-warning-message {
+        padding: 12px 16px;
+        margin: 16px 0;
+        flex-direction: column;
+        text-align: center;
+        gap: 8px;
+    }
+    
+    .gatewaykit-validation-error h4,
+    .gatewaykit-success-message,
+    .gatewaykit-info-message,
+    .gatewaykit-warning-message {
+        justify-content: center;
+    }
+    
+    .gatewaykit-loading-content {
+        padding: 16px;
+        max-width: 250px;
+    }
+    
+    .gatewaykit-spinner {
+        width: 24px;
+        height: 24px;
+        border-width: 2px;
+    }
+    
+    .gatewaykit-loading-text {
+        font-size: 13px;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .gatewaykit-field-error {
+        border-width: 2px;
+        outline-width: 2px;
+    }
+    
+    .gatewaykit-validation-error,
+    .gatewaykit-success-message,
+    .gatewaykit-info-message,
+    .gatewaykit-warning-message {
+        border-width: 2px;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .gatewaykit-spinner,
+    .gatewaykit-progress-bar-fill::after {
+        animation: none;
+    }
+    
+    .gatewaykit-loading-overlay,
+    .gatewaykit-validation-error,
+    .gatewaykit-success-message,
+    .gatewaykit-info-message,
+    .gatewaykit-warning-message {
+        animation: none;
+        transition: none;
+    }
+}
