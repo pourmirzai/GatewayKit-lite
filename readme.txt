@@ -4,7 +4,7 @@ Tags: elementor, payment, paypal, stripe, mollie
 Requires at least: 6.2
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.2.1
+Stable tag: 1.3.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -18,11 +18,16 @@ GatewayKit turns any Elementor Pro Form into a payment form. Build custom forms 
 
 If you sell a single product, collect donations, or invoice clients, you don't need a full store — you just need a form that takes payment. GatewayKit is designed for single-product sales, donations, invoices, event registrations, and simple payment flows where WooCommerce would be overkill.
 
+**Translations:** GatewayKit is available in English, Spanish, French, German, Brazilian Portuguese, and Arabic.
+
 **Payment Gateways Included Free**
 
 * **PayPal** — Modern hosted checkout with sandbox mode and webhook verification
-* **Stripe** — Stripe Checkout with automatic 3D Secure and recurring subscriptions
+* **Stripe** — Stripe Checkout with automatic 3D Secure, Apple Pay, Google Pay, Klarna, Afterpay, and embedded checkout option
 * **Mollie** — iDEAL, credit cards, Bancontact, SOFORT, and more
+* **Razorpay** — UPI, cards, net banking, and wallets for Indian merchants
+* **Paystack** — Cards, bank transfers, and mobile money for African markets
+* **Mercado Pago** — Cards, PIX, and local payment methods for Latin America
 * **CoinGate** — Bitcoin, Ethereum, and 50+ cryptocurrencies
 * **Coinify** — Bitcoin, Ethereum, and popular cryptocurrencies
 * **NOWPayments** — Bitcoin, Ethereum, and 100+ altcoins
@@ -75,7 +80,7 @@ Yes. The Elementor Pro Forms module is required because GatewayKit is an "Action
 
 = Which payment methods are included in Lite? =
 
-All six payment gateways are included in the free plugin: PayPal, Stripe, Mollie, CoinGate, Coinify, and NOWPayments. GatewayKit Pro adds advanced features like discount codes, refunds, analytics, CSV export, and more.
+All nine payment gateways are included in the free plugin: PayPal, Stripe, Mollie, CoinGate, Coinify, NOWPayments, Razorpay, Paystack, and Mercado Pago. GatewayKit Pro adds advanced features like discount codes, refunds, analytics, CSV export, and more.
 
 = Are payment credentials stored securely? =
 
@@ -106,6 +111,40 @@ The same guidance applies if license-key activation fails for the same reason.
 9. Receipt page when opened directly via transaction query.
 
 == Changelog ==
+
+= 1.3.1 =
+
+**Critical fixes**
+
+* Bulk Export on the Transactions page now downloads the selected rows instead of failing silently
+* Webhooks for Razorpay, Paystack, Mercado Pago, and NOWPayments now correctly process pending payments
+* White-label magic link unlocks the settings page again
+
+**Security hardening**
+
+* Payment redirect pages are now safe to reload — duplicate receipts and redundant notifications are prevented
+* PayPal and Coinify webhooks require signing secrets to be configured; unverified requests are rejected
+* Removed the request scanner that was blocking legitimate form fields; SQL safety is still enforced at the database layer
+* Duplicate rate-limit implementations consolidated into one consistent system
+* Encrypted gateway secrets now refuse to operate when WordPress security keys are absent, with a clear admin notice
+
+**Reliability**
+
+* Outgoing webhooks are now delivered asynchronously — a slow downstream service no longer stalls the buyer's success page
+* Proxy-spoofed IP headers can no longer bypass per-IP rate limits (unless you explicitly configure trusted proxy ranges)
+* Payment endpoint now validates redirect URLs and can't be replayed across clients
+
+= 1.3.0 =
+
+**New gateways and payment methods**
+
+* Added Razorpay — UPI, cards, net banking, and wallets for Indian merchants
+* Added Paystack — cards, bank transfers, and mobile money for African markets
+* Added Mercado Pago — cards, PIX, and local methods for Latin American markets
+* Added Apple Pay and Google Pay support via Stripe Checkout
+* Added Klarna and Afterpay / Clearpay (Buy Now Pay Later) via Stripe Checkout
+* Added Stripe Embedded Checkout — keep customers on your site with no redirect
+* Added Payment Links — generate shareable Stripe checkout links without a form
 
 = 1.2.1 =
 * Fixed discount codes not being applied at checkout — discounted total is now correctly sent to all payment gateways
@@ -184,7 +223,31 @@ When a user submits a payment form, the plugin sends the payment amount, currenc
 * Terms of Service: https://nowpayments.io/terms
 * Privacy Policy: https://nowpayments.io/privacy
 
+= Razorpay =
+
+* API Endpoint (Live): https://api.razorpay.com
+* API Endpoint (Test): https://api.razorpay.com (test keys)
+* Terms of Service: https://razorpay.com/terms-of-service/
+* Privacy Policy: https://razorpay.com/privacy-policy/
+
+= Paystack =
+
+* API Endpoint (Live): https://api.paystack.co
+* API Endpoint (Test): https://api.paystack.co (test keys)
+* Terms of Service: https://paystack.com/terms
+* Privacy Policy: https://paystack.com/privacy-policy
+
+= Mercado Pago =
+
+* API Endpoint (Live): https://api.mercadopago.com
+* API Endpoint (Test): https://api.mercadopago.com (sandbox tokens)
+* Terms of Service: https://www.mercadopago.com/terms-and-conditions
+* Privacy Policy: https://www.mercadopago.com/privacy-experience
+
 == Upgrade Notice ==
+
+= 1.3.0 =
+Three new regional gateways (Razorpay, Paystack, Mercado Pago), Apple Pay, Google Pay, Klarna, Afterpay, embedded checkout, and shareable Payment Links.
 
 = 1.2.0 =
 Crypto payments via NOWPayments, date filters, customer email receipts, and transaction notes.

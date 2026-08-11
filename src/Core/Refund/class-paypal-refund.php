@@ -65,7 +65,7 @@ class GatewayKit_PayPal_Refund {
 		}
 
 		$base_url = $is_sandbox ? self::API_BASE_SANDBOX : self::API_BASE_LIVE;
-		$url      = $base_url . '/v2/payments/captures/' . $capture_id . '/refund';
+		$url      = $base_url . '/v2/payments/captures/' . rawurlencode( $capture_id ) . '/refund';
 
 		$body = array(
 			'amount' => array(
@@ -120,7 +120,7 @@ class GatewayKit_PayPal_Refund {
 	private function resolve_capture_id( $transaction ) {
 		// Check ref_id first (PayPal stores capture_id there).
 		$ref_id = $transaction->ref_id;
-		if ( ! empty( $ref_id ) && false !== strpos( $ref_id, 'capture' ) ) {
+		if ( ! empty( $ref_id ) && preg_match( '/^[A-Z0-9]{10,30}$/i', $ref_id ) ) {
 			return $ref_id;
 		}
 

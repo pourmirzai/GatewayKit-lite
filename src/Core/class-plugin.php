@@ -83,11 +83,15 @@ class GatewayKit {
         // Dismissible admin notice promoting GatewayKit Pro (only when Pro is absent).
         add_action('admin_notices', array($this, 'maybe_show_pro_upgrade_notice'));
         add_action('admin_notices', array($this, 'maybe_show_db_update_notice'));
+        add_action('admin_notices', array($this, 'maybe_show_crypto_key_notice'));
         add_action('wp_ajax_gatewaykit_dismiss_pro_notice', array($this, 'dismiss_pro_notice'));
 
 
-        // Register admin components early so their admin_menu callbacks are attached before admin_menu runs
-        add_action('admin_init', array($this, 'early_transactions_bulk_handler'), 0);
+        // Register admin components early so their admin_menu callbacks are attached before admin_menu runs.
+        // Transactions bulk actions (delete/export) are dispatched at
+        // admin_init:5 by GatewayKit_Transaction_List_Table::dispatch_bulk_action()
+        // — the single source of truth, after settings init.
+        add_action('admin_init', array('GatewayKit_Transaction_List_Table', 'dispatch_bulk_action'), 5);
         add_action('admin_init', array($this, 'init_admin_components'), 1);
 
         // Register admin menus at the proper hook
@@ -299,10 +303,15 @@ class GatewayKit {
         if (!$this->admin_settings instanceof GatewayKit_Admin_Settings) {
             $this->admin_settings = new GatewayKit_Admin_Settings();
         }
-        new GatewayKit_Dashboard_Widgets();
-        if ( class_exists( 'GatewayKit_Admin_Discounts' ) ) {
-            $this->admin_discounts = new GatewayKit_Admin_Discounts();
-        }
+		new GatewayKit_Dashboard_Widgets();
+		if ( class_exists( 'GatewayKit_Admin_Discounts' ) ) {
+			$this->admin_discounts = new GatewayKit_Admin_Discounts();
+		}
+
+		// Payment Links admin page (Stripe) — self-registers its submenu + AJAX handler.
+		if ( class_exists( 'GatewayKit_Payment_Links' ) ) {
+			new GatewayKit_Payment_Links();
+		}
 
         // Analytics Dashboard (Pro only — menu + AJAX handler self-register).
         if ( class_exists( 'GatewayKit_Analytics_Dashboard' ) && gatewaykit_is_pro_licensed() ) {
@@ -333,7 +342,7 @@ class GatewayKit {
 
         // Ensure admin discounts instance exists before registering menus.
         // The Discount feature ships only in pro builds, so the class
-        // is absent in lite â€” guard instantiation to avoid a fatal error.
+        // is absent in lite — guard instantiation to avoid a fatal error.
         if ( class_exists( 'GatewayKit_Admin_Discounts' ) && ! $this->admin_discounts instanceof GatewayKit_Admin_Discounts ) {
             $this->admin_discounts = new GatewayKit_Admin_Discounts();
         }
@@ -403,7 +412,7 @@ class GatewayKit {
      *
      * Each gateway folder ships a module.php that requires its own class
      * file(s) and returns metadata (id, name, class, requires). Adding a
-     * gateway is therefore just "drop a folder" â€” no Core edit needed.
+     * gateway is therefore just "drop a folder" — no Core edit needed.
      *
      * Hooked into `gatewaykit_register_gateways` (fired by the gateway manager).
      *
@@ -488,8 +497,8 @@ class GatewayKit {
             return;
         }
 
-        // Only show the upsell on the Lite build (PayPal only). Pro
-        // build are full products and never advertise the upgrade.
+        // Only show the upsell on the Lite build (all gateways included
+        // in Lite; Pro adds discounts, webhooks, analytics, refunds, etc.).
         if ( ! $this->is_lite_build() ) {
             return;
         }
@@ -548,6 +557,42 @@ $upgrade_url = apply_filters( 'gatewaykit_pro_upgrade_url', 'https://gatewaykit.
         <?php
 
         delete_transient( 'gatewaykit_db_updated' );
+    }
+
+    /**
+     * Show an admin notice when the WordPress secret constants required for
+     * at-rest encryption are missing (F8).
+     *
+     * Without SECURE_AUTH_KEY / AUTH_KEY, GatewayKit_Crypto refuses to operate
+     * and every gateway that stores encrypted credentials reports as
+     * unavailable. This notice points the site owner at wp-config.php.
+     */
+    public function maybe_show_crypto_key_notice() {
+        if ( ! current_user_can( 'manage_options' ) ) {
+            return;
+        }
+
+        if ( class_exists( 'GatewayKit_Crypto' ) && GatewayKit_Crypto::is_available() ) {
+            return;
+        }
+
+        ?>
+        <div class="notice notice-error">
+            <p>
+                <strong><?php esc_html_e( 'GatewayKit', 'gatewaykit'); ?></strong>
+                <?php
+                echo wp_kses(
+                    sprintf(
+                        /* translators: %s: wp-config.php file name */
+                        __( 'cannot encrypt payment gateway credentials because the WordPress secret constants (SECURE_AUTH_KEY / AUTH_KEY) are missing from %s. Add them using the WordPress secret-key generator, then re-save your gateway settings.', 'gatewaykit' ),
+                        '<code>wp-config.php</code>'
+                    ),
+                    array( 'code' => array() )
+                );
+                ?>
+            </p>
+        </div>
+        <?php
     }
 
     /**
@@ -643,41 +688,6 @@ $upgrade_url = apply_filters( 'gatewaykit_pro_upgrade_url', 'https://gatewaykit.
                     'debug'   => (defined('WP_DEBUG') && WP_DEBUG) ? true : false,
                 )
             );
-
-            // Live discount-code validation UI Ã¢â‚¬â€ only when the current page has
-            // at least one Elementor form with the discount feature enabled.
-            $discount_forms = array();
-            if ( class_exists( 'GatewayKit_Elementor_Action' ) ) {
-                $discount_forms = GatewayKit_Elementor_Action::get_discount_forms_for_current_page();
-            }
-            if ( ! empty( $discount_forms ) ) {
-                wp_enqueue_script(
-                    'gatewaykit-discount',
-                    GATEWAYKIT_PLUGIN_URL . 'assets/js/gatewaykit-discount' . $suffix . '.js',
-                    array('jquery'),
-                    GATEWAYKIT_VERSION,
-                    true
-                );
-                wp_localize_script(
-                    'gatewaykit-discount',
-                    'GatewayKitDiscount',
-                    array(
-                        'ajaxurl'  => admin_url('admin-ajax.php'),
-                        'nonce'    => wp_create_nonce('gatewaykit_discount_nonce'),
-                        'currency' => strtoupper( get_option('gatewaykit_currency', GatewayKit_Gateway_Manager::get_instance()->get_default_currency()) ),
-                        'forms'    => $discount_forms,
-                        'i18n'     => array(
-                            'apply'           => __( 'Apply', 'gatewaykit' ),
-                            'applying'        => __( 'Applying...', 'gatewaykit' ),
-                            'discount'        => __( 'Discount', 'gatewaykit' ),
-                            'final_amount'    => __( 'Final Amount', 'gatewaykit' ),
-                            'enter_code'      => __( 'Please enter a discount code.', 'gatewaykit' ),
-                            'amount_required' => __( 'Please enter an amount first.', 'gatewaykit' ),
-                            'error'           => __( 'An error occurred. Please try again.', 'gatewaykit' ),
-                        ),
-                    )
-                );
-            }
 
             // Pro forms shared assets: optional-payment animation (Feature C)
             // and Payment Info live-update (Feature D). Ships in Lite assets;
@@ -793,76 +803,6 @@ $upgrade_url = apply_filters( 'gatewaykit_pro_upgrade_url', 'https://gatewaykit.
     }
 
     /**
-     * Handle transactions bulk actions early on admin_init to avoid headers already sent.
-     */
-    public function early_transactions_bulk_handler() {
-        if ( ! is_admin() ) {
-            return;
-        }
-        if ( strtoupper( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ?? '' ) ) ) !== 'POST' ) {
-            return;
-        }
-        // Accept page from either GET or POST to ensure early handling
-        $page = isset($_REQUEST['page']) ? sanitize_key( wp_unslash( $_REQUEST['page'] ) ) : '';
-        if ( $page !== 'gatewaykit-transactions' ) {
-            return;
-        }
-
-        // Determine bulk action from top/bottom selectors using REQUEST (covers GET/POST)
-        $bulk_action = null;
-        if ( isset( $_REQUEST['action'] ) && sanitize_key( wp_unslash( $_REQUEST['action'] ) ) !== '-1' && '' !== sanitize_key( wp_unslash( $_REQUEST['action'] ) ) ) {
-            $bulk_action = sanitize_key( wp_unslash( $_REQUEST['action'] ) );
-        } elseif ( isset( $_REQUEST['action2'] ) && sanitize_key( wp_unslash( $_REQUEST['action2'] ) ) !== '-1' && '' !== sanitize_key( wp_unslash( $_REQUEST['action2'] ) ) ) {
-            $bulk_action = sanitize_key( wp_unslash( $_REQUEST['action2'] ) );
-        }
-
-        if ( ! in_array( $bulk_action, array( 'delete', 'export' ), true ) ) {
-            return;
-        }
-
-        // Verify nonce and capability
-        check_admin_referer( 'bulk-transactions' );
-        if ( ! current_user_can( 'manage_options' ) ) {
-            wp_die( esc_html__( 'You do not have permission to perform this action.', 'gatewaykit' ) );
-        }
-
-        $transaction_ids = isset( $_REQUEST['transaction_ids'] ) ? array_map( 'intval', (array) wp_unslash( $_REQUEST['transaction_ids'] ) ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.MissingUnslash
-
-        if ( $bulk_action === 'delete' ) {
-            if ( ! empty( $transaction_ids ) ) {
-                foreach ( $transaction_ids as $transaction_id ) {
-                    $transaction = GatewayKit_Transaction_Model::find( $transaction_id );
-                    if ( $transaction ) {
-                        $transaction->delete();
-                    }
-                }
-            }
-        }
-        
-        $referer = wp_get_referer();
-        if ( ! $referer ) {
-            $referer = admin_url( 'admin.php?page=gatewaykit-transactions' );
-        }
-        wp_safe_redirect( add_query_arg( 'deleted', count( $transaction_ids ), $referer ) );
-        exit;
-
-        if ( $bulk_action === 'export' ) {
-            if ( empty( $transaction_ids ) ) {
-                $referer = wp_get_referer();
-                if ( ! $referer ) {
-                    $referer = admin_url( 'admin.php?page=gatewaykit-transactions' );
-                }
-                wp_safe_redirect( add_query_arg( array( 'gatewaykit_notice' => 'no_transactions_selected_for_export', 'gatewaykit_notice_type' => 'error' ), $referer ) );
-                exit;
-            }
-            // Export selected IDs to CSV early
-            $table = new GatewayKit_Transaction_List_Table();
-            $table->bulk_export( $transaction_ids );
-            exit;
-        }
-    }
-
-    /**
      * Retry payment verification for failed transactions
      *
      * @param int $transaction_id Transaction ID
@@ -971,16 +911,89 @@ $upgrade_url = apply_filters( 'gatewaykit_pro_upgrade_url', 'https://gatewaykit.
      * embedded nonce) has been cached for a long time or generated for a
      * different user.
      *
+     * F13: each issued nonce is hash-bound to a short-lived, HttpOnly cookie
+     * so it cannot be replayed from a different client (the cookie is set on
+     * the browser that requested the nonce and sent automatically with the
+     * subsequent same-origin payment request).
+     *
      * @return void
      */
     public function ajax_get_nonce() {
         // Rate limiting check (prevents abuse of the open nonce endpoint)
         $this->check_admin_rate_limit();
 
+        $nonce = wp_create_nonce( 'elementor_ajax' );
+
+        // Bind the nonce to a short-lived cookie so it cannot be reused
+        // cross-client (F13). The cookie is HttpOnly (JS cannot read it) and
+        // sent automatically by the browser with the payment POST.
+        $this->set_nonce_bind_cookie( $nonce );
+
         // No nonce is required to *generate* a nonce; this is safe by design.
         wp_send_json_success(array(
-            'nonce' => wp_create_nonce('elementor_ajax'),
+            'nonce' => $nonce,
         ));
+    }
+
+    /**
+     * Name of the nonce-bind cookie (F13).
+     *
+     * @return string
+     */
+    private function nonce_bind_cookie_name() {
+        return 'gatewaykit_nb';
+    }
+
+    /**
+     * Compute the bind value for a faucet-issued nonce (F13).
+     *
+     * HMAC-SHA256 keyed by the WP nonce salt so the value is bound to this
+     * site and the nonce it accompanies.
+     *
+     * @param string $nonce Nonce issued by ajax_get_nonce().
+     * @return string
+     */
+    private function compute_nonce_bind( $nonce ) {
+        return hash_hmac( 'sha256', (string) $nonce, wp_salt( 'nonce' ) );
+    }
+
+    /**
+     * Set the short-lived nonce-bind cookie (F13).
+     *
+     * @param string $nonce Nonce issued by ajax_get_nonce().
+     */
+    private function set_nonce_bind_cookie( $nonce ) {
+        $name    = $this->nonce_bind_cookie_name();
+        $value   = $this->compute_nonce_bind( $nonce );
+        $expire  = time() + ( 15 * MINUTE_IN_SECONDS );
+        $path    = defined( 'COOKIEPATH' ) && COOKIEPATH ? COOKIEPATH : '/';
+        $options = array(
+            'expires'  => $expire,
+            'path'     => $path,
+            'secure'   => is_ssl(),
+            'httponly' => true,
+            'samesite' => 'Lax',
+        );
+
+        setcookie( $name, $value, $options );
+        // Make the value available immediately for same-request callers.
+        $_COOKIE[ $name ] = $value;
+    }
+
+    /**
+     * Verify that the nonce-bind cookie matches the submitted nonce (F13).
+     *
+     * @param string $nonce Nonce submitted with the payment request.
+     * @return bool True when the cookie is present and matches the nonce.
+     */
+    private function verify_nonce_bind( $nonce ) {
+        $name = $this->nonce_bind_cookie_name();
+        if ( empty( $_COOKIE[ $name ] ) ) {
+            return false;
+        }
+        $expected = $this->compute_nonce_bind( $nonce );
+        $supplied = sanitize_text_field( wp_unslash( $_COOKIE[ $name ] ) );
+        return hash_equals( $expected, $supplied );
     }
 
     /**
@@ -1002,7 +1015,7 @@ $upgrade_url = apply_filters( 'gatewaykit_pro_upgrade_url', 'https://gatewaykit.
             wp_send_json_error( __( 'Discount codes are not available.', 'gatewaykit' ) );
         }
 
-        // Rate limiting (public endpoint â€” dedicated bucket so bursts here
+        // Rate limiting (public endpoint — dedicated bucket so bursts here
         // cannot starve the generic admin-ajax limit).
         $rate_limiter = GatewayKit_Rate_Limiter::get_instance();
         $rate_check   = $rate_limiter->check_rate_limit( 'discount_preview' );
@@ -1074,9 +1087,11 @@ $upgrade_url = apply_filters( 'gatewaykit_pro_upgrade_url', 'https://gatewaykit.
     			'http_referer' => isset( $_SERVER['HTTP_REFERER'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_REFERER'] ) ) : 'none'
     		));
     
-    		// Rate limiting check
+    		// Rate limiting check — dedicated process_payment bucket (F13) so
+    		// transaction-creation flood protection is independent of the
+    		// generic admin-ajax / faucet bucket.
     		$rate_limiter = GatewayKit_Rate_Limiter::get_instance();
-    		$rate_check = $rate_limiter->check_rate_limit('admin_ajax');
+    		$rate_check = $rate_limiter->check_rate_limit('process_payment');
     		if (is_wp_error($rate_check)) {
     			$logger->warning('Rate limit exceeded for AJAX payment', array(
     				'rate_check' => $rate_check->get_error_message()
@@ -1106,6 +1121,16 @@ $upgrade_url = apply_filters( 'gatewaykit_pro_upgrade_url', 'https://gatewaykit.
     				'action' => 'elementor_ajax'
     			));
     			wp_send_json_error(__('Security check failed. Please reload and try again.', 'gatewaykit'));
+    			return;
+    		}
+
+    		// F13: the nonce must also be bound to the short-lived cookie
+    		// issued by ajax_get_nonce(). This prevents a nonce harvested from
+    		// a cached page or a third party from being replayed from a
+    		// different client (which would not have the matching cookie).
+    		if ( ! $this->verify_nonce_bind( $nonce ) ) {
+    			$logger->warning('Nonce cookie bind verification failed for AJAX payment');
+    			wp_send_json_error(__('Security check failed. Please reload the page and try again.', 'gatewaykit'));
     			return;
     		}
     
@@ -1204,10 +1229,12 @@ $upgrade_url = apply_filters( 'gatewaykit_pro_upgrade_url', 'https://gatewaykit.
     		return $gateway;
     	}
     
-    	// Validate success URL
-    	$success_url = $validator->validate_required_url($data['success_url']);
+    	// Validate success URL — must point at this site (F13). The open
+    	// gatewaykit_process_payment endpoint must not be usable as an
+    	// open redirect / payment-initiation proxy to third-party hosts.
+    	$success_url = $validator->validate_local_url($data['success_url']);
     	if (is_wp_error($success_url)) {
-    		$logger->error('Invalid success URL in direct payment', array('url' => $data['success_url']));
+    		$logger->error('Invalid success URL in direct payment', array('url' => isset($data['success_url']) ? '(rejected)' : '(missing)'));
     		return $success_url;
     	}
     

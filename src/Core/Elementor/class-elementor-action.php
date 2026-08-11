@@ -251,7 +251,7 @@ class GatewayKit_Elementor_Action extends Action_Base {
 			);
 		}
 
-// --- Advanced controls (failure redirect, partial payments). ---
+		// --- Failure redirect URL (used when a payment fails). ---
 		$widget->add_control(
 			'gatewaykit_failure_url',
 				array(
@@ -386,7 +386,7 @@ class GatewayKit_Elementor_Action extends Action_Base {
 			// @see https://developer.wordpress.org/plugins/security/nonces/
 			// @see https://developer.wordpress.org/apis/security/
 			$nonce_verified = $this->verify_nonce();
-			$nonce_required = get_option( 'gatewaykit_nonce_required', false );
+			$nonce_required = get_option( 'gatewaykit_nonce_required', true );
 
 			// Enhanced nonce verification logging
 			// phpcs:disable WordPress.Security.NonceVerification.Missing, WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- diagnostic logging only; nonce verified below
@@ -394,33 +394,22 @@ class GatewayKit_Elementor_Action extends Action_Base {
 				'nonce_verified' => $nonce_verified,
 				'nonce_required' => $nonce_required,
 				'nonce_action' => 'gatewaykit_elementor_action',
-				'wpnonce_value' => isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash($_POST['_wpnonce'])) : 'none',
-				'gatewaykit_nonce_value' => isset($_POST['gatewaykit_nonce']) ? sanitize_text_field(wp_unslash($_POST['gatewaykit_nonce'])) : 'none'
+				'wpnonce_present' => isset($_POST['_wpnonce']),
+				'gatewaykit_nonce_present' => isset($_POST['gatewaykit_nonce']),
+				'_nonce_present' => isset($_POST['_nonce'])
 			));
 			// phpcs:enable
 
-			if ( $nonce_required && ! $nonce_verified ) {
-				$logger->error('Nonce verification failed - security check blocked', array(
-					'nonce_required' => $nonce_required,
-					'nonce_verified' => $nonce_verified
-				));
-				$ajax_handler->add_error_message( esc_html__( 'Security check failed. Please reload and try again.', 'gatewaykit' ) );
+			if ( ! $nonce_verified ) {
+				$logger->error( 'Nonce verification failed — payment blocked', array(
+					'post_id' => $record->get_form_meta( 'post_id' ) ?: get_the_ID(),
+				) );
+				$ajax_handler->add_error_message( esc_html__( 'Security check failed. Please reload the page and try again.', 'gatewaykit' ) );
 				return;
-			} elseif ( ! $nonce_verified ) {
-				$logger->warning(
-					'Nonce verification failed but proceeding due to gatewaykit_nonce_required=false',
-					array(
-						'post_id' => $record->get_form_meta( 'post_id' ) ?: get_the_ID(),
-						'nonce_verified' => $nonce_verified
-					)
-				);
 			}
 
 			$settings = $record->get( 'form_settings' );
 			$fields   = $record->get( 'fields' );
-
-			// Check strict validation flag (default: false for backward compatibility)
-			$strict_validation = get_option( 'gatewaykit_strict_validation', false );
 
 			// Validate form settings structure
 			if ( ! is_array( $settings ) ) {
@@ -530,14 +519,14 @@ class GatewayKit_Elementor_Action extends Action_Base {
 
 				$transaction->update( array(
 					'status'       => 'completed',
-					'ref_id'       => __( 'NO_PAYMENT', 'gatewaykit' ),
+					'ref_id'       => 'NO_PAYMENT',
 					'completed_at' => current_time( 'mysql' ),
 				) );
 
 				do_action( 'gatewaykit_payment_completed', $transaction );
 
 				$msg = ! empty( $settings['gatewaykit_optional_no_payment_message'] )
-					? $settings['gatewaykit_optional_no_payment_message']
+					? wp_kses_post( $settings['gatewaykit_optional_no_payment_message'] )
 					: __( 'Thank you. Your submission was received.', 'gatewaykit' );
 
 				$ajax_handler->add_response_data( 'gatewaykit_no_payment', true );
@@ -545,6 +534,23 @@ class GatewayKit_Elementor_Action extends Action_Base {
 				$ajax_handler->add_response_data( 'success_message', $msg );
 				return;
 			}
+
+		// --- Pro: partial payment (charge a percentage of the total). ---
+		// Applies to the pre-discount base amount; the discount is then
+		// applied on top of the partial amount.
+		if ( defined( 'GATEWAYKIT_PRO_VERSION' )
+			&& isset( $settings['gatewaykit_partial_enabled'] )
+			&& 'yes' === $settings['gatewaykit_partial_enabled']
+		) {
+			$percent = isset( $settings['gatewaykit_partial_percent'] ) ? (float) $settings['gatewaykit_partial_percent'] : 100;
+			if ( $percent < 1 ) {
+				$percent = 1;
+			}
+			if ( $percent > 100 ) {
+				$percent = 100;
+			}
+			$amount = round( (float) $amount * ( $percent / 100 ), 2 );
+		}
 
 		// --- Discount handling ---
 		// A discount code is processed whenever one is present in the
@@ -630,27 +636,12 @@ class GatewayKit_Elementor_Action extends Action_Base {
 					}
 
 					// NOTE: a fully-free order (e.g. a 100%-off code) is now
-					// completed without a gateway charge â€” handled below after
+					// completed without a gateway charge — handled below after
 					// the payment data is assembled. Do not error out here.
 				}
 			}
 
 		// Prepare payment data
-		// --- Pro: partial payment (charge a percentage of the total). ---
-		if ( isset( $settings['gatewaykit_partial_enabled'] ) && 'yes' === $settings['gatewaykit_partial_enabled'] ) {
-			$percent = isset( $settings['gatewaykit_partial_percent'] ) ? (float) $settings['gatewaykit_partial_percent'] : 100;
-			if ( $percent < 1 ) {
-				$percent = 1;
-			}
-			if ( $percent > 100 ) {
-				$percent = 100;
-			}
-			$amount = round( (float) $amount * ( $percent / 100 ), 2 );
-			if ( $amount <= 0 ) {
-				$amount = round( (float) $settings['gatewaykit_amount'], 2 );
-			}
-		}
-
 		$user_data = $this->get_user_data();
 
 		// --- Email receipt data (Lite). ---
@@ -726,7 +717,7 @@ class GatewayKit_Elementor_Action extends Action_Base {
 			// Mark the order complete immediately (no payment to capture).
 			$transaction->update( array(
 				'status'       => 'completed',
-				'ref_id'       => __( 'FREE', 'gatewaykit' ),
+				'ref_id'       => 'FREE',
 				'completed_at' => current_time( 'mysql' ),
 			) );
 
@@ -819,7 +810,7 @@ class GatewayKit_Elementor_Action extends Action_Base {
 				// Commit the reserved discount usage now that payment was initiated.
 				if ( $discount_applied ) {
 					if ( empty( $result['transaction_id'] ) ) {
-						// No transaction was created â€” release the reserved slot.
+						// No transaction was created — release the reserved slot.
 						GatewayKit_Discount_Model::decrement_usage( $discount_id );
 						GatewayKit_Logger::get_instance()->error(
 							'Discount commit skipped: payment succeeded without a transaction id',
@@ -838,7 +829,7 @@ class GatewayKit_Elementor_Action extends Action_Base {
 						if ( is_wp_error( $recorded ) ) {
 							// The audit row failed to insert, but the payment
 							// already succeeded and the discount was genuinely
-							// consumed â€” keep used_count incremented so it stays
+							// consumed — keep used_count incremented so it stays
 							// accurate vs. actual charges. Surface the mismatch
 							// for manual reconciliation / deferred retry.
 							GatewayKit_Logger::get_instance()->error(
@@ -853,8 +844,18 @@ class GatewayKit_Elementor_Action extends Action_Base {
 					}
 				}
 				$ajax_handler->add_response_data( 'redirect_url', $result['redirect_url'] );
+			} else {
+				// Gateway returned success but no redirect URL — rollback and fail.
+				if ( $discount_applied && ! empty( $discount_id ) ) {
+					GatewayKit_Discount_Model::decrement_usage( $discount_id );
+				}
+				if ( ! empty( $result['transaction_id'] ) ) {
+					GatewayKit_Transaction_Model::find( $result['transaction_id'] )?->update( array( 'status' => 'failed' ) );
+				}
+				$ajax_handler->add_error_message( esc_html__( 'Payment gateway did not return a redirect URL. Please try again.', 'gatewaykit' ) );
+				return;
 			}
-		} catch ( Exception $e ) {
+		} catch ( \Throwable $e ) {
 			$error_handler = GatewayKit_Error_Handler::get_instance();
 			
 			// Log the error with error handler
@@ -972,13 +973,6 @@ class GatewayKit_Elementor_Action extends Action_Base {
 				return new WP_Error( 'gateway_unavailable', esc_html__( 'Selected payment gateway is not properly configured.', 'gatewaykit' ) );
 			}
 
-		// Process payment
-		$callback_url = str_replace(
-			'{gateway}',
-			$payment_data['gateway'],
-			$payment_data['callback_url']
-		);
-
 		// Make the transaction receipt token available to gateways so that
 		// redirect-based flows (e.g. Stripe Checkout / PayPal / CoinGate
 		// cancellation) can embed it in their return URLs and let the callback
@@ -992,7 +986,7 @@ class GatewayKit_Elementor_Action extends Action_Base {
 		$result = $gateway->process_payment(
 			$payment_data['amount'],
 			$payment_data['description'],
-			$callback_url,
+			$payment_data['callback_url'],
 			$user_data
 		);
 
@@ -1034,7 +1028,7 @@ class GatewayKit_Elementor_Action extends Action_Base {
 
 			return new WP_Error( 'payment_failed', esc_html__( 'Payment initiation failed. Please check your payment details and try again.', 'gatewaykit' ) );
 
-		} catch ( Exception $e ) {
+		} catch ( \Throwable $e ) {
 			GatewayKit_Logger::get_instance()->error( 'Payment processing error', array( 'error' => $e->getMessage() ) );
 			return new WP_Error( 'payment_error', esc_html__( 'An error occurred during payment processing.', 'gatewaykit' ) );
 		}
@@ -1052,46 +1046,46 @@ class GatewayKit_Elementor_Action extends Action_Base {
 	 * @return bool True if a valid nonce matched, false otherwise
 	 */
 	private function verify_nonce() {
-	    $logger = GatewayKit_Logger::get_instance();
+		$logger = GatewayKit_Logger::get_instance();
 
-	    // Field names Elementor / WordPress may use to carry the nonce.
-	    $nonce_fields  = array( '_wpnonce', 'nonce', 'gatewaykit_nonce', '_ajax_nonce' );
-	    // Actions the nonce may have been minted against.
-	    $nonce_actions = array( 'elementor_ajax', 'elementor-pro-forms', 'elementor_pro_forms_send_form', 'wp_rest' );
+		// Field names Elementor / WordPress may use to carry the nonce.
+		$nonce_fields  = array( '_wpnonce', 'nonce', 'gatewaykit_nonce', '_ajax_nonce', '_nonce' );
+		// Actions the nonce may have been minted against.
+		$nonce_actions = array( 'elementor_ajax', 'elementor-pro-forms', 'elementor_pro_forms_send_form' );
 
-	    $fields_present = array();
-	    $results        = array();
+		$fields_present = array();
+		$results        = array();
 
-	    foreach ( $nonce_fields as $field ) {
-	        if ( ! isset( $_POST[ $field ] ) ) {
-	            continue;
-	        }
-	        $fields_present[] = $field;
-	        $value = sanitize_text_field( wp_unslash( $_POST[ $field ] ) );
+		foreach ( $nonce_fields as $field ) {
+			if ( ! isset( $_POST[ $field ] ) ) {
+				continue;
+			}
+			$fields_present[] = $field;
+			$value = sanitize_text_field( wp_unslash( $_POST[ $field ] ) );
 
-	        foreach ( $nonce_actions as $action ) {
-	            $valid = (bool) wp_verify_nonce( $value, $action );
-	            $results[ $field . ' / ' . $action ] = $valid;
-	            if ( $valid ) {
-	                $logger->info( 'Nonce verification succeeded', array(
-	                    'field'  => $field,
-	                    'action' => $action,
-	                ) );
-	                return true;
-	            }
-	        }
-	    }
+			foreach ( $nonce_actions as $action ) {
+				$valid = (bool) wp_verify_nonce( $value, $action );
+				$results[ $field . ' / ' . $action ] = $valid;
+				if ( $valid ) {
+					$logger->info( 'Nonce verification succeeded', array(
+						'field'  => $field,
+						'action' => $action,
+					) );
+					return true;
+				}
+			}
+		}
 
-	    // Nothing matched - surface a detailed diagnostic at error level.
-	    $logger->error( 'Nonce verification failed - no valid nonce matched', array(
-	        'fields_checked' => $nonce_fields,
-	        'fields_present' => $fields_present,
-	        'results'        => $results,
-	        'ajax_action'    => isset( $_POST['action'] ) ? sanitize_text_field( wp_unslash( $_POST['action'] ) ) : 'unknown',
-	        'post_id'        => isset( $_POST['post_id'] ) ? sanitize_text_field( wp_unslash( $_POST['post_id'] ) ) : 'unknown',
-	    ) );
+		// Nothing matched - surface a detailed diagnostic at error level.
+		$logger->error( 'Nonce verification failed - no valid nonce matched', array(
+			'fields_checked' => $nonce_fields,
+			'fields_present' => $fields_present,
+			'results'        => $results,
+			'ajax_action'    => isset( $_POST['action'] ) ? sanitize_text_field( wp_unslash( $_POST['action'] ) ) : 'unknown',
+			'post_id'        => isset( $_POST['post_id'] ) ? sanitize_text_field( wp_unslash( $_POST['post_id'] ) ) : 'unknown',
+		) );
 
-	    return false;
+		return false;
 	}
 
 	/**
@@ -1110,104 +1104,6 @@ class GatewayKit_Elementor_Action extends Action_Base {
 		}
 
 		return $options;
-	}
-
-	/**
-	 * Collect all Elementor forms on the current page that have the discount
-	 * feature enabled, with their amount + discount-field configuration.
-	 *
-	 * Used to decide whether (and how) to enqueue the frontend discount UI.
-	 *
-	 * @return array {
-	 *     @type array {
-	 *         @type string $form_id        Elementor form ID.
-	 *         @type string $discount_field Field ID holding the discount code.
-	 *         @type string $amount_type    'fixed' or 'field'.
-	 *         @type float  $amount         Fixed amount (when amount_type is fixed).
-	 *         @type string $amount_field   Field ID holding the amount.
-	 *     }
-	 * }
-	 */
-	public static function get_discount_forms_for_current_page() {
-		if ( ! class_exists( '\Elementor\Plugin' ) || ! is_singular() ) {
-			return array();
-		}
-
-		$post_id = get_the_ID();
-		if ( ! $post_id ) {
-			return array();
-		}
-
-		$document = \Elementor\Plugin::$instance->documents->get_doc_for_frontend( $post_id );
-		if ( ! $document ) {
-			return array();
-		}
-
-		$elements = $document->get_elements_data();
-		$forms    = array();
-		self::collect_discount_forms( $elements, $forms );
-
-		return $forms;
-	}
-
-	/**
-	 * Recursively walk Elementor elements data and collect discount-enabled forms.
-	 *
-	 * @param array $elements Elementor elements tree.
-	 * @param array $forms    Collected forms (passed by reference).
-	 */
-	private static function collect_discount_forms( $elements, &$forms ) {
-		if ( ! is_array( $elements ) ) {
-			return;
-		}
-
-		foreach ( $elements as $element ) {
-			$is_form_widget = isset( $element['elType'] )
-				&& 'widget' === $element['elType']
-				&& isset( $element['widgetType'] )
-				&& 'form' === $element['widgetType'];
-
-			if ( $is_form_widget ) {
-				$settings    = isset( $element['settings'] ) ? $element['settings'] : array();
-
-				// Detect the dedicated Discount Code field by scanning the
-				// form's field list for type gatewaykit_discount_code — no
-				// toggle required.
-				$has_discount = false;
-				if ( ! empty( $settings['form_fields'] ) && is_array( $settings['form_fields'] ) ) {
-					foreach ( $settings['form_fields'] as $ff ) {
-						if ( isset( $ff['field_type'] ) && 'gatewaykit_discount_code' === $ff['field_type'] ) {
-							$has_discount = true;
-							break;
-						}
-					}
-				}
-
-				// Skip when the Discount feature is not available (e.g. Lite build).
-				if ( $has_discount && ! class_exists( 'GatewayKit_Discount_Model' ) ) {
-					$has_discount = false;
-				}
-
-				// Detect payment gateway action by the presence of its
-				// settings key, which is more reliable than checking
-				// submit_actions.
-				$has_payment = isset( $settings['gatewaykit_gateway'] );
-
-				if ( $has_payment && $has_discount ) {
-					$forms[] = array(
-						'form_id'        => isset( $settings['form_id'] ) ? sanitize_key( $settings['form_id'] ) : '',
-						'discount_field' => '',
-						'amount_type'    => isset( $settings['gatewaykit_amount_type'] ) ? $settings['gatewaykit_amount_type'] : 'fixed',
-						'amount'         => isset( $settings['gatewaykit_amount'] ) ? floatval( $settings['gatewaykit_amount'] ) : 0,
-						'amount_field'   => isset( $settings['gatewaykit_amount_field'] ) ? sanitize_key( $settings['gatewaykit_amount_field'] ) : '',
-					);
-				}
-			}
-
-			if ( ! empty( $element['elements'] ) ) {
-				self::collect_discount_forms( $element['elements'], $forms );
-			}
-		}
 	}
 
 	/**
@@ -1286,7 +1182,7 @@ class GatewayKit_Elementor_Action extends Action_Base {
 					$forms[] = array(
 						'form_id'              => isset( $settings['form_id'] ) ? sanitize_key( $settings['form_id'] ) : '',
 						'opt_field'            => isset( $settings['gatewaykit_optional_payment_field'] ) ? sanitize_key( $settings['gatewaykit_optional_payment_field'] ) : '',
-						'no_payment_message'   => isset( $settings['gatewaykit_optional_no_payment_message'] ) ? $settings['gatewaykit_optional_no_payment_message'] : '',
+						'no_payment_message'   => isset( $settings['gatewaykit_optional_no_payment_message'] ) ? wp_kses_post( $settings['gatewaykit_optional_no_payment_message'] ) : '',
 					);
 				}
 			}

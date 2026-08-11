@@ -2,8 +2,8 @@
 /**
  * Plugin Name: GatewayKit – Payment Gateway for Elementor Forms
  * Plugin URI:  https://pourmirzai.com/gatewaykit
- * Description: Accept PayPal payments directly through Elementor Pro Forms. Upgrade to GatewayKit Pro for Stripe, Mollie, and CoinGate.
- * Version:     1.2.1
+ * Description: Accept payments through Elementor Pro Forms with PayPal, Stripe, Mollie, CoinGate, Coinify, NOWPayments, Razorpay, Paystack, and Mercado Pago. Upgrade to GatewayKit Pro for discount codes, webhooks, white label, and more.
+ * Version:     1.3.1
  * Author:      Morteza Pourmirzai
  * Author URI:  https://pourmirzai.com
  * Text Domain: gatewaykit
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Lite build identity.
 if ( ! defined( 'GATEWAYKIT_LITE_VERSION' ) ) {
-	define( 'GATEWAYKIT_LITE_VERSION', '1.2.1' );
+	define( 'GATEWAYKIT_LITE_VERSION', '1.3.1' );
 }
 
 /*
@@ -273,6 +273,19 @@ if ( ! function_exists( 'gatewaykit_fputcsv' ) ) {
 	 * @return int|false Bytes written, or false on failure.
 	 */
 	function gatewaykit_fputcsv( $handle, array $fields ) {
+		// Mitigate CSV formula injection: prefix cells starting with
+		// dangerous characters with a single quote so spreadsheet
+		// applications treat them as text, not formulas.
+		$fields = array_map( function ( $value ) {
+			if ( is_string( $value ) && '' !== $value ) {
+				$first = $value[0];
+				if ( false !== strpos( "=+-@\t\r", $first ) ) {
+					$value = "'" . $value;
+				}
+			}
+			return $value;
+		}, $fields );
+
 		return fputcsv( $handle, $fields );
 	}
 }

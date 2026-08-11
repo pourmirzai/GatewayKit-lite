@@ -1299,7 +1299,7 @@ msgid "Refund"
 msgstr ""
 
 #: src/Core/Admin/class-transaction-list-table.php:714
-msgid "â€” (free)"
+msgid "— (free)"
 msgstr ""
 
 #. translators: 1: original amount, 2: discount amount

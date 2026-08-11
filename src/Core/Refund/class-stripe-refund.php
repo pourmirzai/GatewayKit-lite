@@ -76,7 +76,8 @@ class GatewayKit_Stripe_Refund {
 		$args = array(
 			'method'  => 'POST',
 			'headers' => array(
-				'Authorization' => 'Bearer ' . $secret_key,
+				'Authorization'   => 'Bearer ' . $secret_key,
+				'Idempotency-Key' => 'gk_refund_' . $transaction->id . '_' . round( $amount * 100 ),
 			),
 			'body'    => http_build_query( $params ),
 			'timeout' => 30,
@@ -113,8 +114,9 @@ class GatewayKit_Stripe_Refund {
 	 * @return string|null Payment intent ID or null.
 	 */
 	private function resolve_payment_intent( $transaction ) {
-		// Primary: ref_id stores the payment_intent for Stripe Checkout.
 		$ref_id = $transaction->ref_id;
+
+		// Direct payment intent.
 		if ( ! empty( $ref_id ) && 0 === strpos( $ref_id, 'pi_' ) ) {
 			return $ref_id;
 		}
@@ -124,8 +126,49 @@ class GatewayKit_Stripe_Refund {
 		if ( is_string( $response ) ) {
 			$response = json_decode( $response, true );
 		}
-		if ( is_array( $response ) && ! empty( $response['payment_intent'] ) ) {
+		if ( is_array( $response ) && ! empty( $response['payment_intent'] ) && is_string( $response['payment_intent'] ) ) {
 			return $response['payment_intent'];
+		}
+
+		// Subscription transactions: resolve latest invoice's payment_intent via API.
+		if ( ! empty( $ref_id ) && 0 === strpos( $ref_id, 'sub_' ) ) {
+			$settings   = get_option( 'gatewaykit_stripe_settings', array() );
+			$secret_key = ! empty( $settings['secret_key'] ) ? GatewayKit_Crypto::decrypt( $settings['secret_key'] ) : '';
+			if ( '' !== $secret_key ) {
+				$pi = $this->resolve_pi_from_subscription( $ref_id, $secret_key );
+				if ( $pi ) {
+					return $pi;
+				}
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Resolve the latest payment_intent from a Stripe subscription.
+	 *
+	 * @param string $subscription_id Stripe subscription ID (sub_...).
+	 * @param string $secret_key      Decrypted Stripe secret key.
+	 * @return string|null Payment intent ID or null.
+	 */
+	private function resolve_pi_from_subscription( $subscription_id, $secret_key ) {
+		$response = wp_remote_get(
+			self::API_BASE . '/subscriptions/' . rawurlencode( $subscription_id ) . '?expand[]=latest_invoice.payment_intent',
+			array(
+				'headers' => array( 'Authorization' => 'Bearer ' . $secret_key ),
+				'timeout' => 15,
+			)
+		);
+
+		if ( is_wp_error( $response ) ) {
+			return null;
+		}
+
+		$body = json_decode( wp_remote_retrieve_body( $response ), true );
+
+		if ( ! empty( $body['latest_invoice']['payment_intent']['id'] ) ) {
+			return $body['latest_invoice']['payment_intent']['id'];
 		}
 
 		return null;

@@ -166,23 +166,6 @@ class GatewayKit_Mollie_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 	}
 
 	/**
-	 * Resolve the currency for this transaction.
-	 *
-* @return string ISO 4217 currency code.
-		*/
-		private function get_currency() {
-			$currency = $this->get_setting( 'currency', '' );
-			if ( ! empty( $currency ) ) {
-				return strtoupper( $currency );
-			}
-			$currency = get_option( 'gatewaykit_currency', '' );
-			if ( empty( $currency ) ) {
-				$currency = GatewayKit_Gateway_Manager::get_instance()->get_default_currency();
-			}
-			return strtoupper( $currency );
-		}
-
-	/**
 	 * Get the decrypted Mollie API key.
 	 *
 	 * @return string
@@ -448,6 +431,21 @@ class GatewayKit_Mollie_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 			$status = isset( $payment['status'] ) ? $payment['status'] : '';
 
 			if ( 'paid' === $status ) {
+				$paid_amount     = isset( $payment['amount']['value'] ) ? (float) $payment['amount']['value'] : 0;
+				$expected_amount = (float) $transaction->amount;
+
+				if ( abs( $paid_amount - $expected_amount ) > 0.01 ) {
+					$this->log( 'error', sprintf(
+						'Webhook amount mismatch: expected %.2f, received %.2f — marking as failed',
+						$expected_amount, $paid_amount
+					), array(
+						'transaction_id' => $transaction->id,
+						'gateway'        => $this->get_gateway_id(),
+					) );
+					$transaction->update( array( 'status' => 'failed' ) );
+					return;
+				}
+
 				$transaction->update( array(
 					'status'       => 'completed',
 					'ref_id'       => $payment_id,

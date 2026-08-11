@@ -91,6 +91,14 @@ class GatewayKit_Refund_Service {
 	 * @return array|WP_Error Array with refund details or error.
 	 */
 	public function process_refund( $transaction_id, $amount = null, $reason = '' ) {
+		if ( ! gatewaykit_is_pro_licensed() ) {
+			return new WP_Error( 'not_licensed', __( 'Refunds require a GatewayKit Pro license.', 'gatewaykit' ) );
+		}
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return new WP_Error( 'forbidden', __( 'You do not have permission to process refunds.', 'gatewaykit' ) );
+		}
+
 		$transaction = GatewayKit_Transaction_Model::find( $transaction_id );
 
 		if ( ! $transaction ) {
@@ -101,9 +109,15 @@ class GatewayKit_Refund_Service {
 			return new WP_Error( 'invalid_status', __( 'Only completed transactions can be refunded.', 'gatewaykit' ) );
 		}
 
+		$lock_key = 'gatewaykit_refund_lock_' . $transaction_id;
+		if ( false === wp_cache_add( $lock_key, 1, 'gatewaykit', 120 ) ) {
+			return new WP_Error( 'refund_in_progress', __( 'A refund is already being processed for this transaction. Please wait.', 'gatewaykit' ) );
+		}
+
 		$gateway_id = $transaction->gateway;
 
 		if ( ! $this->supports_refund( $gateway_id ) ) {
+			wp_cache_delete( $lock_key, 'gatewaykit' );
 			return new WP_Error(
 				'unsupported',
 				sprintf(
@@ -121,10 +135,6 @@ class GatewayKit_Refund_Service {
 			$amount = $original_amount;
 		}
 
-		if ( $amount > $original_amount ) {
-			return new WP_Error( 'exceeds_amount', __( 'Refund amount cannot exceed the original payment amount.', 'gatewaykit' ) );
-		}
-
 		$handler = $this->handlers[ $gateway_id ];
 
 		$result = $handler->refund( $transaction, $amount, $reason );
@@ -136,6 +146,7 @@ class GatewayKit_Refund_Service {
 				'amount'         => $amount,
 				'error'          => $result->get_error_message(),
 			) );
+			wp_cache_delete( $lock_key, 'gatewaykit' );
 			return $result;
 		}
 
@@ -155,6 +166,23 @@ class GatewayKit_Refund_Service {
 			$existing_response = array();
 		}
 
+		$already_refunded = 0;
+		if ( is_array( $existing_response ) && isset( $existing_response['total_refunded'] ) ) {
+			$already_refunded = (float) $existing_response['total_refunded'];
+		}
+
+		if ( ( $amount + $already_refunded ) > $original_amount ) {
+			wp_cache_delete( $lock_key, 'gatewaykit' );
+			return new WP_Error(
+				'exceeds_amount',
+				sprintf(
+					/* translators: 1: requested amount, 2: already refunded, 3: original amount */
+					__( 'Refund amount (%1$s) plus already refunded (%2$s) exceeds the original payment (%3$s).', 'gatewaykit' ),
+					$amount, $already_refunded, $original_amount
+				)
+			);
+		}
+
 		$refund_history                    = isset( $existing_response['refunds'] ) ? $existing_response['refunds'] : array();
 		$refund_history[]                  = array(
 			'refund_id'     => $refund_id,
@@ -167,10 +195,24 @@ class GatewayKit_Refund_Service {
 		$existing_response['refunds']      = $refund_history;
 		$existing_response['total_refunded'] = ( isset( $existing_response['total_refunded'] ) ? (float) $existing_response['total_refunded'] : 0 ) + $amount;
 
-		$transaction->update( array(
+		$updated = $transaction->update( array(
 			'status'            => $new_status,
 			'gateway_response'  => $existing_response,
 		) );
+
+		if ( false === $updated ) {
+			wp_cache_delete( $lock_key, 'gatewaykit' );
+			GatewayKit_Logger::get_instance()->error(
+				'Refund succeeded at gateway but DB update failed — status inconsistency',
+				array( 'transaction_id' => $transaction_id, 'gateway' => $gateway_id )
+			);
+			return new WP_Error(
+				'db_update_failed',
+				__( 'The refund was processed at the gateway, but the local database update failed. Please contact support — manual status correction may be required.', 'gatewaykit' )
+			);
+		}
+
+		wp_cache_delete( $lock_key, 'gatewaykit' );
 
 		GatewayKit_Logger::get_instance()->info( 'Refund processed', array(
 			'transaction_id' => $transaction_id,

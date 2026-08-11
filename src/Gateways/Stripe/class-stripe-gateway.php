@@ -125,6 +125,36 @@ class GatewayKit_Stripe_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 				'label'       => __( 'Webhook Signing Secret', 'gatewaykit' ),
 				'description' => __( 'The signing secret for your Stripe webhook endpoint (whsec_...). Required to verify webhooks.', 'gatewaykit' ),
 			),
+			'checkout_mode' => array(
+				'type'        => 'select',
+				'label'       => __( 'Checkout Display Mode', 'gatewaykit' ),
+				'options'     => array(
+					'hosted'   => __( 'Hosted Page (redirect to Stripe)', 'gatewaykit' ),
+					'embedded' => __( 'Embedded (no redirect, form on your site)', 'gatewaykit' ),
+				),
+				'default'     => 'hosted',
+				'description' => __( 'Embedded mode keeps customers on your site for a smoother experience. Requires Publishable Key. Hosted mode redirects to Stripe’s optimized checkout page.', 'gatewaykit' ),
+			),
+			'enable_apple_pay' => array(
+				'type'        => 'checkbox',
+				'label'       => __( 'Apple Pay', 'gatewaykit' ),
+				'description' => __( 'Show Apple Pay button on checkout. Requires domain verification in Stripe Dashboard → Settings → Payment Methods → Apple Pay.', 'gatewaykit' ),
+			),
+			'enable_google_pay' => array(
+				'type'        => 'checkbox',
+				'label'       => __( 'Google Pay', 'gatewaykit' ),
+				'description' => __( 'Show Google Pay button on checkout. Requires domain verification in Stripe Dashboard.', 'gatewaykit' ),
+			),
+			'enable_klarna' => array(
+				'type'        => 'checkbox',
+				'label'       => __( 'Klarna (Buy Now Pay Later)', 'gatewaykit' ),
+				'description' => __( 'Let customers pay in installments with Klarna. Availability depends on your Stripe account region.', 'gatewaykit' ),
+			),
+			'enable_afterpay' => array(
+				'type'        => 'checkbox',
+				'label'       => __( 'Afterpay / Clearpay (Buy Now Pay Later)', 'gatewaykit' ),
+				'description' => __( 'Let customers pay in 4 installments. Availability depends on your Stripe account region.', 'gatewaykit' ),
+			),
 		);
 
 		// Mark subscription-related settings as Pro features (handled via Elementor form fields, not gateway settings).
@@ -141,7 +171,7 @@ class GatewayKit_Stripe_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 	 */
 	public function get_gateway_info() {
 		return array(
-			'description' => __( 'Accept credit/debit cards and more via Stripe Checkout (hosted page). 3D Secure handled automatically. <strong>Restricted keys (rk_test_/rk_live_) with "Checkout Sessions" read/write permissions are recommended for security.</strong>', 'gatewaykit' ),
+			'description' => __( 'Accept credit/debit cards, Apple Pay, Google Pay, Klarna, and Afterpay / Clearpay via Stripe Checkout (hosted page). 3D Secure handled automatically. <strong>Restricted keys (rk_test_/rk_live_) with "Checkout Sessions" read/write permissions are recommended for security.</strong>', 'gatewaykit' ),
 		);
 	}
 
@@ -175,43 +205,39 @@ class GatewayKit_Stripe_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 			}
 		}
 
+		// Embedded Checkout renders the session client-side via Stripe.js, so
+		// the publishable key is required for that mode.
+		$checkout_mode = isset( $validated['checkout_mode'] ) ? $validated['checkout_mode'] : 'hosted';
+		$publishable   = isset( $validated['publishable_key'] ) ? $validated['publishable_key'] : '';
+		if ( 'embedded' === $checkout_mode && '' === $publishable ) {
+			return new WP_Error( 'stripe_embedded_requires_publishable_key', __( 'Publishable Key is required for Embedded Checkout mode.', 'gatewaykit' ) );
+		}
+
 		return $validated;
 	}
 
 	/**
-	 * Format amount into Stripe's minor units for the active currency.
+	 * Format amount into Stripe's minor units for the given currency.
 	 *
 	 * Stripe expects integer minor units for most currencies (e.g. cents) and
-	 * the whole amount for zero-decimal currencies (e.g. JPY).
+	 * the whole amount for zero-decimal currencies (e.g. JPY). When no
+	 * currency is passed, the transaction currency is resolved from settings.
 	 *
-	 * @param float $amount Amount.
+	 * @param float  $amount   Amount.
+	 * @param string $currency ISO 4217 currency code (optional, resolved from settings when empty).
 	 * @return int Minor units.
 	 */
-	protected function format_amount( $amount ) {
-		$currency = $this->get_currency();
+	protected function format_amount( $amount, $currency = '' ) {
+		if ( '' === $currency ) {
+			$currency = $this->get_currency();
+		}
+		$currency = strtoupper( $currency );
 
 		if ( in_array( $currency, self::$zero_decimal, true ) ) {
 			return (int) round( (float) $amount );
 		}
 
 		return (int) round( (float) $amount * 100 );
-	}
-
-	/**
-	 * Resolve the currency for this transaction.
-	 *
-	 * @return string ISO 4217 currency code.
-	 */
-	private function get_currency() {
-		$currency = $this->get_setting( 'currency', '' );
-		if ( ! empty( $currency ) ) {
-			return strtoupper( $currency );
-		}
-		$currency = get_option( 'gatewaykit_currency', '' );
-		if ( empty( $currency ) ) {
-			$currency = GatewayKit_Gateway_Manager::get_instance()->get_default_currency();
-		}
-		return strtoupper( $currency );
 	}
 
 	/**
@@ -397,6 +423,60 @@ class GatewayKit_Stripe_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 	}
 
 	/**
+	 * Create a reusable Stripe Payment Link for a fixed amount.
+	 *
+	 * The link is hosted on Stripe's domain and lets merchants collect payment
+	 * without a form (invoices, WhatsApp/Telegram sales, email links). Payments
+	 * made through the link go directly to the merchant's Stripe account and
+	 * are NOT tracked by GatewayKit (they bypass the Elementor form flow).
+	 *
+	 * @param float  $amount      Payment amount in major units.
+	 * @param string $currency    ISO 4217 currency code (e.g. USD).
+	 * @param string $name        Product or service name.
+	 * @param string $description Optional description.
+	 * @return array|WP_Error Decoded Stripe response or error.
+	 */
+	public function create_payment_link( $amount, $currency, $name, $description = '' ) {
+		$currency  = strtoupper( $currency );
+		$formatted = $this->format_amount( $amount, $currency );
+
+		if ( $formatted <= 0 ) {
+			return new WP_Error( 'stripe_invalid_amount', __( 'Payment amount must be greater than zero.', 'gatewaykit' ) );
+		}
+
+		$product_data = array(
+			'name' => mb_substr( (string) $name, 0, 200 ),
+		);
+
+		if ( '' !== $description ) {
+			$product_data['description'] = mb_substr( (string) $description, 0, 2000 );
+		}
+
+		$params = array(
+			'line_items' => array(
+				array(
+					'quantity'   => 1,
+					'price_data' => array(
+						'currency'     => strtolower( $currency ),
+						'unit_amount'  => $formatted,
+						'product_data' => $product_data,
+					),
+				),
+			),
+		);
+
+		$response = $this->api_request( '/payment_links', $params, 'POST' );
+
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		$this->log( 'info', 'Stripe payment link created', array( 'amount' => $formatted, 'currency' => $currency ) );
+
+		return $response;
+	}
+
+	/**
 	 * Create a Stripe Checkout Session.
 	 *
 	 * @param float  $amount       Payment amount.
@@ -420,8 +500,16 @@ class GatewayKit_Stripe_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 		// Recompute formatted amount now that currency may have changed.
 		$formatted  = $this->format_amount( $amount );
 
-		// Stripe replaces {CHECKOUT_SESSION_ID} in success_url with the new id.
-		$success_url = add_query_arg( array( 'authority' => '{CHECKOUT_SESSION_ID}' ), $callback_url );
+		// Embedded mode keeps the buyer on the site, so the {CHECKOUT_SESSION_ID}
+		// template is not supported. The frontend redirects via JS after the
+		// embedded checkout completes, using the session id returned in the API
+		// response. Hosted mode relies on Stripe replacing the placeholder.
+		$is_embedded = ( 'embedded' === $this->get_setting( 'checkout_mode', 'hosted' ) );
+		if ( $is_embedded ) {
+			$success_url = $callback_url;
+		} else {
+			$success_url = add_query_arg( array( 'authority' => '{CHECKOUT_SESSION_ID}' ), $callback_url );
+		}
 
 		// Carry the transaction receipt token on cancel so the callback handler
 		// can resolve the order and route to the configured failure URL.
@@ -473,6 +561,42 @@ class GatewayKit_Stripe_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 			);
 		}
 
+		// Embedded Checkout renders the Checkout Session in an iframe on the
+		// site, so Stripe requires ui_mode=embedded and does not return a hosted
+		// redirect URL — instead the response carries a client_secret.
+		if ( $is_embedded ) {
+			$params['ui_mode'] = 'embedded';
+		}
+
+		// Build the payment_method_types array for one-time payments when any
+		// enhanced method (Apple Pay / Google Pay / Klarna / Afterpay) is
+		// enabled. Defaults to Stripe Dashboard defaults when none are checked
+		// (backward compatible). BNPL / wallet methods are not supported for
+		// subscriptions, so only the card type applies there.
+		if ( ! $is_subscription ) {
+			$payment_method_types = array( 'card' );
+
+			$enhanced_methods = array(
+				'enable_apple_pay'  => 'apple_pay',
+				'enable_google_pay' => 'google_pay',
+				'enable_klarna'     => 'klarna',
+				'enable_afterpay'   => 'afterpay_clearpay',
+			);
+
+			foreach ( $enhanced_methods as $setting_key => $method_type ) {
+				if ( '1' === (string) $this->get_setting( $setting_key, '' ) ) {
+					$payment_method_types[] = $method_type;
+				}
+			}
+
+			// Only send the param when at least one non-card method is enabled,
+			// so existing installs without these settings keep using Stripe
+			// Dashboard defaults.
+			if ( count( $payment_method_types ) > 1 ) {
+				$params['payment_method_types'] = $payment_method_types;
+			}
+		}
+
 		$response = $this->api_request( '/checkout/sessions', $params, 'POST' );
 
 		if ( is_wp_error( $response ) ) {
@@ -483,10 +607,28 @@ class GatewayKit_Stripe_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 			);
 		}
 
-		$session_id   = isset( $response['id'] ) ? $response['id'] : '';
-		$redirect_url = isset( $response['url'] ) ? $response['url'] : '';
+		$session_id    = isset( $response['id'] ) ? $response['id'] : '';
+		$redirect_url  = isset( $response['url'] ) ? $response['url'] : '';
+		$client_secret = isset( $response['client_secret'] ) ? $response['client_secret'] : '';
 
-		if ( '' === $session_id || '' === $redirect_url ) {
+		if ( '' === $session_id ) {
+			return array(
+				'status'        => 'error',
+				'error_type'    => 'gateway',
+				'error_message' => __( 'Stripe did not return a checkout session.', 'gatewaykit' ),
+			);
+		}
+
+		// Hosted sessions always return a redirect URL; embedded sessions
+		// return a client_secret instead.
+		if ( $is_embedded && '' === $client_secret ) {
+			return array(
+				'status'        => 'error',
+				'error_type'    => 'gateway',
+				'error_message' => __( 'Stripe did not return a client secret for the embedded checkout session.', 'gatewaykit' ),
+			);
+		}
+		if ( ! $is_embedded && '' === $redirect_url ) {
 			return array(
 				'status'        => 'error',
 				'error_type'    => 'gateway',
@@ -495,19 +637,27 @@ class GatewayKit_Stripe_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 		}
 
 		// Cache the redirect URL so get_redirect_url() can resolve it.
-		set_transient( 'gatewaykit_stripe_redirect_' . $session_id, $redirect_url, DAY_IN_SECONDS );
+		if ( '' !== $redirect_url ) {
+			set_transient( 'gatewaykit_stripe_redirect_' . $session_id, $redirect_url, DAY_IN_SECONDS );
+		}
+
+		// Cache the client secret so get_embedded_client_secret() can resolve it.
+		if ( '' !== $client_secret ) {
+			set_transient( 'gatewaykit_stripe_embedded_' . $session_id, $client_secret, DAY_IN_SECONDS );
+		}
 
 		// Cache subscription mode flag for verify_payment().
 		if ( $is_subscription ) {
 			set_transient( 'gatewaykit_stripe_sub_' . $session_id, true, WEEK_IN_SECONDS );
 		}
 
-		$this->log( 'info', 'Stripe checkout session created', array( 'session_id' => $session_id, 'amount' => $formatted, 'currency' => $currency ) );
+		$this->log( 'info', 'Stripe checkout session created', array( 'session_id' => $session_id, 'amount' => $formatted, 'currency' => $currency, 'mode' => $is_embedded ? 'embedded' : 'hosted' ) );
 
 		return array(
 			'status'       => 'success',
 			'authority'    => $session_id,
 			'redirect_url' => $redirect_url,
+			'client_secret' => $client_secret,
 		);
 	}
 
@@ -552,9 +702,20 @@ class GatewayKit_Stripe_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 			);
 		}
 
-		// Validate amount.
+		// Validate amount. Fail closed if the session omits amount_total.
+		if ( ! isset( $session['amount_total'] ) ) {
+			$this->log( 'error', 'Stripe Checkout session missing amount_total — rejecting payment', array(
+				'session_id' => isset( $session['id'] ) ? $session['id'] : 'unknown',
+				'authority'  => $authority,
+			) );
+			return array(
+				'status'        => 'failed',
+				'error_message' => __( 'Stripe payment amount could not be verified.', 'gatewaykit' ),
+			);
+		}
+
 		$expected   = $this->format_amount( $amount );
-		$paid_total = isset( $session['amount_total'] ) ? (int) $session['amount_total'] : $expected;
+		$paid_total = (int) $session['amount_total'];
 		if ( $paid_total > 0 && abs( $paid_total - $expected ) > 0 ) {
 			$this->log( 'error', 'Stripe amount mismatch', array( 'expected' => $expected, 'paid' => $paid_total ) );
 			return array(
@@ -588,6 +749,18 @@ class GatewayKit_Stripe_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 	public function get_redirect_url( $authority ) {
 		$authority = sanitize_text_field( (string) $authority );
 		$cached    = get_transient( 'gatewaykit_stripe_redirect_' . $authority );
+		return $cached ? $cached : '';
+	}
+
+	/**
+	 * Resolve the embedded checkout client secret for a session.
+	 *
+	 * @param string $session_id Session id.
+	 * @return string
+	 */
+	public function get_embedded_client_secret( $session_id ) {
+		$session_id = sanitize_text_field( (string) $session_id );
+		$cached     = get_transient( 'gatewaykit_stripe_embedded_' . $session_id );
 		return $cached ? $cached : '';
 	}
 

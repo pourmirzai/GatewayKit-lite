@@ -285,20 +285,11 @@ class GatewayKit_Gateway_Manager {
 	}
 
 	/**
-	 * Clear enabled gateways cache
-	 */
-	private function clear_enabled_gateways_cache() {
-		// Clear WordPress object cache for the enabled gateways option
-		wp_cache_delete( 'gatewaykit_enabled_gateways', 'options' );
-	}
-
-	/**
 	 * Register default gateways
 	 */
 	private function register_default_gateways() {
-		// No gateways are bundled with the shared core. Each version registers
-		// its own gateways (PayPal in Lite; Stripe/Mollie/CoinGate in Pro) by
-		// hooking into this action.
+		// Gateways are auto-discovered from src/Gateways/*/module.php and
+		// registered here. All 9 gateways ship in the Lite build.
 		do_action( 'gatewaykit_register_gateways', $this );
 	}
 
@@ -343,7 +334,7 @@ class GatewayKit_Gateway_Manager {
 	/**
 	 * Get the base PayPal-supported currencies (ISO 4217).
 	 *
-	 * Source: PayPal REST API v2 documentation â€” currencies supported for
+	 * Source: PayPal REST API v2 documentation — currencies supported for
 	 * transactional use. This list is the foundation for Lite and Pro
 	 * builds; Pro intersects it with each gateway's own supported list.
 	 *
@@ -383,28 +374,25 @@ class GatewayKit_Gateway_Manager {
 	/**
 	 * Get the list of currencies selectable in the admin settings.
 	 *
-	 * - Lite build: full PayPal currency list.
-	 * - Pro build: PayPal currency list intersected with every registered
-	 *   gateway's get_supported_currencies() so only currencies accepted by
-	 *   ALL active gateways remain.
+	 * Intersects the PayPal currency list with every registered gateway's
+	 * get_supported_currencies() so only currencies accepted by ALL active
+	 * gateways remain. Applies to both Lite and Pro builds.
 	 *
 	 * @return array Associative array: code => label.
 	 */
 	public function get_available_currencies() {
-		// Lite + Pro â€” start from the PayPal currency list.
 		$currencies = self::get_paypal_currencies();
 
-		// Pro: intersect with each gateway's supported currencies.
-		if ( defined( 'GATEWAYKIT_PRO_VERSION' ) ) {
-			foreach ( $this->gateways as $gateway_id => $class_name ) {
-				$gateway = $this->get_gateway( $gateway_id );
-				if ( ! $gateway ) {
-					continue;
-				}
-				$supported = $gateway->get_supported_currencies();
-				if ( ! empty( $supported ) ) {
-					$currencies = array_intersect_key( $currencies, array_flip( $supported ) );
-				}
+		// Intersect with each enabled gateway's supported currencies.
+		// This applies to both Lite and Pro, since all gateways ship in Lite.
+		foreach ( $this->gateways as $gateway_id => $class_name ) {
+			$gateway = $this->get_gateway( $gateway_id );
+			if ( ! $gateway ) {
+				continue;
+			}
+			$supported = $gateway->get_supported_currencies();
+			if ( ! empty( $supported ) ) {
+				$currencies = array_intersect_key( $currencies, array_flip( $supported ) );
 			}
 		}
 

@@ -150,23 +150,6 @@ class GatewayKit_NOWPayments_Gateway extends GatewayKit_Abstract_Payment_Gateway
 	}
 
 	/**
-	 * Resolve the currency for this transaction.
-	 *
-	 * @return string ISO 4217 currency code.
-	 */
-	private function get_currency() {
-			$currency = $this->get_setting( 'currency', '' );
-			if ( ! empty( $currency ) ) {
-				return strtoupper( $currency );
-			}
-			$currency = get_option( 'gatewaykit_currency', '' );
-			if ( empty( $currency ) ) {
-				$currency = GatewayKit_Gateway_Manager::get_instance()->get_default_currency();
-			}
-			return strtoupper( $currency );
-		}
-
-	/**
 	 * Get the active API base URL.
 	 *
 	 * @return string
@@ -359,7 +342,12 @@ class GatewayKit_NOWPayments_Gateway extends GatewayKit_Abstract_Payment_Gateway
 
 		$invoice_status = isset( $result['invoice_status'] ) ? $result['invoice_status'] : '';
 
-		if ( ! in_array( $invoice_status, array( 'finished', 'confirmed', 'complete' ), true ) ) {
+		// Only genuinely terminal-success invoice statuses complete the order.
+		// `success` and `finished` are the terminal-success invoice states
+		// reported by NOWPayments. `confirmed` is intermediate (payment
+		// confirmed but payout still processing); `complete` is not a real
+		// NOWPayments status.
+		if ( ! in_array( $invoice_status, array( 'finished', 'success' ), true ) ) {
 			return array(
 				'status'        => 'failed',
 				'error_message' => sprintf(
@@ -440,7 +428,19 @@ class GatewayKit_NOWPayments_Gateway extends GatewayKit_Abstract_Payment_Gateway
 			exit;
 		}
 
-		$expected_sig = hash_hmac( 'sha512', $raw_body, $ipn_secret );
+		// Verify HMAC-SHA512 signature per NOWPayments docs
+		// (https://documenter.getpostman.com/view/7907941/S1a32n38): the
+		// signature is computed over the decoded payload with its keys sorted
+		// alphabetically and re-serialized compactly, NOT over the raw bytes.
+		// The official reference implementation uses a top-level ksort; we sort
+		// recursively (a strict superset that produces an identical result for
+		// flat payloads, and the correct result for nested ones). The
+		// re-serialization uses JSON_UNESCAPED_SLASHES to match the reference.
+		$sorted = $decoded;
+		$this->recursive_ksort( $sorted );
+		$signed_payload = wp_json_encode( $sorted, JSON_UNESCAPED_SLASHES );
+
+		$expected_sig = hash_hmac( 'sha512', $signed_payload, $ipn_secret );
 		if ( ! hash_equals( $expected_sig, $signature ) ) {
 			$this->log( 'warning', 'NOWPayments IPN: signature mismatch' );
 			status_header( 403 );
@@ -471,10 +471,31 @@ class GatewayKit_NOWPayments_Gateway extends GatewayKit_Abstract_Payment_Gateway
 		}
 
 		if ( in_array( $transaction->status, array( 'pending', 'processing' ), true ) ) {
-			$completed_statuses = array( 'finished', 'confirmed', 'complete' );
-			$failed_statuses    = array( 'failed', 'expired', 'refunded' );
+			// `finished` is the only genuinely terminal-success payment_status
+			// reported by NOWPayments. `confirmed`/`sending`/`waiting`/
+			// `confirming`/`partially_paid` are intermediate (still
+			// processing); `failed`/`expired`/`refunded` are terminal-failure.
+			// `complete` is not a real NOWPayments status.
+			$completed_statuses  = array( 'finished' );
+			$processing_statuses = array( 'waiting', 'confirming', 'confirmed', 'sending', 'partially_paid', 'sending_again' );
+			$failed_statuses     = array( 'failed', 'expired', 'refunded' );
 
 			if ( in_array( $payment_status, $completed_statuses, true ) ) {
+				$paid_amount     = isset( $decoded['price_amount'] ) ? (float) $decoded['price_amount'] : 0;
+				$expected_amount = (float) $transaction->amount;
+
+				if ( abs( $paid_amount - $expected_amount ) > 0.01 ) {
+					$this->log( 'error', sprintf(
+						'Webhook amount mismatch: expected %.2f, received %.2f — marking as failed',
+						$expected_amount, $paid_amount
+					), array(
+						'transaction_id' => $transaction->id,
+						'gateway'        => $this->get_gateway_id(),
+					) );
+					$transaction->update( array( 'status' => 'failed' ) );
+					return;
+				}
+
 				$transaction->update( array(
 					'status'       => 'completed',
 					'ref_id'       => $order_id,
@@ -484,6 +505,8 @@ class GatewayKit_NOWPayments_Gateway extends GatewayKit_Abstract_Payment_Gateway
 			} elseif ( in_array( $payment_status, $failed_statuses, true ) ) {
 				$transaction->update( array( 'status' => 'failed' ) );
 				do_action( 'gatewaykit_payment_failed', $transaction, array( 'nowpayments_status' => $payment_status ) );
+			} elseif ( in_array( $payment_status, $processing_statuses, true ) ) {
+				$transaction->update( array( 'status' => 'processing' ) );
 			}
 		}
 
@@ -503,5 +526,29 @@ class GatewayKit_NOWPayments_Gateway extends GatewayKit_Abstract_Payment_Gateway
 			return $mapped;
 		}
 		return '' !== $authority && is_numeric( $authority ) ? (string) $authority : '';
+	}
+
+	/**
+	 * Recursively sort an array's keys in ascending alphabetical order.
+	 *
+	 * Used to build the canonical JSON representation of an IPN payload that
+	 * NOWPayments signs (HMAC-SHA512). Operates on nested arrays so the
+	 * signature matches regardless of payload shape; for flat payloads the
+	 * result is identical to a top-level ksort (the official reference
+	 * implementation).
+	 *
+	 * @param array $array Array to sort (passed by reference).
+	 */
+	private function recursive_ksort( &$array ) {
+		if ( ! is_array( $array ) ) {
+			return;
+		}
+		foreach ( $array as &$value ) {
+			if ( is_array( $value ) ) {
+				$this->recursive_ksort( $value );
+			}
+		}
+		unset( $value );
+		ksort( $array );
 	}
 }

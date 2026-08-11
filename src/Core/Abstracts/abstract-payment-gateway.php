@@ -203,41 +203,20 @@ abstract class GatewayKit_Abstract_Payment_Gateway implements GatewayKit_Payment
 	}
 
 	/**
-	 * Make HTTP request
+	 * Get the configured currency for this gateway.
 	 *
-	 * @param string $url     Request URL
-	 * @param array  $data    Request data
-	 * @param string $method  HTTP method
-	 * @return array Response data
+	 * @return string Uppercase ISO 4217 currency code.
 	 */
-	protected function make_request( $url, $data = array(), $method = 'POST' ) {
-		$args = array(
-			'method'  => $method,
-			'body'    => json_encode( $data ),
-			'headers' => array(
-				'Content-Type' => 'application/json',
-			),
-			'timeout' => 30,
-		);
-
-		$response = wp_remote_request( $url, $args );
-
-		if ( is_wp_error( $response ) ) {
-			$this->log( 'error', 'HTTP request failed: ' . $response->get_error_message() );
-			return array(
-				'success' => false,
-				'error'   => $response->get_error_message(),
-			);
+	protected function get_currency() {
+		$currency = $this->get_setting( 'currency', '' );
+		if ( ! empty( $currency ) ) {
+			return strtoupper( $currency );
 		}
-
-		$body = wp_remote_retrieve_body( $response );
-		$data = json_decode( $body, true );
-
-		return array(
-			'success' => true,
-			'data'    => $data,
-			'code'    => wp_remote_retrieve_response_code( $response ),
-		);
+		$currency = get_option( 'gatewaykit_currency', '' );
+		if ( empty( $currency ) ) {
+			$currency = GatewayKit_Gateway_Manager::get_instance()->get_default_currency();
+		}
+		return strtoupper( $currency );
 	}
 
 	/**

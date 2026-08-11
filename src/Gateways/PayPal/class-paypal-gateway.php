@@ -226,27 +226,6 @@ class GatewayKit_PayPal_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 	}
 
 	/**
-	 * Get the currency code used for PayPal orders.
-	 *
-	 * Falls back to USD when no currency is configured (or the stored site
-	 * currency is not PayPal-compatible). A per-gateway 'currency' setting
-	 * takes precedence.
-	 *
-	 * @return string ISO 4217 currency code.
-	 */
-private function get_currency() {
-			$currency = $this->get_setting( 'currency', '' );
-			if ( ! empty( $currency ) ) {
-				return strtoupper( $currency );
-			}
-			$currency = get_option( 'gatewaykit_currency', '' );
-			if ( empty( $currency ) ) {
-				$currency = GatewayKit_Gateway_Manager::get_instance()->get_default_currency();
-			}
-			return strtoupper( $currency );
-		}
-
-	/**
 	 * Build the base API URL for the active mode.
 	 *
 	 * @return string
@@ -658,7 +637,14 @@ private function get_currency() {
 		$sig = $this->verify_webhook_signature( $event, $raw_body );
 		if ( is_wp_error( $sig ) ) {
 			$this->log( 'error', 'PayPal webhook signature verification error', array( 'error' => $sig->get_error_message() ) );
-			return array( 'status' => 'failed', 'error_message' => $sig->get_error_message() );
+			// F5: a missing-webhook-id configuration error is surfaced with a
+			// distinct status so the dispatcher can reject the webhook (403)
+			// instead of acknowledging it.
+			return array(
+				'status'        => 'config_error',
+				'error_code'    => $sig->get_error_code(),
+				'error_message' => $sig->get_error_message(),
+			);
 		}
 		if ( true !== $sig ) {
 			$this->log( 'error', 'PayPal webhook signature invalid — rejecting forged or tampered payload' );
@@ -722,27 +708,36 @@ private function get_currency() {
 	 * PAYPAL-TRANSMISSION-ID, PAYPAL-TRANSMISSION-SIG, PAYPAL-TRANSMISSION-TIME).
 	 * Returns true only when PayPal responds with verification_status=SUCCESS.
 	 *
-	 * Backward-compat: when no `webhook_id` is configured we return true and
-	 * log a warning, falling back to the order re-fetch verification only.
-	 * This keeps existing installs working but signals the missing hardening.
+	 * Security (F5): the `webhook_id` is mandatory. When it is empty the
+	 * webhook is rejected with a WP_Error so the dispatcher returns 403
+	 * instead of silently accepting forged payloads.
 	 *
-	 * @param array  $event     Decoded webhook event payload.
-	 * @param string $raw_body  Raw request body bytes (unused: PayPal's verify
-	 *                          endpoint expects the decoded event object, not
-	 *                          the raw bytes).
-	 * @return bool|WP_Error True on verified (or on backward-compat skip),
-	 *                       false on bad signature, WP_Error on API failure.
+	 * N4: PayPal computes the webhook signature over the EXACT bytes it
+	 * posted, so the `webhook_event` sent to its verify endpoint must be the
+	 * raw, unsanitized decoded payload. The caller's `$event` may have been
+	 * run through sanitize_text_field() (callback-handler.php) which corrupts
+	 * the signature; we therefore re-decode `$raw_body` here and use that.
+	 *
+	 * @param array  $event     Decoded webhook event payload (possibly
+	 *                          sanitized — used only as a fallback).
+	 * @param string $raw_body  Raw request body bytes; decoded unsanitized and
+	 *                          sent to PayPal's verify endpoint.
+	 * @return bool|WP_Error True on verified, false on bad signature,
+	 *                       WP_Error on API failure or missing configuration.
 	 */
 	private function verify_webhook_signature( $event, $raw_body = '' ) {
 		$webhook_id = $this->get_setting( 'webhook_id' );
 
 		if ( empty( $webhook_id ) ) {
-			// Backward-compat: no webhook ID configured — skip signature
-			// verification and rely on order re-fetch only. This is the
-			// historical behavior; surfacing it in the log nudges the admin
-			// to configure the Webhook ID for full protection.
-			$this->log( 'warning', 'PayPal webhook signature not verified: no webhook_id configured (falling back to order re-fetch only)' );
-			return true;
+			// F5: a missing Webhook ID is a configuration error — refuse to
+			// verify. Returning a WP_Error (code 'paypal_webhook_id_missing')
+			// lets verify_webhook_event() and the dispatcher surface a 403
+			// and the merchant fix the gateway settings.
+			$this->log( 'error', 'PayPal webhook rejected: no webhook_id configured (cannot verify signature)' );
+			return new WP_Error(
+				'paypal_webhook_id_missing',
+				__( 'PayPal Webhook ID is not configured — webhook signature cannot be verified.', 'gatewaykit' )
+			);
 		}
 
 		// PayPal transmission headers. Read raw, then wp_unslash. These are
@@ -764,6 +759,17 @@ private function get_currency() {
 			}
 		}
 
+		// N4: re-decode the raw body so the webhook_event forwarded to PayPal
+		// is byte-identical to what PayPal sent. The sanitized $event passed
+		// in from the dispatcher is intentionally NOT used here — running the
+		// top-level fields through sanitize_text_field() mutates the bytes
+		// (strips tags, collapses whitespace, entities) and breaks the
+		// signature check. Fall back to $event only when no raw body exists.
+		$raw_event = '' !== $raw_body ? json_decode( $raw_body, true ) : null;
+		if ( ! is_array( $raw_event ) ) {
+			$raw_event = is_array( $event ) ? $event : array();
+		}
+
 		$body = array(
 			'auth_algo'         => $headers['auth_algo'],
 			'cert_url'          => $headers['cert_url'],
@@ -771,7 +777,7 @@ private function get_currency() {
 			'transmission_sig'  => $headers['transmission_sig'],
 			'transmission_time' => $headers['transmission_time'],
 			'webhook_id'        => $webhook_id,
-			'webhook_event'     => $event,
+			'webhook_event'     => $raw_event,
 		);
 
 		$response = $this->api_request( '/v1/notifications/verify-webhook-signature', $body, 'POST' );

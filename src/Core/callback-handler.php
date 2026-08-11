@@ -102,6 +102,26 @@ function gatewaykit_handle_payment_callback() {
 		wp_die( esc_html__( 'Payment gateway not found.', 'gatewaykit' ) );
 	}
 
+	// Idempotency guard (F4): if the transaction has already reached a
+	// terminal state, do not re-run verify_payment() and do not re-fire
+	// gatewaykit_payment_completed / gatewaykit_payment_failed. Reloading
+	// the success URL (or the gateway double-calling the redirect URL)
+	// otherwise causes duplicate receipts, webhooks, and subscription
+	// activations. Route the buyer to the appropriate stored URL.
+	if ( ! in_array( $transaction->status, array( 'pending', 'processing' ), true ) ) {
+		$redirect_url = 'completed' === $transaction->status
+			? $transaction->success_url
+			: ( $transaction->failure_url ? $transaction->failure_url : $transaction->success_url );
+
+		if ( $redirect_url ) {
+			$redirect_url = add_query_arg( 'gatewaykit_receipt', $transaction->receipt_token, $redirect_url );
+			wp_safe_redirect( $redirect_url );
+			exit;
+		}
+
+		wp_die( esc_html__( 'This payment has already been processed.', 'gatewaykit' ) );
+	}
+
 	// Verify payment
 	$result = $gateway->verify_payment( $authority, $transaction->amount );
 
@@ -237,6 +257,18 @@ function gatewaykit_handle_webhook() {
 	if ( 'paypal' === $gateway_id && $gateway instanceof GatewayKit_PayPal_Gateway ) {
 		$result = $gateway->verify_webhook_event( $event, $raw_body );
 
+		// F5: a configuration error (missing webhook_id / signing secret)
+		// must reject the webhook rather than acknowledge it, so the merchant
+		// is forced to finish configuring the gateway.
+		if ( isset( $result['status'] ) && 'config_error' === $result['status'] ) {
+			GatewayKit_Logger::get_instance()->error(
+				'PayPal webhook rejected: configuration error',
+				array( 'error_code' => isset( $result['error_code'] ) ? $result['error_code'] : '', 'error_message' => isset( $result['error_message'] ) ? $result['error_message'] : '' )
+			);
+			status_header( 403 );
+			exit;
+		}
+
 		if ( 'success' === $result['status'] && ! empty( $result['order_id'] ) ) {
 			$transaction = GatewayKit_Transaction_Model::find_by_authority( $result['order_id'] );
 
@@ -267,24 +299,34 @@ function gatewaykit_handle_webhook() {
 			exit;
 		}
 
-	// Unsupported event types / verification failures still get a 200 so
-	// PayPal does not keep hammering us, but we log them.
-	GatewayKit_Logger::get_instance()->info(
-		'PayPal webhook not actioned',
-		array( 'result' => $result, 'event_type' => isset( $event['event_type'] ) ? sanitize_text_field( $event['event_type'] ) : '' )
-	);
-	status_header( 200 );
-	exit;
-}
-
-	// NOWPayments (Lite) — handle directly to keep it out of the Pro action.
-	if ( 'nowpayments' === $gateway_id && $gateway instanceof GatewayKit_NOWPayments_Gateway ) {
-		$gateway->handle_webhook(); // Exits internally.
-		return;
+		// Unsupported event types / verification failures still get a 200 so
+		// PayPal does not keep hammering us, but we log them.
+		GatewayKit_Logger::get_instance()->info(
+			'PayPal webhook not actioned',
+			array( 'result' => $result, 'event_type' => isset( $event['event_type'] ) ? sanitize_text_field( $event['event_type'] ) : '' )
+		);
+		status_header( 200 );
+		exit;
 	}
 
 	/**
-	 * Allow other gateways (Pro) to handle their own webhook events.
+	 * Generic dispatcher — any gateway that ships a handle_webhook() method
+	 * handles its own signature verification and exits internally. This
+	 * covers Stripe, Mollie, CoinGate, Coinify, NOWPayments, Razorpay,
+	 * Paystack and MercadoPago (and any custom gateway following the same
+	 * contract) so async payment methods always reach their handler
+	 * regardless of the Lite/Pro split. Fixes F2: previously only
+	 * stripe|mollie|coingate|coinify were routed by the Pro module,
+	 * leaving Razorpay/Paystack/MercadoPago webhooks silently dropped.
+	 */
+	if ( method_exists( $gateway, 'handle_webhook' ) ) {
+		$gateway->handle_webhook();
+		exit;
+	}
+
+	/**
+	 * Backward-compat fallback action for gateways/listeners that hook into
+	 * the shared event but do not implement handle_webhook() themselves.
 	 *
 	 * @param array                        $event    Decoded webhook payload.
 	 * @param GatewayKit_Payment_Gateway_Interface $gateway Gateway instance.

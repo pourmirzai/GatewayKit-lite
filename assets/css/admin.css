@@ -1905,7 +1905,7 @@
     border: 1px solid #D1D5DB;
 }
 
-/* Transaction Notes Modal â€” wider than default */
+/* Transaction Notes Modal — wider than default */
 #gatewaykit-notes-modal .gatewaykit-modal-content {
     max-width: 600px;
 }
@@ -1971,12 +1971,12 @@
 }
 
 .gatewaykit-error-details .gatewaykit-copy-button.copied::after {
-    content: ' âœ“ Copied!';
+    content: ' - Copied!';
     margin-left: 8px;
 }
 
 /* ==========================================================================
-   Pro upsell â€” locked action + upgrade pill
+   Pro upsell — locked action + upgrade pill
    Used on the Transactions page to gate Pro-only actions (e.g. CSV export)
    behind a visible-but-disabled control with an inline upgrade link.
    ========================================================================== */
@@ -2024,7 +2024,7 @@
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
 }
 
-/* Date range filter block â€” used in the transactions-page filter bar.
+/* Date range filter block — used in the transactions-page filter bar.
    Rendered inline after the gateway dropdown; disabled inputs + Pro badge
    when unlicensed (ARCH-022). */
 .gatewaykit-date-filter {
@@ -2055,7 +2055,7 @@
     font-size: 11px;
 }
 
-/* Transaction Notes â€” Feature H (admin timeline in form-data modal) */
+/* Transaction Notes — Feature H (admin timeline in form-data modal) */
 .gatewaykit-transaction-notes {
     margin-top: 20px;
     padding-top: 16px;

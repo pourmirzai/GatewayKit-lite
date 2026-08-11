@@ -161,7 +161,7 @@ class GatewayKit_Admin_Settings {
 	 * Register settings
 	 */
 	public function register_settings() {
-		// General settings Ã¢â‚¬â€ each registered with a sanitization callback.
+		// General settings — each registered with a sanitization callback.
 		register_setting( 'gatewaykit_settings', 'gatewaykit_currency', array( 'sanitize_callback' => array( $this, 'sanitize_currency_setting' ) ) );
 		register_setting( 'gatewaykit_settings', 'gatewaykit_log_level', array( 'sanitize_callback' => array( $this, 'sanitize_log_level_setting' ) ) );
 		register_setting( 'gatewaykit_settings', 'gatewaykit_print_mode', array( 'sanitize_callback' => array( $this, 'sanitize_print_mode_setting' ) ) );
@@ -169,6 +169,7 @@ class GatewayKit_Admin_Settings {
 		register_setting( 'gatewaykit_settings', 'gatewaykit_elementor_action_rate_limit', array( 'sanitize_callback' => 'absint' ) );
 		register_setting( 'gatewaykit_settings', 'gatewaykit_admin_ajax_rate_limit', array( 'sanitize_callback' => 'absint' ) );
 		register_setting( 'gatewaykit_settings', 'gatewaykit_callback_rate_limit', array( 'sanitize_callback' => 'absint' ) );
+		register_setting( 'gatewaykit_settings', 'gatewaykit_trusted_proxies', array( 'sanitize_callback' => array( $this, 'sanitize_trusted_proxies' ) ) );
 
 		// Webhook settings (Pro only).
 		if ( defined( 'GATEWAYKIT_PRO_VERSION' ) ) {
@@ -249,6 +250,43 @@ public function sanitize_currency_setting( $value ) {
 	}
 
 	/**
+	 * Sanitize the trusted-proxy CIDR list (one CIDR or single IP per line).
+	 *
+	 * Each non-empty line is validated as either a single IP (IPv4/IPv6) or a
+	 * CIDR. Invalid lines are dropped so GatewayKit_IP_Helper never sees a
+	 * malformed entry. (F12)
+	 *
+	 * @param mixed $value Raw textarea value.
+	 * @return string Newline-separated, validated CIDRs/IPs.
+	 */
+	public function sanitize_trusted_proxies( $value ) {
+		$clean = array();
+		foreach ( preg_split( '/\r\n|\r|\n/', (string) $value ) as $line ) {
+			$line = trim( $line );
+			if ( '' === $line ) {
+				continue;
+			}
+
+			if ( false !== strpos( $line, '/' ) ) {
+				list( $ip, $mask ) = explode( '/', $line, 2 );
+				$mask = (int) $mask;
+				if ( ! filter_var( $ip, FILTER_VALIDATE_IP ) ) {
+					continue;
+				}
+				$max_mask = false !== strpos( $ip, ':' ) ? 128 : 32;
+				if ( $mask <= 0 || $mask > $max_mask ) {
+					continue;
+				}
+				$clean[] = $ip . '/' . $mask;
+			} elseif ( filter_var( $line, FILTER_VALIDATE_IP ) ) {
+				$clean[] = $line;
+			}
+		}
+
+		return implode( "\n", $clean );
+	}
+
+	/**
 	 * Sanitize webhook events (whitelist of known events).
 	 *
 	 * @param mixed $value Raw input (array or string).
@@ -323,7 +361,7 @@ public function sanitize_currency_setting( $value ) {
 				// Defense-in-depth license gate. The "Export All" button is
 				// rendered disabled on Lite (ARCH-022) and the bulk action
 				// is hidden from the dropdown, but a forged POST could still
-				// reach this endpoint â€” never stream the CSV without Pro.
+				// reach this endpoint — never stream the CSV without Pro.
 				if ( ! gatewaykit_is_pro_licensed() ) {
 					wp_die(
 						sprintf(
@@ -357,6 +395,23 @@ public function sanitize_currency_setting( $value ) {
 			add_action( 'admin_notices', function() {
 				echo '<div class="notice notice-error is-dismissible"><p>' . esc_html__( 'No transactions selected for export.', 'gatewaykit' ) . '</p></div>';
 			} );
+		}
+
+		if ( isset( $_GET['gatewaykit_notice'] ) ) {
+			$notice_type = sanitize_key( wp_unslash( $_GET['gatewaykit_notice'] ) );
+
+			if ( 'refund_success' === $notice_type ) {
+				add_action( 'admin_notices', function() {
+					echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Refund processed successfully.', 'gatewaykit' ) . '</p></div>';
+				} );
+			}
+
+			if ( 'refund_failed' === $notice_type ) {
+				$message = isset( $_GET['gatewaykit_message'] ) ? sanitize_text_field( wp_unslash( $_GET['gatewaykit_message'] ) ) : '';
+				add_action( 'admin_notices', function() use ( $message ) {
+					echo '<div class="notice notice-error is-dismissible"><p>' . esc_html__( 'Refund failed: ', 'gatewaykit' ) . esc_html( $message ) . '</p></div>';
+				} );
+			}
 		}
 		// phpcs:enable
 	}
@@ -704,16 +759,24 @@ public function sanitize_currency_setting( $value ) {
 						</td>
 					</tr>
 
-					<tr>
-						<th scope="row"><?php esc_html_e( 'Admin AJAX Rate Limit', 'gatewaykit' ); ?></th>
-						<td>
-							<input type="number" name="gatewaykit_admin_ajax_rate_limit" value="<?php echo esc_attr( get_option( 'gatewaykit_admin_ajax_rate_limit', '10' ) ); ?>" min="1" max="100" />
-							<p class="description"><?php esc_html_e( 'Maximum requests per IP per 15 minutes for admin AJAX calls.', 'gatewaykit' ); ?></p>
-						</td>
-					</tr>
+				<tr>
+					<th scope="row"><?php esc_html_e( 'Admin AJAX Rate Limit', 'gatewaykit' ); ?></th>
+					<td>
+						<input type="number" name="gatewaykit_admin_ajax_rate_limit" value="<?php echo esc_attr( get_option( 'gatewaykit_admin_ajax_rate_limit', '10' ) ); ?>" min="1" max="100" />
+						<p class="description"><?php esc_html_e( 'Maximum requests per IP per 15 minutes for admin AJAX calls.', 'gatewaykit' ); ?></p>
+					</td>
+				</tr>
+
+				<tr>
+					<th scope="row"><?php esc_html_e( 'Trusted Proxy CIDRs', 'gatewaykit' ); ?></th>
+					<td>
+						<textarea name="gatewaykit_trusted_proxies" rows="4" cols="60" class="large-text" placeholder="e.g. 173.245.48.0/20"><?php echo esc_textarea( get_option( 'gatewaykit_trusted_proxies', '' ) ); ?></textarea>
+						<p class="description"><?php esc_html_e( 'Forwarded headers (X-Forwarded-For, CF-Connecting-IP, …) are only honoured when the incoming connection comes from one of these CIDRs. Leave empty to always trust REMOTE_ADDR — recommended unless the site is behind Cloudflare or a known reverse proxy.', 'gatewaykit' ); ?></p>
+					</td>
+				</tr>
 
 
-			</table>
+		</table>
 		</div>
 		<?php
 		// Webhook settings (Pro only).
@@ -983,7 +1046,7 @@ public function sanitize_currency_setting( $value ) {
 	 */
 	private function get_gateway_logo( $gateway_id ) {
 		// No hardcoded per-gateway branding in the shared core. Gateways
-		// registered per-version supply a logo image at
+		// auto-discovered from src/Gateways/ supply a logo image at
 		// assets/images/gateways/<gateway_id>.png when available; otherwise a
 		// generic text badge is rendered.
 		$gateway_logos = array();
@@ -1081,7 +1144,9 @@ public function sanitize_currency_setting( $value ) {
 	 * Save settings
 	 */
 	private function save_settings() {
-		// Nonce is verified in settings_page() before this method is called.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified via wp_verify_nonce() in settings_page() before save_settings() runs
+		$active_tab = isset( $_POST['tab'] ) ? sanitize_key( wp_unslash( $_POST['tab'] ) ) : 'general';
+
 		// Debug: Log received data
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 			// phpcs:disable WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- debug logging of raw request shape
@@ -1104,6 +1169,7 @@ public function sanitize_currency_setting( $value ) {
 			'gatewaykit_elementor_action_rate_limit',
 			'gatewaykit_admin_ajax_rate_limit',
 			'gatewaykit_callback_rate_limit',
+			'gatewaykit_trusted_proxies',
 		);
 
 		// Webhook settings (Pro only).
@@ -1117,13 +1183,15 @@ public function sanitize_currency_setting( $value ) {
 		$general_settings[] = 'gatewaykit_receipt_email_subject';
 		$general_settings[] = 'gatewaykit_receipt_email_attach_pdf';
 
-		// phpcs:disable WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- nonce verified in settings_page(); values sanitized below
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- nonce verified in settings_page(); each value sanitized by its per-field callback (absint / sanitize_text_field / sanitize_trusted_proxies) below
 		foreach ( $general_settings as $setting ) {
 			if ( isset( $_POST[ $setting ] ) ) {
 				if ( $setting === 'gatewaykit_rate_limit_enabled' ) {
 					update_option( $setting, '1' );
 				} elseif ( in_array( $setting, array( 'gatewaykit_elementor_action_rate_limit', 'gatewaykit_admin_ajax_rate_limit', 'gatewaykit_callback_rate_limit' ), true ) ) {
 					update_option( $setting, absint( wp_unslash( $_POST[ $setting ] ) ) );
+				} elseif ( 'gatewaykit_trusted_proxies' === $setting ) {
+					update_option( $setting, $this->sanitize_trusted_proxies( wp_unslash( $_POST[ $setting ] ) ) );
 				} elseif ( $setting === 'gatewaykit_receipt_email_attach_pdf' ) {
 					update_option( $setting, '1' );
 				} else {
@@ -1133,12 +1201,14 @@ public function sanitize_currency_setting( $value ) {
 					}
 					update_option( $setting, $value );
 				}
-			} elseif ( $setting === 'gatewaykit_rate_limit_enabled' || $setting === 'gatewaykit_receipt_email_attach_pdf' ) {
+			} elseif ( ( $setting === 'gatewaykit_rate_limit_enabled' || $setting === 'gatewaykit_receipt_email_attach_pdf' )
+				&& 'general' === $active_tab
+			) {
 				update_option( $setting, '0' );
 			}
 		}
 
-		// Webhook settings â€” textarea and checkbox array (Pro only).
+		// Webhook settings — textarea and checkbox array (Pro only).
 		if ( defined( 'GATEWAYKIT_PRO_VERSION' ) ) {
 			if ( isset( $_POST['gatewaykit_webhook_urls'] ) ) {
 				$raw_urls     = wp_unslash( $_POST['gatewaykit_webhook_urls'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitized immediately below
@@ -1149,7 +1219,8 @@ public function sanitize_currency_setting( $value ) {
 				$raw_events     = wp_unslash( $_POST['gatewaykit_webhook_events'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitized immediately below
 				$sanitized_events = $this->sanitize_webhook_events( $raw_events );
 				update_option( 'gatewaykit_webhook_events', $sanitized_events );
-			} elseif ( isset( $_POST['action'] ) ) {
+			} elseif ( isset( $_POST['gatewaykit_webhook_events'] ) || isset( $_POST['submit'] ) ) {
+				// Webhook events section was submitted (even if all checkboxes unchecked).
 				update_option( 'gatewaykit_webhook_events', array() );
 			}
 		}
@@ -1302,7 +1373,7 @@ public function sanitize_currency_setting( $value ) {
 					</button>
 				</form>
 			<?php else : ?>
-				<!-- Export All Transactions â€” locked (Lite). Pro unlocks CSV export. -->
+				<!-- Export All Transactions — locked (Lite). Pro unlocks CSV export. -->
 				<span class="gatewaykit-locked-action" style="display: inline-block; margin-right: 10px; vertical-align: middle;">
 					<button type="button" class="button button-primary" disabled="disabled" aria-disabled="true"
 						title="<?php esc_attr_e( 'CSV export is a GatewayKit Pro feature. Upgrade to unlock.', 'gatewaykit' ); ?>">
@@ -1351,7 +1422,7 @@ public function sanitize_currency_setting( $value ) {
 				</select>
 
 			<?php
-			// Date range filter â€” always available (moved to Lite in 1.2.0).
+			// Date range filter — always available (moved to Lite in 1.2.0).
 			?>
 			<span class="gatewaykit-date-filter">
 				<label class="screen-reader-text" for="gatewaykit-filter-date-from"><?php esc_html_e( 'Date From', 'gatewaykit' ); ?></label>
@@ -1750,7 +1821,7 @@ public function sanitize_currency_setting( $value ) {
 		global $wpdb;
 		$table_name = $wpdb->prefix . 'gatewaykit_payment_transactions';
 
-		// Get transaction data (AJAX admin-only request; no cache â€” real-time view).
+		// Get transaction data (AJAX admin-only request; no cache — real-time view).
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- admin AJAX; real-time single-record lookup by PK
 		$transaction = $wpdb->get_row(
 			$wpdb->prepare(

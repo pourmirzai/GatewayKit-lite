@@ -141,23 +141,6 @@ class GatewayKit_CoinGate_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 	}
 
 	/**
-	 * Resolve the currency for this transaction.
-	 *
-	 * @return string ISO 4217 currency code.
-	 */
-	private function get_currency() {
-			$currency = $this->get_setting( 'currency', '' );
-			if ( ! empty( $currency ) ) {
-				return strtoupper( $currency );
-			}
-			$currency = get_option( 'gatewaykit_currency', '' );
-			if ( empty( $currency ) ) {
-				$currency = GatewayKit_Gateway_Manager::get_instance()->get_default_currency();
-			}
-			return strtoupper( $currency );
-		}
-
-	/**
 	 * Get the active API base URL.
 	 *
 	 * @return string
@@ -438,6 +421,30 @@ class GatewayKit_CoinGate_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 
 		if ( in_array( $transaction->status, array( 'pending', 'processing' ), true ) ) {
 			if ( in_array( $status, array( 'paid', 'confirmed', 'paid_over' ), true ) ) {
+				// Re-fetch the order to verify the paid amount against the API.
+				$order = $this->api_request( '/orders/' . rawurlencode( $order_id ), array(), 'GET' );
+
+				if ( is_wp_error( $order ) ) {
+					$this->log( 'error', 'CoinGate webhook: could not fetch order for amount verification', array( 'order_id' => $order_id ) );
+					$transaction->update( array( 'status' => 'failed' ) );
+					return;
+				}
+
+				$paid_amount     = isset( $order['price'] ) ? (float) $order['price'] : ( isset( $order['price_amount'] ) ? (float) $order['price_amount'] : 0 );
+				$expected_amount = (float) $transaction->amount;
+
+				if ( abs( $paid_amount - $expected_amount ) > 0.01 ) {
+					$this->log( 'error', sprintf(
+						'Webhook amount mismatch: expected %.2f, received %.2f — marking as failed',
+						$expected_amount, $paid_amount
+					), array(
+						'transaction_id' => $transaction->id,
+						'gateway'        => $this->get_gateway_id(),
+					) );
+					$transaction->update( array( 'status' => 'failed' ) );
+					return;
+				}
+
 				$transaction->update( array(
 					'status'       => 'completed',
 					'ref_id'       => $order_id,

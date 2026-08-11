@@ -2,7 +2,17 @@
 /**
  * Security Manager
  *
- * Manages security aspects of the plugin
+ * Manages security aspects of the plugin: security headers, nonce/capability
+ * helpers and payment-data validation.
+ *
+ * The bespoke SQLi/XSS request scanner and the duplicate per-IP rate limiter
+ * that used to run on `wp_loaded` were removed (F6/F7/F9): the scanner
+ * produced widespread false positives on legitimate form fields ("select from
+ * these options", "update my settings", CSS hex colours, dashes in names…)
+ * while leaving nested payloads uninspected, and the per-endpoint
+ * GatewayKit_Rate_Limiter is the canonical, sliding-window implementation.
+ * SQL safety continues to be enforced by $wpdb->prepare() in every model,
+ * and XSS by sanitize_*() at the storage layer.
  *
  * @package GatewayKit
  */
@@ -49,11 +59,8 @@ class GatewayKit_Security_Manager {
 	 * Initialize hooks
 	 */
 	private function init_hooks() {
-		// Add security headers
+		// Add security headers.
 		add_action( 'send_headers', array( $this, 'add_security_headers' ) );
-
-		// Validate requests
-		add_action( 'wp_loaded', array( $this, 'validate_requests' ) );
 	}
 
 	/**
@@ -68,257 +75,12 @@ class GatewayKit_Security_Manager {
 	}
 
 	/**
-	 * Validate requests
-	 */
-	public function validate_requests() {
-		// Only validate on payment-related pages
-		if ( ! $this->is_payment_request() ) {
-			return;
-		}
-
-		// Check for suspicious activity
-		$this->check_suspicious_activity();
-	}
-
-	/**
-	 * Check if current request is payment-related
-	 *
-	 * @return bool True if payment request
-	 */
-	private function is_payment_request() {
-		$current_url = $this->get_current_url();
-
-		// Check for payment callback URLs
-		$callback_patterns = array(
-			'gatewaykit_callback',
-			'payment/verify',
-		);
-
-		foreach ( $callback_patterns as $pattern ) {
-			if ( strpos( $current_url, $pattern ) !== false ) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * Get current URL
-	 *
-	 * @return string Current URL
-	 */
-	private function get_current_url() {
-		if ( isset( $_SERVER['REQUEST_URI'] ) ) {
-			return esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) );
-		}
-		return '';
-	}
-
-	/**
-	 * Check for suspicious activity
-	 */
-	private function check_suspicious_activity() {
-		// Rate limiting check
-		if ( $this->is_rate_limited() ) {
-			$this->log_security_event(
-				'rate_limit_exceeded',
-				array(
-					'ip'         => $this->get_client_ip(),
-					'user_agent' => $this->get_user_agent(),
-				)
-			);
-
-			wp_die( esc_html__( 'Too many requests. Please try again later.', 'gatewaykit' ), '', array( 'response' => 429 ) );
-		}
-
-		// Check for SQL injection attempts
-		if ( $this->detect_sql_injection() ) {
-			$this->log_security_event(
-				'sql_injection_attempt',
-				array(
-					'ip'   => $this->get_client_ip(),
-					'data' => isset( $_REQUEST ) ? wp_unslash( $_REQUEST ) : array(), // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- intentional raw request inspection for security scanning
-				)
-			);
-
-			wp_die( esc_html__( 'Invalid request.', 'gatewaykit' ), '', array( 'response' => 400 ) );
-		}
-
-		// Check for XSS attempts
-		if ( $this->detect_xss() ) {
-			$this->log_security_event(
-				'xss_attempt',
-				array(
-					'ip'   => $this->get_client_ip(),
-					'data' => isset( $_REQUEST ) ? wp_unslash( $_REQUEST ) : array(), // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- intentional raw request inspection for security scanning
-				)
-			);
-
-			wp_die( esc_html__( 'Invalid request.', 'gatewaykit' ), '', array( 'response' => 400 ) );
-		}
-	}
-
-	/**
-	 * Check rate limiting
-	 *
-	 * @return bool True if rate limited
-	 */
-	private function is_rate_limited() {
-		$ip            = $this->get_client_ip();
-		$transient_key = 'gatewaykit_rate_limit_' . md5( $ip );
-
-		$requests = get_transient( $transient_key );
-
-		if ( false === $requests ) {
-			$requests = 0;
-		}
-
-		++$requests;
-
-		// Configurable rate limiting - allow 30 requests per minute for normal users
-		// More restrictive for payment callbacks
-		$is_payment_callback = $this->is_payment_request();
-		$max_requests = $is_payment_callback ? 10 : 30;
-		$time_window = $is_payment_callback ? MINUTE_IN_SECONDS : MINUTE_IN_SECONDS;
-
-		if ( $requests > $max_requests ) {
-			return true;
-		}
-
-		set_transient( $transient_key, $requests, $time_window );
-		return false;
-	}
-
-	/**
-	 * Detect SQL injection attempts
-	 *
-	 * @return bool True if SQL injection detected
-	 */
-	private function detect_sql_injection() {
-		$patterns = array(
-			// Enhanced SQL injection patterns with context awareness
-			'/\bunion\s+select\b/i',
-			'/\bselect\s+.*\bfrom\b/i',
-			'/\binsert\s+into\b/i',
-			'/\bupdate\s+.*\bset\b/i',
-			'/\bdelete\s+from\b/i',
-			'/\bdrop\s+(table|database|index)\b/i',
-			'/\bcreate\s+(table|database|index)\b/i',
-			'/\balter\s+table\b/i',
-			'/\bexec\s*\(/i',
-			'/\bexecute\s*\(/i',
-			'/\bsp_exec\s*\(/i',
-			'/\bxp_cmdshell\b/i',
-			'/\bscript\b/i',
-			'/\bjavascript\b/i',
-			'/\bonload\s*=/i',
-			'/\bonerror\s*=/i',
-			'/\bonclick\s*=/i',
-			'/\bonfocus\s*=/i',
-			// Comment-based attacks
-			'/--.*$/',
-			'/\/\*.*\*\//',
-			'/#.*$/',
-			// Hex encoding attacks
-			'/0x[0-9a-f]+/i',
-			// Time-based attacks
-			'/\bwaitfor\s+delay\b/i',
-			'/\bsleep\s*\(/i',
-			'/\bbenchmark\s*\(/i',
-		);
-
-		$data = $this->get_request_data();
-
-		foreach ( $data as $key => $value ) {
-			if ( is_string( $value ) ) {
-				// Skip common non-SQL fields to reduce false positives
-				$skip_fields = array('s', 'gatewaykit_page', 'page', 'action', '_wpnonce', '_wp_http_referer');
-				if (in_array($key, $skip_fields)) {
-					continue;
-				}
-
-				foreach ( $patterns as $pattern ) {
-					if ( preg_match( $pattern, $value ) ) {
-						return true;
-					}
-				}
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * Detect XSS attempts
-	 *
-	 * @return bool True if XSS detected
-	 */
-	private function detect_xss() {
-		$patterns = array(
-			'/<script/i',
-			'/javascript:/i',
-			'/on\w+\s*=/i',
-			'/<iframe/i',
-			'/<object/i',
-			'/<embed/i',
-		);
-
-		$data = $this->get_request_data();
-
-		foreach ( $data as $value ) {
-			if ( is_string( $value ) ) {
-				foreach ( $patterns as $pattern ) {
-					if ( preg_match( $pattern, $value ) ) {
-						return true;
-					}
-				}
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * Get request data for security checks
-	 *
-	 * @return array Request data
-	 */
-	private function get_request_data() {
-		// Sanitize each value before scanning. The merged data feeds the
-		// SQL-injection / XSS scanners (detect_sql_injection() / detect_xss()),
-		// which inspect generic request parameters (strings); there are no
-		// specific integer/URL/email fields expected here, so sanitize_text_field()
-		// is the correct per-field sanitizer. It safely returns '' for nested
-		// array values, which the scanners already skip via is_string() checks.
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing -- public security scan on wp_loaded; no nonce context
-		$get_data  = array_map( 'sanitize_text_field', wp_unslash( $_GET ) );
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing -- public security scan on wp_loaded; no nonce context
-		$post_data = array_map( 'sanitize_text_field', wp_unslash( $_POST ) );
-		return array_merge( $get_data, $post_data );
-	}
-
-	/**
-	 * Get client IP address
-	 *
-	 * @return string Client IP
-	 */
-	/**
 	 * Get client IP address
 	 *
 	 * @return string Client IP
 	 */
 	private function get_client_ip() {
 		return GatewayKit_IP_Helper::get_client_ip();
-	}
-
-	/**
-	 * Get user agent
-	 *
-	 * @return string User agent
-	 */
-	private function get_user_agent() {
-		return isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
 	}
 
 	/**
@@ -336,11 +98,11 @@ class GatewayKit_Security_Manager {
 	}
 
 	/**
-		* Validate nonce for all admin actions
-		*
-		* @param string $action Nonce action
-		* @return bool True if valid
-		*/
+	 * Validate nonce for all admin actions
+	 *
+	 * @param string $action Nonce action
+	 * @return bool True if valid
+	 */
 	public function verify_admin_nonce( $action ) {
 		if ( ! is_admin() ) {
 			return false;
@@ -374,11 +136,11 @@ class GatewayKit_Security_Manager {
 	}
 
 	/**
-		* Validate CSRF token for AJAX requests
-		*
-		* @param string $action Action name
-		* @return bool True if valid
-		*/
+	 * Validate CSRF token for AJAX requests
+	 *
+	 * @param string $action Action name
+	 * @return bool True if valid
+	 */
 	public function verify_ajax_nonce( $action ) {
 		if ( ! wp_doing_ajax() ) {
 			return false;
@@ -412,12 +174,12 @@ class GatewayKit_Security_Manager {
 	}
 
 	/**
-		* Sanitize and validate input data
-		*
-		* @param array $data Input data to sanitize
-		* @param array $allowed_fields Allowed fields
-		* @return array Sanitized data
-		*/
+	 * Sanitize and validate input data
+	 *
+	 * @param array $data Input data to sanitize
+	 * @param array $allowed_fields Allowed fields
+	 * @return array Sanitized data
+	 */
 	public function sanitize_input_data( $data, $allowed_fields = array() ) {
 		$sanitized = array();
 

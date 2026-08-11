@@ -1,5 +1,39 @@
 # GatewayKit Changelog
 
+## 1.3.1
+
+**Critical fixes**
+
+- Bulk "Export" on the Transactions page now downloads the selected rows instead of failing silently
+- Webhooks for Razorpay, Paystack, Mercado Pago, and NOWPayments now correctly process pending payments
+- White-label magic link unlocks the settings page again
+
+**Security hardening**
+
+- Payment redirect pages are now safe to reload — duplicate receipts and redundant notifications are prevented
+- PayPal and Coinify webhooks require signing secrets to be configured; unverified requests are rejected
+- Removed the request scanner that was blocking legitimate form fields; SQL safety is still enforced at the database layer
+- Duplicate rate-limit implementations consolidated into one consistent system
+- Encrypted gateway secrets now refuse to operate when WordPress security keys are absent, with a clear admin notice
+
+**Reliability**
+
+- Outgoing webhooks are now delivered asynchronously — a slow downstream service no longer stalls the buyer's success page
+- Proxy-spoofed IP headers can no longer bypass per-IP rate limits (unless you explicitly configure trusted proxy ranges)
+- The payment endpoint now validates redirect URLs and can't be replayed across clients
+
+## 1.3.0
+
+**New gateways and payment methods**
+
+* Added Razorpay — UPI, cards, net banking, and wallets for Indian merchants
+* Added Paystack — cards, bank transfers, and mobile money for African markets
+* Added Mercado Pago — cards, PIX, and local methods for Latin American markets
+* Added Apple Pay and Google Pay support via Stripe Checkout
+* Added Klarna and Afterpay / Clearpay (Buy Now Pay Later) via Stripe Checkout
+* Added Stripe Embedded Checkout — keep customers on your site with no redirect
+* Added Payment Links — generate shareable Stripe checkout links without a form
+
 ## 1.2.1
 
 **Hotfix**

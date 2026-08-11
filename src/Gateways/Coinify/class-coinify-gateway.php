@@ -152,23 +152,6 @@ class GatewayKit_Coinify_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 	}
 
 	/**
-	 * Resolve the currency for this transaction.
-	 *
-	 * @return string ISO 4217 currency code.
-	 */
-	private function get_currency() {
-			$currency = $this->get_setting( 'currency', '' );
-			if ( ! empty( $currency ) ) {
-				return strtoupper( $currency );
-			}
-			$currency = get_option( 'gatewaykit_currency', '' );
-			if ( empty( $currency ) ) {
-				$currency = GatewayKit_Gateway_Manager::get_instance()->get_default_currency();
-			}
-			return strtoupper( $currency );
-		}
-
-	/**
 	 * Get the active API base URL.
 	 *
 	 * @return string
@@ -435,18 +418,37 @@ class GatewayKit_Coinify_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 			exit;
 		}
 
-		// Verify the signature if the secret is configured.
+		// Verify the HMAC-SHA256 signature. The signing secret is mandatory
+		// (F5): a missing secret is a configuration error — refuse to act on
+		// the payload rather than silently accepting forged webhooks.
 		$secret = $this->get_api_secret();
-		if ( '' !== $secret ) {
-			$signature = isset( $_SERVER['HTTP_X_COINIFY_SIGNATURE'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_X_COINIFY_SIGNATURE'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			$expected  = hash_hmac( 'sha256', $body, $secret );
-			if ( '' === $signature || ! hash_equals( $expected, $signature ) ) {
-				GatewayKit_Logger::get_instance()->warning( 'Coinify webhook: signature mismatch', array( 'intent_id' => $intent_id ) );
-				status_header( 403 );
-				exit;
-			}
-		} else {
-			GatewayKit_Logger::get_instance()->warning( 'Coinify webhook: no API secret configured — skipping signature check', array( 'intent_id' => $intent_id ) );
+		if ( '' === $secret ) {
+			GatewayKit_Logger::get_instance()->error(
+				'Coinify webhook: API secret is not configured — refusing to verify inbound payload',
+				array( 'intent_id' => $intent_id )
+			);
+			status_header( 403 );
+			exit;
+		}
+
+		// Read the webhook signature header. The Coinify docs
+		// (https://coinify.readme.io/recipes/validate-webhook-signature)
+		// document `X-Coinify-Webhook-Signature`; accept the legacy
+		// `X-Coinify-Signature` spelling too for backward compatibility,
+		// preferring the documented name (N5).
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- public webhook endpoint; authenticity verified via HMAC.
+		$signature = '';
+		if ( isset( $_SERVER['HTTP_X_COINIFY_WEBHOOK_SIGNATURE'] ) ) {
+			$signature = sanitize_text_field( wp_unslash( $_SERVER['HTTP_X_COINIFY_WEBHOOK_SIGNATURE'] ) );
+		} elseif ( isset( $_SERVER['HTTP_X_COINIFY_SIGNATURE'] ) ) {
+			$signature = sanitize_text_field( wp_unslash( $_SERVER['HTTP_X_COINIFY_SIGNATURE'] ) );
+		}
+		// phpcs:enable
+		$expected  = hash_hmac( 'sha256', $body, $secret );
+		if ( '' === $signature || ! hash_equals( $expected, $signature ) ) {
+			GatewayKit_Logger::get_instance()->warning( 'Coinify webhook: signature mismatch', array( 'intent_id' => $intent_id ) );
+			status_header( 403 );
+			exit;
 		}
 
 		// Verify the token matches the one returned at intent creation.
@@ -479,6 +481,21 @@ class GatewayKit_Coinify_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 
 		if ( in_array( $transaction->status, array( 'pending', 'processing' ), true ) ) {
 			if ( in_array( $status, array( 'completed', 'settled' ), true ) ) {
+				$paid_amount     = isset( $payload['amount'] ) ? (float) $payload['amount'] : 0;
+				$expected_amount = (float) $transaction->amount;
+
+				if ( abs( $paid_amount - $expected_amount ) > 0.01 ) {
+					$this->log( 'error', sprintf(
+						'Webhook amount mismatch: expected %.2f, received %.2f — marking as failed',
+						$expected_amount, $paid_amount
+					), array(
+						'transaction_id' => $transaction->id,
+						'gateway'        => $this->get_gateway_id(),
+					) );
+					$transaction->update( array( 'status' => 'failed' ) );
+					return;
+				}
+
 				$transaction->update( array(
 					'status'       => 'completed',
 					'ref_id'       => $intent_id,

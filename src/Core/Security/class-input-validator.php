@@ -121,6 +121,51 @@ class GatewayKit_Input_Validator {
 	}
 
 	/**
+	 * Validate that a URL is well-formed AND points at this site (F13).
+	 *
+	 * The open `gatewaykit_process_payment` AJAX endpoint accepts a
+	 * caller-supplied `success_url`; without a same-host check an attacker
+	 * can use the endpoint as an open redirect / payment-initiation proxy.
+	 * This enforces that the host matches home_url() (with an opt-in filter
+	 * to allow additional hosts for legitimate multi-site setups).
+	 *
+	 * @param string $url URL to validate.
+	 * @return string|WP_Error Validated URL or error.
+	 */
+	public function validate_local_url( $url ) {
+		$url = esc_url_raw( $url );
+
+		if ( empty( $url ) ) {
+			return new WP_Error( 'required_url_empty', __( 'Redirect URL after payment completion is required.', 'gatewaykit' ) );
+		}
+
+		$host = strtolower( (string) wp_parse_url( $url, PHP_URL_HOST ) );
+		if ( '' === $host ) {
+			return new WP_Error( 'invalid_success_url', __( 'Invalid redirect URL.', 'gatewaykit' ) );
+		}
+
+		$site_host  = strtolower( (string) wp_parse_url( home_url(), PHP_URL_HOST ) );
+		$allowed    = array( $site_host );
+		$extra_hosts = apply_filters( 'gatewaykit_allowed_success_hosts', array() );
+		if ( is_array( $extra_hosts ) ) {
+			foreach ( $extra_hosts as $extra ) {
+				if ( is_string( $extra ) && '' !== $extra ) {
+					$allowed[] = strtolower( $extra );
+				}
+			}
+		}
+
+		if ( ! in_array( $host, $allowed, true ) ) {
+			return new WP_Error(
+				'external_success_url_rejected',
+				__( 'Redirect URL must point to this site.', 'gatewaykit' )
+			);
+		}
+
+		return $url;
+	}
+
+	/**
 	 * Validate gateway
 	 *
 	 * @param string $gateway Gateway ID

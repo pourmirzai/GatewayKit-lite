@@ -74,6 +74,10 @@ class GatewayKit_Rate_Limiter {
 			'elementor_action' => get_option( 'gatewaykit_elementor_action_rate_limit', self::DEFAULT_MAX_REQUESTS ),
 			'admin_ajax'       => get_option( 'gatewaykit_admin_ajax_rate_limit', self::DEFAULT_MAX_REQUESTS ),
 			'callback'         => get_option( 'gatewaykit_callback_rate_limit', self::DEFAULT_MAX_REQUESTS ),
+			// Dedicated bucket for the open gatewaykit_process_payment endpoint
+			// (F13): caps pending-transaction creation per IP independently of
+			// the generic admin_ajax limit. Default 10 / 5 min.
+			'process_payment'  => get_option( 'gatewaykit_process_payment_rate_limit', 10 ),
 		);
 
 		return isset( $thresholds[ $endpoint ] ) ? intval( $thresholds[ $endpoint ] ) : self::DEFAULT_MAX_REQUESTS;
@@ -97,7 +101,11 @@ class GatewayKit_Rate_Limiter {
 	 * @return bool|WP_Error True if allowed, WP_Error if rate limited
 	 */
 	public function check_rate_limit( $endpoint ) {
-		if ( ! $this->is_enabled() ) {
+		// Rate limiting is opt-in globally, but the process_payment bucket is
+		// abuse protection on a public endpoint and is ALWAYS active regardless
+		// of the gatewaykit_rate_limit_enabled toggle (N6). Its limit stays
+		// tunable via gatewaykit_process_payment_rate_limit (see get_threshold).
+		if ( 'process_payment' !== $endpoint && ! $this->is_enabled() ) {
 			return true;
 		}
 
@@ -163,7 +171,7 @@ class GatewayKit_Rate_Limiter {
 			'current_count' => $current_count ?: 0,
 			'threshold'     => $this->get_threshold( $endpoint ),
 			'time_window'   => self::DEFAULT_TIME_WINDOW,
-			'enabled'       => $this->is_enabled(),
+			'enabled'       => 'process_payment' === $endpoint ? true : $this->is_enabled(),
 		);
 	}
 }

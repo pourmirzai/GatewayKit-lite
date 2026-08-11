@@ -37,22 +37,6 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 
 
 	/**
-	 * Convert to screen method for WordPress 6.0+ compatibility
-	 *
-	 * This method was removed from WP_List_Table in newer WordPress versions
-	 * but is still expected by some parent class functionality.
-	 * Made public to allow external calls that may occur in WP core or plugins.
-	 *
-	 * @return void
-	 */
-	public static function convert_to_screen() {
-		// For WordPress 6.0+, this method is no longer needed
-		// but we provide a stub implementation for compatibility
-		// Note: This method is called statically in some WP versions, but we keep it as instance method
-		// to maintain compatibility with the parent class
-	}
-
-	/**
 	 * Get columns
 	 */
 	public function get_columns() {
@@ -121,9 +105,6 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 
 		// Process bulk actions if any
 		$this->process_bulk_action();
-
-		// Process single row actions (refund).
-		$this->process_single_action();
 
 		// Get data
 		// Get per-page from user meta (saved by WordPress's set_screen_options), fallback to 20.
@@ -217,7 +198,7 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 		if ( ! empty( $search_raw ) ) {
 			$search_term = '%' . $wpdb->esc_like( $search_raw ) . '%';
 
-			// Prepare search conditions
+			// Prepare search conditions — push values in the SAME ORDER as conditions.
 			$search_conditions = array(
 				't.receipt_token LIKE %s',
 				't.ref_id LIKE %s',
@@ -226,9 +207,10 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 				'u.user_email LIKE %s',
 				'u.user_login LIKE %s',
 			);
+			$where_values = array_merge( $where_values, array_fill( 0, 6, $search_term ) );
 
-			// Add JSON search conditions only if needed (better performance)
-			if ( strlen( $search_raw ) > 2 ) { // Only search in JSON if search term is longer than 2 chars
+			// Add JSON search conditions only for longer search terms.
+			if ( strlen( $search_raw ) > 2 ) {
 				$search_conditions = array_merge(
 					$search_conditions,
 					array(
@@ -239,15 +221,10 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 						'JSON_UNQUOTE(JSON_EXTRACT(t.form_data, "$.mobile")) LIKE %s',
 					)
 				);
-
-				// Add search values for JSON fields
 				$where_values = array_merge( $where_values, array_fill( 0, 5, $search_term ) );
 			}
 
 			$where[] = '(' . implode( ' OR ', $search_conditions ) . ')';
-
-			// Add search values for non-JSON fields
-			$where_values = array_merge( array( $search_term, $search_term, $search_term, $search_term, $search_term, $search_term ), $where_values );
 
 			// Add user table join for user searches
 			$joins[]      = "LEFT JOIN %i u ON t.user_id = u.ID";
@@ -290,8 +267,13 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 
 		// Use FORCE INDEX for better performance on large tables
 		$force_index = '';
-		if ( in_array( $orderby, array( 'created_at', 'status', 'amount' ), true ) ) {
-			$force_index = "FORCE INDEX (idx_{$orderby})";
+		$index_map    = array(
+			'created_at' => 'idx_created_at',
+			'status'     => 'idx_status',
+			'amount'     => 'idx_amount_status',
+		);
+		if ( isset( $index_map[ $orderby ] ) ) {
+			$force_index = "FORCE INDEX ({$index_map[ $orderby ]})";
 		}
 
 		// Build the query with proper table aliases.
@@ -418,21 +400,6 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 		}
 		
 		return $count;
-	}
-
-	/**
-	 * Get all transaction IDs
-	 *
-	 * @deprecated 1.1.0 Use get_filtered_transaction_ids() instead which respects
-	 * the current filter context (status, gateway, date range, search) passed
-	 * through the export form's hidden inputs.
-	 */
-	private function get_all_transaction_ids() {
-		global $wpdb;
-
-		$table_name = $wpdb->prefix . 'gatewaykit_payment_transactions';
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- table name internal; no user input
-		return $wpdb->get_col( $wpdb->prepare( "SELECT id FROM %i ORDER BY id DESC", $table_name ) );
 	}
 
 	/**
@@ -598,7 +565,6 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 		// Process transactions in batches to prevent memory issues
 		$batch_size = 100;
 		$total_ids = count( $transaction_ids );
-		$processed = 0;
 
 		// Pre-load gateway manager to avoid repeated instantiation
 		$gateway_manager = GatewayKit_Gateway_Manager::get_instance();
@@ -660,7 +626,6 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 					}, $row );
 
 					gatewaykit_fputcsv( $output, $row );
-					$processed++;
 
 			} catch ( Exception $e ) {
 				// Log error and continue with next transaction
@@ -718,9 +683,19 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 				'gatewaykit_refund_' . $item['id']
 			);
 			$actions['refund'] = '<span class="dashicons dashicons-money-alt" style="margin-top:2px;"></span> ' .
-				'<a href="' . esc_url( $refund_url ) . '" class="gatewaykit-refund-action" data-transaction-id="' . esc_attr( $item['id'] ) . '" data-amount="' . esc_attr( $item['amount'] ) . '" data-currency="' . esc_attr( $item['currency'] ) . '">' .
-				esc_html__( 'Refund', 'gatewaykit' ) .
-				'</a>';
+				sprintf(
+					'<a href="%s" class="gatewaykit-refund-action" data-transaction-id="%s" data-amount="%s" data-currency="%s" onclick="return confirm(%s);">%s</a>',
+					esc_url( $refund_url ),
+					esc_attr( $item['id'] ),
+					esc_attr( $item['amount'] ),
+					esc_attr( $item['currency'] ),
+					esc_attr( wp_json_encode( sprintf(
+						/* translators: %s: refund amount */
+						__( 'Are you sure you want to refund %s? This action cannot be undone.', 'gatewaykit' ),
+						$item['amount'] . ' ' . $item['currency']
+					) ) ),
+					esc_html__( 'Refund', 'gatewaykit' )
+				);
 		}
 
 		if ( ! empty( $actions ) ) {
@@ -751,7 +726,7 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 			case 'gateway':
 				// Free orders (fully discounted) didn't go through a gateway.
 				if ( (float) $item['amount'] <= 0 && 'completed' === $item['status'] ) {
-					return '<span style="color:#888;">' . esc_html__( 'â€” (free)', 'gatewaykit' ) . '</span>';
+					return '<span style="color:#888;">' . esc_html__( '— (free)', 'gatewaykit' ) . '</span>';
 				}
 				$gateway_manager = GatewayKit_Gateway_Manager::get_instance();
 				$gateway         = $gateway_manager->get_gateway( $item['gateway'] );
@@ -883,17 +858,17 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 		// Get error severity class
 		$severity_class = $this->get_error_severity_class( $error_type );
 
-		// Create display text
-		$display_text = ! empty( $error_message ) ? esc_html( $error_message ) : esc_html( $error_type );
-
-		// Truncate if too long
-		if ( strlen( $display_text ) > 50 ) {
-			$display_text = substr( $display_text, 0, 47 ) . '...';
+		// Create display text (truncate raw text, then escape once at output).
+		$raw_text = ! empty( $error_message ) ? $error_message : $error_type;
+		if ( function_exists( 'mb_strlen' ) && mb_strlen( $raw_text ) > 50 ) {
+			$raw_text = mb_substr( $raw_text, 0, 47 ) . '...';
+		} elseif ( strlen( $raw_text ) > 50 ) {
+			$raw_text = substr( $raw_text, 0, 47 ) . '...';
 		}
 
 		return '<span class="gatewaykit-error-info ' . esc_attr( $severity_class ) . '" title="' . esc_attr( wp_strip_all_tags( $tooltip_content ) ) . '">' .
 			   '<span class="dashicons dashicons-warning" style="margin-top: 2px;"></span> ' .
-			   esc_html( $display_text ) .
+			   esc_html( $raw_text ) .
 			   '</span>';
 	}
 
@@ -932,6 +907,43 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 		}
 
 		return $actions;
+	}
+
+	/**
+	 * Dispatch bulk actions early on admin_init.
+	 *
+	 * Single entry point for the Transactions page bulk actions (delete /
+	 * export). Hooked on `admin_init:5` so it runs after settings init but
+	 * before any page output — this lets `process_bulk_action()` safely call
+	 * `wp_safe_redirect()` + `exit` without triggering "headers already sent".
+	 *
+	 * The actual nonce + capability + license checks live in
+	 * `process_bulk_action()` (single source of truth).
+	 */
+	public static function dispatch_bulk_action() {
+		if ( ! is_admin() ) {
+			return;
+		}
+
+		// Only the transactions page issues bulk-action POSTs.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- nonce verified inside process_bulk_action()
+		$page = isset( $_REQUEST['page'] ) ? sanitize_key( wp_unslash( $_REQUEST['page'] ) ) : '';
+		if ( 'gatewaykit-transactions' !== $page ) {
+			return;
+		}
+
+		// Detect a bulk action from either the top or bottom selector.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- nonce verified inside process_bulk_action()
+		$action  = isset( $_REQUEST['action'] ) ? sanitize_key( wp_unslash( $_REQUEST['action'] ) ) : '';
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- nonce verified inside process_bulk_action()
+		$action2 = isset( $_REQUEST['action2'] ) ? sanitize_key( wp_unslash( $_REQUEST['action2'] ) ) : '';
+
+		if ( ! in_array( $action, array( 'delete', 'export' ), true ) && ! in_array( $action2, array( 'delete', 'export' ), true ) ) {
+			return;
+		}
+
+		$table = new self();
+		$table->process_bulk_action();
 	}
 
 	/**
@@ -1002,17 +1014,6 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 	}
 
 	/**
-	 * Process single row actions (refund).
-	 *
-	 * Refund processing is now handled by GatewayKit_Admin_Settings::handle_refund_action()
-	 * on admin_init (before any output) to avoid "headers already sent" warnings.
-	 * This method is kept as a no-op for backward compatibility.
-	 */
-	private function process_single_action() {
-		return;
-	}
-
-	/**
 	 * Bulk delete transactions
 	 */
 	private function bulk_delete( $transaction_ids ) {
@@ -1042,16 +1043,6 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 		// Filters and search are rendered at the page level via a dedicated GET form
 		// in GatewayKit_Admin_Settings::transactions_page() to avoid duplicate UI and mixed form methods.
 		return;
-	}
-
-	/**
-	 * Get current filter value
-	 *
-	 * @param string $filter_name Filter name.
-	 * @return string Filter value.
-	 */
-	protected function get_current_filter( $filter_name ) {
-		return isset( $_GET[ $filter_name ] ) ? sanitize_key( wp_unslash( $_GET[ $filter_name ] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	}
 
 	/**

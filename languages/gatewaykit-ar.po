@@ -1,0 +1,3145 @@
+# Copyright (C) 2026 Morteza Pourmirzai
+# This file is distributed under the GPL v2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: GatewayKit\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/GatewayKit\n"
+"Last-Translator: GatewayKit\n"
+"Language-Team: GatewayKit\n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-07-25T21:51:51+00:00\n"
+"PO-Revision-Date: 2026-08-05T00:00:00+00:00\n"
+"X-Generator: opencode\n"
+"X-Domain: gatewaykit\n"
+"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);\n"
+
+#. Plugin Name of the plugin
+#: gatewaykit-pro.php
+msgid "GatewayKit Pro – Payment Gateway for Elementor Forms"
+msgstr "GatewayKit Pro – بوابة الدفع لنماذج Elementor"
+
+#. Plugin URI of the plugin
+#: gatewaykit-pro.php
+msgid "https://pourmirzai.com/gatewaykit"
+msgstr "https://pourmirzai.com/gatewaykit"
+
+#. Description of the plugin
+#: gatewaykit-pro.php
+msgid "Add-on for GatewayKit. Unlocks advanced Pro features: discount codes, advanced transaction log, per-form redirects, partial payments, currency selector, outgoing webhooks, and white-label branding. All payment gateways (Stripe, Mollie, CoinGate, Coinify, PayPal, NOWPayments) are now included in the free GatewayKit."
+msgstr "إضافة لـ GatewayKit. تفتح ميزات Pro المتقدمة: أكواد الخصم، سجل معاملات متقدم، عمليات إعادة توجيه لكل نموذج، مدفوعات جزئية، محدد عملة، خطافات ويب صادرة، وعلامة بيضاء. جميع بوابات الدفع (Stripe، Mollie، CoinGate، Coinify، PayPal، NOWPayments) مضمّنة الآن في GatewayKit المجاني."
+
+#. Author of the plugin
+#: gatewaykit-pro.php
+msgid "Morteza Pourmirzai"
+msgstr "Morteza Pourmirzai"
+
+#. Author URI of the plugin
+#: gatewaykit-pro.php
+msgid "https://pourmirzai.com"
+msgstr "https://pourmirzai.com"
+
+#: gatewaykit-pro.php:294
+#: src/Core/class-plugin.php:510
+msgid "GatewayKit Pro"
+msgstr "GatewayKit Pro"
+
+#: gatewaykit-pro.php:297
+msgid "is installed but not activated. Pro features (discount codes, advanced transaction log, per-form redirects, partial payments, currency selector, outgoing webhooks, white-label branding) are locked until you enter a valid license key."
+msgstr "مثبّت ولكن غير مفعّل. ميزات Pro (أكواد الخصم، سجل المعاملات المتقدم، عمليات إعادة التوجيه لكل نموذج، المدفوعات الجزئية، محدد العملة، خطافات الويب الصادرة، العلامة البيضاء) مقفلة حتى تُدخل مفتاح ترخيص صالحًا."
+
+#: gatewaykit-pro.php:304
+msgid "Activate License"
+msgstr "تفعيل الترخيص"
+
+#. translators: %s: setting field name
+#: src/Core/Abstracts/abstract-payment-gateway.php:156
+#, php-format
+msgid "%s is required."
+msgstr "%s مطلوب."
+
+#: src/Core/Admin/class-admin-settings.php:61
+#: src/Core/Admin/class-admin-settings.php:62
+#: src/Core/Admin/class-analytics-dashboard.php:95
+#: src/Core/Admin/class-analytics-dashboard.php:153
+msgid "Transactions"
+msgstr "المعاملات"
+
+#: src/Core/Admin/class-admin-settings.php:71
+#: src/Core/Admin/class-admin-settings.php:72
+#: src/Core/Admin/class-admin-settings.php:379
+#: src/Core/Admin/class-dashboard-widgets.php:176
+msgid "Settings"
+msgstr "الإعدادات"
+
+#: src/Core/Admin/class-admin-settings.php:81
+#: src/Core/Admin/class-admin-settings.php:82
+msgid "Logs"
+msgstr "السجلات"
+
+#: src/Core/Admin/class-admin-settings.php:91
+#: src/Core/Admin/class-admin-settings.php:92
+#: src/Core/Admin/class-admin-settings.php:385
+#: src/Core/Admin/class-admin-settings.php:1373
+msgid "Usage Guide"
+msgstr "دليل الاستخدام"
+
+#: src/Core/Admin/class-admin-settings.php:259
+#: src/Core/Admin/class-admin-settings.php:1890
+#: src/Core/Admin/class-transaction-list-table.php:1011
+#: src/Core/class-plugin.php:527
+#: src/Features/Discount/class-admin-discounts.php:491
+msgid "Security check failed."
+msgstr "فشل فحص الأمان."
+
+#: src/Core/Admin/class-admin-settings.php:263
+#: src/Core/Admin/class-transaction-list-table.php:926
+#: src/Core/Admin/class-transaction-list-table.php:942
+#: src/Core/Admin/class-transaction-list-table.php:1000
+#: src/Core/Admin/class-transaction-list-table.php:1044
+#: src/Core/class-plugin.php:783
+msgid "You do not have permission to perform this action."
+msgstr "ليس لديك صلاحية تنفيذ هذا الإجراء."
+
+#. translators: %s: upgrade URL
+#: src/Core/Admin/class-admin-settings.php:274
+#: src/Core/Admin/class-transaction-list-table.php:952
+#, php-format
+msgid "CSV export is a GatewayKit Pro feature. Upgrade to Pro to unlock it: %s"
+msgstr "تصدير CSV هو ميزة من ميزات GatewayKit Pro. قم بالترقية إلى Pro لفتحها: %s"
+
+#. translators: %s: number of deleted transactions
+#: src/Core/Admin/class-admin-settings.php:294
+#, php-format
+msgid "%s transaction deleted."
+msgid_plural "%s transactions deleted."
+msgstr[0] "تم حذف %s معاملات."
+msgstr[1] "تم حذف %s معاملة."
+msgstr[2] "تم حذف %s معاملتين."
+msgstr[3] "تم حذف %s معاملات."
+msgstr[4] "تم حذف %s معاملة."
+msgstr[5] "تم حذف %s معاملة."
+
+#: src/Core/Admin/class-admin-settings.php:301
+msgid "No transactions selected for export."
+msgstr "لم يتم تحديد معاملات للتصدير."
+
+#: src/Core/Admin/class-admin-settings.php:312
+#: src/Core/Admin/class-admin-settings.php:401
+#: src/Core/Admin/class-admin-settings.php:1288
+#: src/Core/Admin/class-admin-settings.php:1447
+#: src/Core/Admin/class-admin-settings.php:1600
+#: src/Core/Admin/class-admin-settings.php:1706
+#: src/Core/Admin/class-admin-settings.php:1783
+#: src/Core/Admin/class-admin-settings.php:1840
+#: src/Core/Admin/class-admin-settings.php:1895
+#: src/Core/Admin/class-analytics-dashboard.php:108
+#: src/Core/Admin/class-log-list-table.php:123
+#: src/Features/Discount/class-admin-discounts.php:108
+#: src/Features/Discount/class-admin-discounts.php:648
+msgid "You do not have sufficient permissions to access this page."
+msgstr "ليس لديك الصلاحيات الكافية للوصول إلى هذه الصفحة."
+
+#: src/Core/Admin/class-admin-settings.php:327
+#: src/Core/class-plugin.php:345
+msgid "GatewayKit Dashboard"
+msgstr "لوحة تحكم GatewayKit"
+
+#: src/Core/Admin/class-admin-settings.php:334
+#: src/Core/Admin/class-admin-settings.php:341
+#: src/Core/Admin/class-dashboard-widgets.php:55
+msgid "Payment Overview"
+msgstr "نظرة عامة على المدفوعات"
+
+#: src/Core/Admin/class-admin-settings.php:335
+msgid "Statistics and details of your GatewayKit payments"
+msgstr "إحصائيات وتفاصيل مدفوعاتك في GatewayKit"
+
+#: src/Core/Admin/class-admin-settings.php:351
+#: src/Core/Admin/class-dashboard-widgets.php:65
+msgid "Recent Transactions"
+msgstr "أحدث المعاملات"
+
+#: src/Core/Admin/class-admin-settings.php:361
+#: src/Core/Admin/class-dashboard-widgets.php:75
+msgid "Gateway Performance"
+msgstr "أداء البوابة"
+
+#: src/Core/Admin/class-admin-settings.php:371
+msgid "Quick Actions"
+msgstr "إجراءات سريعة"
+
+#: src/Core/Admin/class-admin-settings.php:376
+#: src/Core/Admin/class-dashboard-widgets.php:173
+#: src/Core/Admin/class-dashboard-widgets.php:260
+msgid "View All Transactions"
+msgstr "عرض كل المعاملات"
+
+#: src/Core/Admin/class-admin-settings.php:382
+msgid "View Logs"
+msgstr "عرض السجلات"
+
+#: src/Core/Admin/class-admin-settings.php:410
+msgid "GatewayKit White Label Settings Link"
+msgstr "رابط إعدادات العلامة البيضاء في GatewayKit"
+
+#. translators: %1$s: newline, %2$s: magic link URL
+#: src/Core/Admin/class-admin-settings.php:413
+#, php-format
+msgid "Use the following link to access the White Label settings for 1 hour:%1$s%2$s"
+msgstr "استخدم الرابط التالي للوصول إلى إعدادات العلامة البيضاء لمدة ساعة واحدة:%1$s%2$s"
+
+#: src/Core/Admin/class-admin-settings.php:418
+msgid "Magic link sent to your email."
+msgstr "تم إرسال الرابط السحري إلى بريدك الإلكتروني."
+
+#: src/Core/Admin/class-admin-settings.php:426
+msgid "Settings saved successfully."
+msgstr "تم حفظ الإعدادات بنجاح."
+
+#: src/Core/Admin/class-admin-settings.php:428
+msgid "Form validation error. Please refresh the page and try again."
+msgstr "خطأ في التحقق من النموذج. يرجى تحديث الصفحة والمحاولة مرة أخرى."
+
+#: src/Core/Admin/class-admin-settings.php:433
+msgid "GatewayKit Settings"
+msgstr "إعدادات GatewayKit"
+
+#: src/Core/Admin/class-admin-settings.php:436
+msgid "Configure your payment gateways and general settings."
+msgstr "قم بتكوين بوابات الدفع والإعدادات العامة."
+
+#: src/Core/Admin/class-admin-settings.php:438
+#: src/Core/Admin/class-admin-settings.php:1378
+msgid "View Documentation"
+msgstr "عرض التوثيق"
+
+#: src/Core/Admin/class-admin-settings.php:454
+msgid "Save Settings"
+msgstr "حفظ الإعدادات"
+
+#: src/Core/Admin/class-admin-settings.php:477
+#: src/Core/Admin/class-admin-settings.php:513
+msgid "General Settings"
+msgstr "الإعدادات العامة"
+
+#: src/Core/Admin/class-admin-settings.php:480
+msgid "Gateway Settings"
+msgstr "إعدادات البوابة"
+
+#: src/Core/Admin/class-admin-settings.php:483
+msgid "Tools"
+msgstr "الأدوات"
+
+#: src/Core/Admin/class-admin-settings.php:487
+#: src/Core/Admin/class-admin-settings.php:700
+msgid "White Label"
+msgstr "العلامة البيضاء"
+
+#: src/Core/Admin/class-admin-settings.php:517
+#: src/Core/Admin/class-transaction-list-table.php:554
+msgid "Currency"
+msgstr "العملة"
+
+#: src/Core/Admin/class-admin-settings.php:530
+msgid "Default currency for payments."
+msgstr "العملة الافتراضية للمدفوعات."
+
+#: src/Core/Admin/class-admin-settings.php:536
+msgid "Log Level"
+msgstr "مستوى السجل"
+
+#: src/Core/Admin/class-admin-settings.php:539
+#: src/Core/Admin/class-admin-settings.php:1325
+#: src/Core/Admin/class-admin-settings.php:2002
+#: src/Core/Utils/class-log-formatter.php:206
+msgid "Error"
+msgstr "خطأ"
+
+#: src/Core/Admin/class-admin-settings.php:540
+#: src/Core/Admin/class-admin-settings.php:1326
+#: src/Core/Utils/class-log-formatter.php:205
+msgid "Warning"
+msgstr "تحذير"
+
+#: src/Core/Admin/class-admin-settings.php:541
+#: src/Core/Admin/class-admin-settings.php:1327
+#: src/Core/Utils/class-log-formatter.php:204
+msgid "Info"
+msgstr "معلومات"
+
+#: src/Core/Admin/class-admin-settings.php:542
+#: src/Core/Admin/class-admin-settings.php:1328
+#: src/Core/Utils/class-log-formatter.php:203
+msgid "Debug"
+msgstr "تصحيح"
+
+#: src/Core/Admin/class-admin-settings.php:544
+msgid "Minimum level of logs to record."
+msgstr "الحد الأدنى لمستوى السجلات المراد تسجيلها."
+
+#: src/Core/Admin/class-admin-settings.php:549
+msgid "Print Mode"
+msgstr "وضع الطباعة"
+
+#: src/Core/Admin/class-admin-settings.php:552
+msgid "Print Full Page"
+msgstr "طباعة الصفحة كاملة"
+
+#: src/Core/Admin/class-admin-settings.php:553
+msgid "Print Receipt Only"
+msgstr "طباعة الإيصال فقط"
+
+#: src/Core/Admin/class-admin-settings.php:555
+msgid "Choose what should be printed when clicking the print button on payment result page."
+msgstr "اختر ما يجب طباعته عند النقر على زر الطباعة في صفحة نتيجة الدفع."
+
+#: src/Core/Admin/class-admin-settings.php:560
+msgid "Enable Rate Limiting"
+msgstr "تفعيل تحديد المعدل"
+
+#: src/Core/Admin/class-admin-settings.php:564
+msgid "Enable rate limiting for sensitive endpoints"
+msgstr "تفعيل تحديد المعدل لنقاط النهاية الحساسة"
+
+#: src/Core/Admin/class-admin-settings.php:566
+msgid "Protect against abuse by limiting requests from the same IP address."
+msgstr "احمِ من سوء الاستخدام عن طريق تحديد الطلبات القادمة من نفس عنوان IP."
+
+#: src/Core/Admin/class-admin-settings.php:571
+msgid "Elementor Action Rate Limit"
+msgstr "حد معدل إجراء Elementor"
+
+#: src/Core/Admin/class-admin-settings.php:574
+msgid "Maximum requests per IP per 15 minutes for payment form submissions."
+msgstr "أقصى عدد طلبات لكل عنوان IP لكل 15 دقيقة لإرسالات نموذج الدفع."
+
+#: src/Core/Admin/class-admin-settings.php:579
+msgid "Admin AJAX Rate Limit"
+msgstr "حد معدل AJAX للإدارة"
+
+#: src/Core/Admin/class-admin-settings.php:582
+msgid "Maximum requests per IP per 15 minutes for admin AJAX calls."
+msgstr "أقصى عدد طلبات لكل عنوان IP لكل 15 دقيقة لاستدعاءات AJAX الخاصة بالإدارة."
+
+#: src/Core/Admin/class-admin-settings.php:587
+#: src/Core/Admin/class-admin-settings.php:668
+msgid "Subject Template"
+msgstr "قالب الموضوع"
+
+#: src/Core/Admin/class-admin-settings.php:589
+#: src/Core/Admin/class-admin-settings.php:670
+msgid "Payment Receipt from {site_name}"
+msgstr "إيصال دفع من {site_name}"
+
+#: src/Core/Admin/class-admin-settings.php:590
+#: src/Core/Admin/class-admin-settings.php:671
+msgid "Placeholders: {site_name}, {amount}, {receipt_code}."
+msgstr "البدائل: {site_name}، {amount}، {receipt_code}."
+
+#: src/Core/Admin/class-admin-settings.php:594
+#: src/Core/Admin/class-admin-settings.php:675
+msgid "Attach PDF Receipt"
+msgstr "إرفاق إيصال PDF"
+
+#: src/Core/Admin/class-admin-settings.php:598
+msgid "Attach a PDF receipt to the confirmation email."
+msgstr "إرفاق إيصال PDF برسالة التأكيد الإلكترونية."
+
+#: src/Core/Admin/class-admin-settings.php:600
+msgid "When enabled, a professionally formatted PDF receipt will be generated and attached to the customer receipt email."
+msgstr "عند التفعيل، سيتم إنشاء إيصال PDF منسق بشكل احترافي وإرفاقه ببريد إيصال العميل."
+
+#: src/Core/Admin/class-admin-settings.php:611
+msgid "Outgoing Webhooks (Pro)"
+msgstr "خطافات الويب الصادرة (Pro)"
+
+#: src/Core/Admin/class-admin-settings.php:612
+msgid "Send payment events to Zapier, Make, N8N, or any webhook receiver."
+msgstr "أرسل أحداث الدفع إلى Zapier أو Make أو N8N أو أي مستقبل لخطافات الويب."
+
+#: src/Core/Admin/class-admin-settings.php:615
+msgid "Webhook URLs"
+msgstr "روابط خطاف الويب"
+
+#: src/Core/Admin/class-admin-settings.php:618
+msgid "One URL per line. Each enabled event will POST a JSON payload to all URLs."
+msgstr "رابط واحد في كل سطر. كل حدث مفعّل سيرسل حمولة JSON إلى جميع الروابط."
+
+#: src/Core/Admin/class-admin-settings.php:622
+msgid "Events"
+msgstr "الأحداث"
+
+#: src/Core/Admin/class-admin-settings.php:626
+msgid "Payment Completed"
+msgstr "اكتمل الدفع"
+
+#: src/Core/Admin/class-admin-settings.php:630
+#: src/Core/class-payment-result-shortcode.php:134
+msgid "Payment Failed"
+msgstr "فشل الدفع"
+
+#: src/Core/Admin/class-admin-settings.php:632
+msgid "Select which events trigger a webhook delivery."
+msgstr "حدد الأحداث التي تُفعّل إرسال خطاف الويب."
+
+#: src/Core/Admin/class-admin-settings.php:636
+#: src/Gateways/Stripe/class-stripe-gateway.php:120
+msgid "Secret Key"
+msgstr "المفتاح السري"
+
+#: src/Core/Admin/class-admin-settings.php:639
+msgid "Optional. When set, each delivery includes an X-GatewayKit-Signature header (HMAC-SHA256) for verification."
+msgstr "اختياري. عند تعيينه، سيتضمن كل إرسال ترويسة X-GatewayKit-Signature (HMAC-SHA256) للتحقق."
+
+#: src/Core/Admin/class-admin-settings.php:650
+msgid "Customer Email Receipt"
+msgstr "إيصال البريد الإلكتروني للعميل"
+
+#: src/Core/Admin/class-admin-settings.php:651
+msgid "Default settings for customer payment receipt emails. Per-form toggles are in the Elementor form action settings."
+msgstr "الإعدادات الافتراضية لبريد إيصال الدفع للعميل. توجد مفاتيح التبديل لكل نموذج في إعدادات إجراء نموذج Elementor."
+
+#: src/Core/Admin/class-admin-settings.php:654
+msgid "From Name"
+msgstr "اسم المرسل"
+
+#: src/Core/Admin/class-admin-settings.php:657
+msgid "Name shown as the sender. Defaults to site name."
+msgstr "الاسم الظاهر كمرسل. الافتراضي هو اسم الموقع."
+
+#: src/Core/Admin/class-admin-settings.php:661
+msgid "From Email"
+msgstr "بريد المرسل"
+
+#: src/Core/Admin/class-admin-settings.php:664
+msgid "Sender email address. Defaults to admin email."
+msgstr "عنوان البريد الإلكتروني للمرسل. الافتراضي هو بريد المشرف."
+
+#: src/Core/Admin/class-admin-settings.php:679
+msgid "Attach a PDF receipt to the email."
+msgstr "إرفاق إيصال PDF بالبريد الإلكتروني."
+
+#: src/Core/Admin/class-admin-settings.php:681
+msgid "When enabled, a professionally formatted PDF receipt will be attached to the customer email."
+msgstr "عند التفعيل، سيتم إرفاق إيصال PDF منسق بشكل احترافي ببريد العميل."
+
+#: src/Core/Admin/class-admin-settings.php:701
+msgid "Rename the plugin in the WordPress admin. After saving, this tab will be hidden. Use the magic link below to re-access these settings."
+msgstr "أعد تسمية الإضافة في لوحة إدارة WordPress. بعد الحفظ، سيتم إخفاء هذا التبويب. استخدم الرابط السحري أدناه للوصول إلى هذه الإعدادات مرة أخرى."
+
+#: src/Core/Admin/class-admin-settings.php:707
+msgid "Enable White Label"
+msgstr "تفعيل العلامة البيضاء"
+
+#: src/Core/Admin/class-admin-settings.php:710
+msgid "When enabled, the plugin name and description will be replaced with your custom values."
+msgstr "عند التفعيل، سيتم استبدال اسم الإضافة ووصفها بقيمك المخصصة."
+
+#: src/Core/Admin/class-admin-settings.php:714
+msgid "Custom Name"
+msgstr "اسم مخصص"
+
+#: src/Core/Admin/class-admin-settings.php:716
+msgid "My Payment Gateway"
+msgstr "بوابة الدفع الخاصة بي"
+
+#: src/Core/Admin/class-admin-settings.php:717
+msgid "The name shown in the admin menu, dashboard, and plugins list."
+msgstr "الاسم الظاهر في قائمة الإدارة ولوحة التحكم وقائمة الإضافات."
+
+#: src/Core/Admin/class-admin-settings.php:721
+msgid "Custom Description"
+msgstr "وصف مخصص"
+
+#: src/Core/Admin/class-admin-settings.php:723
+msgid "Optional description for the plugins list."
+msgstr "وصف اختياري لقائمة الإضافات."
+
+#: src/Core/Admin/class-admin-settings.php:724
+msgid "Optional. Shown in the plugins list."
+msgstr "اختياري. يظهر في قائمة الإضافات."
+
+#: src/Core/Admin/class-admin-settings.php:728
+msgid "Magic Link"
+msgstr "الرابط السحري"
+
+#: src/Core/Admin/class-admin-settings.php:731
+msgid "Bookmark this link or click \"Email me the link\" to re-access White Label settings after this tab hides."
+msgstr "احفظ هذا الرابط أو انقر على \"أرسل لي الرابط بالبريد\" لإعادة الوصول إلى إعدادات العلامة البيضاء بعد إخفاء هذا التبويب."
+
+#: src/Core/Admin/class-admin-settings.php:732
+msgid "Copy Link"
+msgstr "نسخ الرابط"
+
+#: src/Core/Admin/class-admin-settings.php:740
+msgid "Email me the link"
+msgstr "أرسل لي الرابط بالبريد"
+
+#: src/Core/Admin/class-admin-settings.php:744
+msgid "Save White Label Settings"
+msgstr "حفظ إعدادات العلامة البيضاء"
+
+#: src/Core/Admin/class-admin-settings.php:749
+msgid "Scope Limitation:"
+msgstr "حدود النطاق:"
+
+#: src/Core/Admin/class-admin-settings.php:749
+msgid "Freemius \"Account\" and \"Add-Ons\" submenus remain visible. They handle license/subscription management and cannot be renamed safely."
+msgstr "تبقى القوائم الفرعية \"الحساب\" و\"الإضافات\" في Freemius ظاهرة. وهي تدير الترخيص/الاشتراك ولا يمكن إعادة تسميتها بأمان."
+
+#: src/Core/Admin/class-admin-settings.php:766
+msgid "Configure your payment gateways. Enable or disable gateways and set their specific settings below."
+msgstr "قم بتكوين بوابات الدفع. فعّل أو عطّل البوابات واضبط إعداداتها الخاصة أدناه."
+
+#: src/Core/Admin/class-admin-settings.php:769
+msgid "Need an additional payment gateway? Please contact support to request it."
+msgstr "هل تحتاج إلى بوابة دفع إضافية؟ يرجى التواصل مع الدعم لطلبها."
+
+#: src/Core/Admin/class-admin-settings.php:807
+#: src/Core/Admin/class-admin-settings.php:2009
+msgid "Enabled"
+msgstr "مفعّل"
+
+#: src/Core/Admin/class-admin-settings.php:807
+#: src/Core/Admin/class-admin-settings.php:2010
+msgid "Disabled"
+msgstr "معطّل"
+
+#: src/Core/Admin/class-admin-settings.php:817
+msgid "This gateway is not properly configured. Please check your settings below."
+msgstr "هذه البوابة غير مكوّنة بشكل صحيح. يرجى التحقق من إعداداتك أدناه."
+
+#: src/Core/Admin/class-admin-settings.php:826
+msgid "Test Connection"
+msgstr "اختبار الاتصال"
+
+#: src/Core/Admin/class-admin-settings.php:828
+msgid "Verify your credentials before enabling the gateway. No payment is created."
+msgstr "تحقق من بيانات الاعتماد قبل تفعيل البوابة. لن يتم إنشاء أي عملية دفع."
+
+#: src/Core/Admin/class-admin-settings.php:891
+msgid "This gateway has no configurable settings."
+msgstr "لا تحتوي هذه البوابة على إعدادات قابلة للتكوين."
+
+#. translators: %s: gateway name
+#: src/Core/Admin/class-admin-settings.php:1064
+#, php-format
+msgid "Gateway \"%s\" cannot be enabled because its settings are incomplete. Please enter the required settings first."
+msgstr "لا يمكن تفعيل البوابة \"%s\" لأن إعداداتها غير مكتملة. يرجى إدخال الإعدادات المطلوبة أولاً."
+
+#: src/Core/Admin/class-admin-settings.php:1114
+msgid "Payment Transactions"
+msgstr "معاملات الدفع"
+
+#: src/Core/Admin/class-admin-settings.php:1156
+#: src/Core/Admin/class-admin-settings.php:1165
+msgid "Export All Transactions"
+msgstr "تصدير جميع المعاملات"
+
+#: src/Core/Admin/class-admin-settings.php:1163
+msgid "CSV export is a GatewayKit Pro feature. Upgrade to unlock."
+msgstr "تصدير CSV هو ميزة من ميزات GatewayKit Pro. قم بالترقية لفتحها."
+
+#: src/Core/Admin/class-admin-settings.php:1168
+msgid "Upgrade to Pro"
+msgstr "الترقية إلى Pro"
+
+#: src/Core/Admin/class-admin-settings.php:1189
+msgid "All Statuses"
+msgstr "كل الحالات"
+
+#: src/Core/Admin/class-admin-settings.php:1190
+#: src/Core/Admin/class-dashboard-widgets.php:243
+#: src/Core/Admin/class-transaction-list-table.php:796
+msgid "Pending"
+msgstr "قيد الانتظار"
+
+#: src/Core/Admin/class-admin-settings.php:1191
+#: src/Core/Admin/class-transaction-list-table.php:797
+msgid "Processing"
+msgstr "قيد المعالجة"
+
+#: src/Core/Admin/class-admin-settings.php:1192
+#: src/Core/Admin/class-transaction-list-table.php:798
+#: src/Core/class-payment-result-shortcode.php:336
+msgid "Completed"
+msgstr "مكتمل"
+
+#: src/Core/Admin/class-admin-settings.php:1193
+#: src/Core/Admin/class-admin-settings.php:2027
+#: src/Core/Admin/class-dashboard-widgets.php:152
+#: src/Core/Admin/class-dashboard-widgets.php:240
+#: src/Core/Admin/class-transaction-list-table.php:799
+#: src/Core/class-plugin.php:594
+msgid "Failed"
+msgstr "فشل"
+
+#: src/Core/Admin/class-admin-settings.php:1194
+#: src/Core/Admin/class-transaction-list-table.php:800
+msgid "Cancelled"
+msgstr "ملغي"
+
+#: src/Core/Admin/class-admin-settings.php:1198
+#: src/Core/Admin/class-analytics-dashboard.php:129
+msgid "All Gateways"
+msgstr "كل البوابات"
+
+#: src/Core/Admin/class-admin-settings.php:1212
+msgid "Date From"
+msgstr "من تاريخ"
+
+#: src/Core/Admin/class-admin-settings.php:1215
+#: src/Core/Email/class-receipt-pdf.php:164
+msgid "From"
+msgstr "من"
+
+#: src/Core/Admin/class-admin-settings.php:1217
+msgid "Date To"
+msgstr "إلى تاريخ"
+
+#: src/Core/Admin/class-admin-settings.php:1220
+msgid "To"
+msgstr "إلى"
+
+#: src/Core/Admin/class-admin-settings.php:1224
+#: src/Core/Admin/class-admin-settings.php:1340
+msgid "Filter"
+msgstr "تصفية"
+
+#: src/Core/Admin/class-admin-settings.php:1229
+msgid "Search Transactions:"
+msgstr "البحث في المعاملات:"
+
+#: src/Core/Admin/class-admin-settings.php:1230
+#: src/Core/Admin/class-transaction-list-table.php:1103
+msgid "Search by name, receipt code, email, phone..."
+msgstr "ابحث بالاسم أو رمز الإيصال أو البريد الإلكتروني أو الهاتف..."
+
+#: src/Core/Admin/class-admin-settings.php:1231
+msgid "Search Transactions"
+msgstr "البحث في المعاملات"
+
+#: src/Core/Admin/class-admin-settings.php:1247
+msgid "Transaction Form Data"
+msgstr "بيانات نموذج المعاملة"
+
+#: src/Core/Admin/class-admin-settings.php:1252
+#: src/Core/Admin/class-admin-settings.php:1989
+msgid "Loading..."
+msgstr "جارٍ التحميل..."
+
+#: src/Core/Admin/class-admin-settings.php:1271
+msgid "Payment Logs"
+msgstr "سجلات الدفع"
+
+#: src/Core/Admin/class-admin-settings.php:1308
+#: src/Core/Admin/class-log-list-table.php:291
+msgid "Copy Selected"
+msgstr "نسخ المحدد"
+
+#: src/Core/Admin/class-admin-settings.php:1312
+#: src/Core/Admin/class-log-list-table.php:292
+#: src/Core/Admin/class-transaction-list-table.php:907
+msgid "Export Selected"
+msgstr "تصدير المحدد"
+
+#: src/Core/Admin/class-admin-settings.php:1322
+msgid "Filter by level"
+msgstr "تصفية حسب المستوى"
+
+#: src/Core/Admin/class-admin-settings.php:1324
+msgid "All Levels"
+msgstr "كل المستويات"
+
+#: src/Core/Admin/class-admin-settings.php:1331
+msgid "Date from"
+msgstr "من تاريخ"
+
+#: src/Core/Admin/class-admin-settings.php:1332
+msgid "From date"
+msgstr "من تاريخ"
+
+#: src/Core/Admin/class-admin-settings.php:1334
+msgid "Date to"
+msgstr "إلى تاريخ"
+
+#: src/Core/Admin/class-admin-settings.php:1335
+msgid "To date"
+msgstr "إلى تاريخ"
+
+#: src/Core/Admin/class-admin-settings.php:1337
+#: src/Core/Admin/class-admin-settings.php:1338
+msgid "Transaction ID"
+msgstr "معرّف المعاملة"
+
+#: src/Core/Admin/class-admin-settings.php:1344
+msgid "Search logs:"
+msgstr "البحث في السجلات:"
+
+#: src/Core/Admin/class-admin-settings.php:1345
+msgid "Search message..."
+msgstr "البحث في الرسالة..."
+
+#: src/Core/Admin/class-admin-settings.php:1346
+msgid "Search Logs"
+msgstr "البحث في السجلات"
+
+#: src/Core/Admin/class-admin-settings.php:1376
+msgid "Learn how to set up and use the GatewayKit plugin with Elementor forms."
+msgstr "تعرّف على كيفية إعداد واستخدام إضافة GatewayKit مع نماذج Elementor."
+
+#: src/Core/Admin/class-admin-settings.php:1383
+msgid "Follow these steps to set up and use the GatewayKit plugin:"
+msgstr "اتبع هذه الخطوات لإعداد واستخدام إضافة GatewayKit:"
+
+#: src/Core/Admin/class-admin-settings.php:1389
+msgid "Activate a Payment Gateway"
+msgstr "تفعيل بوابة دفع"
+
+#: src/Core/Admin/class-admin-settings.php:1390
+msgid "Ensure at least one payment gateway is active and properly configured in the Settings page."
+msgstr "تأكد من أن بوابة دفع واحدة على الأقل مفعّلة ومكوّنة بشكل صحيح في صفحة الإعدادات."
+
+#: src/Core/Admin/class-admin-settings.php:1397
+msgid "Create an Elementor Form"
+msgstr "إنشاء نموذج Elementor"
+
+#: src/Core/Admin/class-admin-settings.php:1398
+msgid "Build a new form using Elementor's form widget with the necessary fields for your payment process."
+msgstr "أنشئ نموذجًا جديدًا باستخدام أداة النماذج في Elementor مع الحقول اللازمة لعملية الدفع الخاصة بك."
+
+#: src/Core/Admin/class-admin-settings.php:1405
+msgid "Configure Form Actions"
+msgstr "تكوين إجراءات النموذج"
+
+#: src/Core/Admin/class-admin-settings.php:1406
+msgid "In the form's \"Actions After Submit\" section, enable only the Payment Gateway action and disable all other actions."
+msgstr "في قسم \"الإجراءات بعد الإرسال\" بالنموذج، فعّل إجراء بوابة الدفع فقط وعطّل جميع الإجراءات الأخرى."
+
+#: src/Core/Admin/class-admin-settings.php:1413
+msgid "Set Payment Settings"
+msgstr "ضبط إعدادات الدفع"
+
+#: src/Core/Admin/class-admin-settings.php:1414
+msgid "Configure the payment amount and redirect page settings in the Payment Gateway action configuration."
+msgstr "قم بتكوين مبلغ الدفع وإعدادات صفحة إعادة التوجيه في تكوين إجراء بوابة الدفع."
+
+#: src/Core/Admin/class-admin-settings.php:1421
+msgid "Create Results Page"
+msgstr "إنشاء صفحة النتائج"
+
+#: src/Core/Admin/class-admin-settings.php:1423
+msgid "Create a new page and add the shortcode"
+msgstr "أنشئ صفحة جديدة وأضف الكود المختصر"
+
+#: src/Core/Admin/class-admin-settings.php:1425
+msgid "to display payment results."
+msgstr "لعرض نتائج الدفع."
+
+#: src/Core/Admin/class-admin-settings.php:1431
+#: src/Core/Admin/class-admin-settings.php:2047
+#: src/Core/class-payment-result-shortcode.php:218
+#: src/Core/class-payment-result-shortcode.php:378
+msgid "Copy"
+msgstr "نسخ"
+
+#: src/Core/Admin/class-admin-settings.php:1457
+msgid "GatewayKit Tools"
+msgstr "أدوات GatewayKit"
+
+#: src/Core/Admin/class-admin-settings.php:1460
+msgid "Database maintenance and diagnostic tools for GatewayKit."
+msgstr "أدوات صيانة قاعدة البيانات والتشخيص الخاصة بـ GatewayKit."
+
+#: src/Core/Admin/class-admin-settings.php:1479
+msgid "Database Schema Management"
+msgstr "إدارة مخطط قاعدة البيانات"
+
+#: src/Core/Admin/class-admin-settings.php:1480
+msgid "Check and repair database schema for GatewayKit tables."
+msgstr "افحص وأصلح مخطط قاعدة البيانات لجداول GatewayKit."
+
+#: src/Core/Admin/class-admin-settings.php:1483
+msgid "Current Table Status"
+msgstr "حالة الجدول الحالية"
+
+#: src/Core/Admin/class-admin-settings.php:1487
+msgid "Table"
+msgstr "الجدول"
+
+#: src/Core/Admin/class-admin-settings.php:1488
+#: src/Core/Admin/class-admin-settings.php:1993
+#: src/Core/Admin/class-transaction-list-table.php:67
+#: src/Core/Admin/class-transaction-list-table.php:556
+#: src/Core/class-payment-result-shortcode.php:319
+#: src/Core/class-payment-result-shortcode.php:393
+#: src/Core/Email/class-receipt-pdf.php:263
+msgid "Status"
+msgstr "الحالة"
+
+#: src/Core/Admin/class-admin-settings.php:1489
+msgid "Records"
+msgstr "السجلات"
+
+#: src/Core/Admin/class-admin-settings.php:1498
+msgid "Exists"
+msgstr "موجود"
+
+#: src/Core/Admin/class-admin-settings.php:1498
+msgid "Missing"
+msgstr "مفقود"
+
+#: src/Core/Admin/class-admin-settings.php:1509
+msgid "Database Actions"
+msgstr "إجراءات قاعدة البيانات"
+
+#: src/Core/Admin/class-admin-settings.php:1515
+msgid "Verify Schema"
+msgstr "التحقق من المخطط"
+
+#: src/Core/Admin/class-admin-settings.php:1519
+msgid "Optimize Tables"
+msgstr "تحسين الجداول"
+
+#: src/Core/Admin/class-admin-settings.php:1522
+msgid "Are you sure you want to reset the database version? This will force the schema to be rebuilt on next load."
+msgstr "هل أنت متأكد من رغبتك في إعادة تعيين إصدار قاعدة البيانات؟ سيؤدي ذلك إلى إجبار المخطط على إعادة البناء عند التحميل التالي."
+
+#: src/Core/Admin/class-admin-settings.php:1523
+msgid "Reset DB Version"
+msgstr "إعادة تعيين إصدار قاعدة البيانات"
+
+#: src/Core/Admin/class-admin-settings.php:1530
+msgid "Database Information"
+msgstr "معلومات قاعدة البيانات"
+
+#: src/Core/Admin/class-admin-settings.php:1533
+msgid "Current DB Version"
+msgstr "إصدار قاعدة البيانات الحالي"
+
+#: src/Core/Admin/class-admin-settings.php:1537
+msgid "Target DB Version"
+msgstr "إصدار قاعدة البيانات المستهدف"
+
+#: src/Core/Admin/class-admin-settings.php:1564
+msgid "Database schema verified and repaired."
+msgstr "تم التحقق من مخطط قاعدة البيانات وإصلاحه."
+
+#: src/Core/Admin/class-admin-settings.php:1570
+msgid "Database version has been reset. Schema will be rebuilt on next load."
+msgstr "تمت إعادة تعيين إصدار قاعدة البيانات. سيتم إعادة بناء المخطط عند التحميل التالي."
+
+#: src/Core/Admin/class-admin-settings.php:1575
+msgid "Database tables optimized."
+msgstr "تم تحسين جداول قاعدة البيانات."
+
+#: src/Core/Admin/class-admin-settings.php:1607
+#: src/Core/Admin/class-admin-settings.php:1713
+msgid "Transaction ID is required."
+msgstr "معرّف المعاملة مطلوب."
+
+#: src/Core/Admin/class-admin-settings.php:1626
+#: src/Core/Admin/class-admin-settings.php:1720
+#: src/Core/Admin/class-admin-settings.php:2073
+#: src/Core/Admin/class-admin-settings.php:2100
+#: src/Core/callback-handler.php:94
+#: src/Core/class-plugin.php:1448
+#: src/Core/Refund/class-refund-service.php:97
+msgid "Transaction not found."
+msgstr "لم يتم العثور على المعاملة."
+
+#: src/Core/Admin/class-admin-settings.php:1733
+#: src/Core/Admin/class-transaction-list-table.php:845
+msgid "License Error"
+msgstr "خطأ في الترخيص"
+
+#: src/Core/Admin/class-admin-settings.php:1734
+#: src/Core/Admin/class-transaction-list-table.php:846
+msgid "Gateway Error"
+msgstr "خطأ في البوابة"
+
+#: src/Core/Admin/class-admin-settings.php:1735
+#: src/Core/Admin/class-transaction-list-table.php:847
+msgid "Configuration Error"
+msgstr "خطأ في التكوين"
+
+#: src/Core/Admin/class-admin-settings.php:1736
+#: src/Core/Admin/class-transaction-list-table.php:848
+msgid "Network Error"
+msgstr "خطأ في الشبكة"
+
+#: src/Core/Admin/class-admin-settings.php:1737
+#: src/Core/Admin/class-transaction-list-table.php:849
+msgid "Validation Error"
+msgstr "خطأ في التحقق"
+
+#: src/Core/Admin/class-admin-settings.php:1738
+#: src/Core/Admin/class-transaction-list-table.php:850
+msgid "Unknown Error"
+msgstr "خطأ غير معروف"
+
+#: src/Core/Admin/class-admin-settings.php:1750
+msgid "No error message available"
+msgstr "لا توجد رسالة خطأ متاحة"
+
+#: src/Core/Admin/class-admin-settings.php:1789
+msgid "Gateway is required."
+msgstr "البوابة مطلوبة."
+
+#: src/Core/Admin/class-admin-settings.php:1808
+msgid "Gateway is not registered."
+msgstr "البوابة غير مسجلة."
+
+#: src/Core/Admin/class-admin-settings.php:1817
+msgid "Test failed."
+msgstr "فشل الاختبار."
+
+#: src/Core/Admin/class-admin-settings.php:1849
+#: src/Core/Admin/class-admin-settings.php:1903
+msgid "No valid log IDs provided."
+msgstr "لم يتم تقديم معرّفات سجلات صالحة."
+
+#: src/Core/Admin/class-admin-settings.php:1856
+#: src/Core/Admin/class-admin-settings.php:1909
+msgid "No logs found for the selected entries."
+msgstr "لم يتم العثور على سجلات للإدخالات المحددة."
+
+#: src/Core/Admin/class-admin-settings.php:1984
+msgid "Are you sure you want to delete the selected transactions?"
+msgstr "هل أنت متأكد من رغبتك في حذف المعاملات المحددة؟"
+
+#: src/Core/Admin/class-admin-settings.php:1985
+msgid "Please check the form for errors."
+msgstr "يرجى التحقق من النموذج بحثًا عن أخطاء."
+
+#: src/Core/Admin/class-admin-settings.php:1986
+msgid "Testing..."
+msgstr "جارٍ الاختبار..."
+
+#: src/Core/Admin/class-admin-settings.php:1987
+msgid "Test failed"
+msgstr "فشل الاختبار"
+
+#: src/Core/Admin/class-admin-settings.php:1988
+msgid "AJAX error occurred"
+msgstr "حدث خطأ في AJAX"
+
+#: src/Core/Admin/class-admin-settings.php:1990
+#: src/Core/class-payment-result-shortcode.php:311
+#: src/Core/Email/class-receipt-pdf.php:146
+msgid "Transaction Details"
+msgstr "تفاصيل المعاملة"
+
+#: src/Core/Admin/class-admin-settings.php:1991
+#: src/Core/Admin/class-log-list-table.php:60
+#: src/Core/Admin/class-transaction-list-table.php:549
+msgid "ID"
+msgstr "المعرّف"
+
+#: src/Core/Admin/class-admin-settings.php:1992
+#: src/Core/Admin/class-transaction-list-table.php:65
+#: src/Core/Admin/class-transaction-list-table.php:553
+#: src/Core/class-payment-result-shortcode.php:233
+#: src/Core/class-payment-result-shortcode.php:443
+#: src/Core/Elementor/class-elementor-action.php:124
+#: src/Core/Email/class-receipt-email.php:260
+msgid "Amount"
+msgstr "المبلغ"
+
+#: src/Core/Admin/class-admin-settings.php:1994
+#: src/Core/Admin/class-transaction-list-table.php:70
+#: src/Core/Email/class-receipt-pdf.php:149
+msgid "Date"
+msgstr "التاريخ"
+
+#: src/Core/Admin/class-admin-settings.php:1995
+msgid "User ID"
+msgstr "معرّف المستخدم"
+
+#: src/Core/Admin/class-admin-settings.php:1996
+#: src/Core/Admin/class-transaction-list-table.php:66
+#: src/Core/Admin/class-transaction-list-table.php:555
+#: src/Core/class-payment-result-shortcode.php:292
+#: src/Core/class-payment-result-shortcode.php:520
+#: src/Core/Email/class-receipt-email.php:272
+#: src/Core/Email/class-receipt-pdf.php:216
+#: src/Features/Discount/class-admin-discounts.php:219
+msgid "Description"
+msgstr "الوصف"
+
+#: src/Core/Admin/class-admin-settings.php:1997
+msgid "Form Data"
+msgstr "بيانات النموذج"
+
+#: src/Core/Admin/class-admin-settings.php:1998
+msgid "Field"
+msgstr "الحقل"
+
+#: src/Core/Admin/class-admin-settings.php:1999
+#: src/Features/Discount/class-admin-discounts.php:235
+#: src/Features/Discount/class-admin-discounts.php:620
+msgid "Value"
+msgstr "القيمة"
+
+#: src/Core/Admin/class-admin-settings.php:2000
+msgid "No form data available."
+msgstr "لا توجد بيانات نموذج متاحة."
+
+#: src/Core/Admin/class-admin-settings.php:2001
+msgid "User Data"
+msgstr "بيانات المستخدم"
+
+#: src/Core/Admin/class-admin-settings.php:2003
+#: src/Core/Admin/class-transaction-list-table.php:835
+msgid "Unknown error"
+msgstr "خطأ غير معروف"
+
+#: src/Core/Admin/class-admin-settings.php:2004
+msgid "AJAX error occurred."
+msgstr "حدث خطأ في AJAX."
+
+#: src/Core/Admin/class-admin-settings.php:2007
+msgid "Merchant ID is required"
+msgstr "معرّف التاجر مطلوب"
+
+#: src/Core/Admin/class-admin-settings.php:2008
+msgid "Invalid API key format"
+msgstr "صيغة مفتاح API غير صالحة"
+
+#: src/Core/Admin/class-admin-settings.php:2011
+#: src/Core/Admin/class-admin-settings.php:2026
+#: src/Core/class-plugin.php:593
+msgid "Copied!"
+msgstr "تم النسخ!"
+
+#: src/Core/Admin/class-admin-settings.php:2012
+msgid "Notes"
+msgstr "الملاحظات"
+
+#: src/Core/Admin/class-admin-settings.php:2013
+msgid "No notes yet."
+msgstr "لا توجد ملاحظات بعد."
+
+#: src/Core/Admin/class-admin-settings.php:2014
+msgid "Add a note..."
+msgstr "إضافة ملاحظة..."
+
+#: src/Core/Admin/class-admin-settings.php:2015
+msgid "Save Note"
+msgstr "حفظ الملاحظة"
+
+#: src/Core/Admin/class-admin-settings.php:2016
+msgid "Saving..."
+msgstr "جارٍ الحفظ..."
+
+#: src/Core/Admin/class-admin-settings.php:2017
+msgid "Unknown"
+msgstr "غير معروف"
+
+#: src/Core/Admin/class-admin-settings.php:2041
+msgid "Please select at least one log entry."
+msgstr "يرجى تحديد إدخال سجل واحد على الأقل."
+
+#: src/Core/Admin/class-admin-settings.php:2042
+msgid "Copying..."
+msgstr "جارٍ النسخ..."
+
+#. translators: %s: number of copied log entries
+#: src/Core/Admin/class-admin-settings.php:2044
+#, php-format
+msgid "Copied %s log entries to clipboard."
+msgstr "تم نسخ %s من إدخالات السجل إلى الحافظة."
+
+#: src/Core/Admin/class-admin-settings.php:2045
+msgid "Failed to copy logs."
+msgstr "فشل نسخ السجلات."
+
+#: src/Core/Admin/class-admin-settings.php:2046
+#: src/Core/class-plugin.php:643
+#: src/Features/Discount/class-admin-discounts.php:96
+msgid "An error occurred. Please try again."
+msgstr "حدث خطأ. يرجى المحاولة مرة أخرى."
+
+#: src/Core/Admin/class-admin-settings.php:2062
+#: src/Core/Admin/class-admin-settings.php:2088
+msgid "Unauthorized."
+msgstr "غير مصرح."
+
+#: src/Core/Admin/class-admin-settings.php:2068
+#: src/Core/Admin/class-transaction-list-table.php:1006
+msgid "Invalid transaction ID."
+msgstr "معرّف معاملة غير صالح."
+
+#: src/Core/Admin/class-admin-settings.php:2095
+msgid "Transaction ID and note are required."
+msgstr "معرّف المعاملة والملاحظة مطلوبان."
+
+#: src/Core/Admin/class-analytics-dashboard.php:49
+#: src/Core/Admin/class-analytics-dashboard.php:50
+msgid "Analytics"
+msgstr "التحليلات"
+
+#: src/Core/Admin/class-analytics-dashboard.php:91
+msgid "Loading analytics..."
+msgstr "جارٍ تحميل التحليلات..."
+
+#: src/Core/Admin/class-analytics-dashboard.php:92
+msgid "Failed to load analytics data."
+msgstr "فشل تحميل بيانات التحليلات."
+
+#: src/Core/Admin/class-analytics-dashboard.php:93
+msgid "No transaction data available for the selected period."
+msgstr "لا توجد بيانات معاملات متاحة للفترة المحددة."
+
+#: src/Core/Admin/class-analytics-dashboard.php:94
+msgid "Revenue"
+msgstr "الإيرادات"
+
+#: src/Core/Admin/class-analytics-dashboard.php:96
+#: src/Core/Admin/class-analytics-dashboard.php:157
+msgid "Avg. Order Value"
+msgstr "متوسط قيمة الطلب"
+
+#: src/Core/Admin/class-analytics-dashboard.php:97
+#: src/Core/Admin/class-analytics-dashboard.php:161
+#: src/Core/Admin/class-dashboard-widgets.php:167
+msgid "Success Rate"
+msgstr "معدل النجاح"
+
+#: src/Core/Admin/class-analytics-dashboard.php:115
+msgid "GatewayKit Analytics"
+msgstr "تحليلات GatewayKit"
+
+#: src/Core/Admin/class-analytics-dashboard.php:119
+msgid "Period:"
+msgstr "الفترة:"
+
+#: src/Core/Admin/class-analytics-dashboard.php:121
+msgid "Last 7 days"
+msgstr "آخر 7 أيام"
+
+#: src/Core/Admin/class-analytics-dashboard.php:122
+msgid "Last 30 days"
+msgstr "آخر 30 يومًا"
+
+#: src/Core/Admin/class-analytics-dashboard.php:123
+msgid "Last 90 days"
+msgstr "آخر 90 يومًا"
+
+#: src/Core/Admin/class-analytics-dashboard.php:124
+msgid "Last 12 months"
+msgstr "آخر 12 شهرًا"
+
+#: src/Core/Admin/class-analytics-dashboard.php:127
+msgid "Gateway:"
+msgstr "البوابة:"
+
+#: src/Core/Admin/class-analytics-dashboard.php:149
+msgid "Total Revenue"
+msgstr "إجمالي الإيرادات"
+
+#: src/Core/Admin/class-analytics-dashboard.php:169
+msgid "Revenue Over Time"
+msgstr "الإيرادات بمرور الوقت"
+
+#: src/Core/Admin/class-analytics-dashboard.php:173
+msgid "Transactions by Gateway"
+msgstr "المعاملات حسب البوابة"
+
+#: src/Core/Admin/class-analytics-dashboard.php:181
+msgid "Success vs Failed"
+msgstr "النجاح مقابل الفشل"
+
+#: src/Core/Admin/class-analytics-dashboard.php:185
+msgid "Top Forms by Revenue"
+msgstr "أعلى النماذج إيرادًا"
+
+#: src/Core/Admin/class-analytics-dashboard.php:200
+msgid "Permission denied."
+msgstr "تم رفض الإذن."
+
+#. translators: %s: post ID
+#: src/Core/Admin/class-analytics-dashboard.php:332
+#, php-format
+msgid "Page #%s"
+msgstr "الصفحة #%s"
+
+#. translators: %s: form ID
+#: src/Core/Admin/class-analytics-dashboard.php:338
+#, php-format
+msgid "Form %s"
+msgstr "النموذج %s"
+
+#: src/Core/Admin/class-dashboard-widgets.php:142
+msgid "Total Transactions"
+msgstr "إجمالي المعاملات"
+
+#: src/Core/Admin/class-dashboard-widgets.php:147
+#: src/Core/Admin/class-dashboard-widgets.php:237
+msgid "Successful"
+msgstr "ناجحة"
+
+#: src/Core/Admin/class-dashboard-widgets.php:157
+msgid "Total Amount"
+msgstr "إجمالي المبلغ"
+
+#: src/Core/Admin/class-dashboard-widgets.php:162
+msgid "Average Amount"
+msgstr "متوسط المبلغ"
+
+#: src/Core/Admin/class-dashboard-widgets.php:217
+msgid "No recent transactions."
+msgstr "لا توجد معاملات حديثة."
+
+#: src/Core/Admin/class-dashboard-widgets.php:275
+msgid "No gateway data available."
+msgstr "لا توجد بيانات بوابة متاحة."
+
+#: src/Core/Admin/class-dashboard-widgets.php:286
+msgid "transactions"
+msgstr "معاملة"
+
+#: src/Core/Admin/class-dashboard-widgets.php:290
+msgid "success rate"
+msgstr "معدل النجاح"
+
+#: src/Core/Admin/class-dashboard-widgets.php:299
+msgid "Configure Gateways"
+msgstr "تكوين البوابات"
+
+#: src/Core/Admin/class-log-list-table.php:61
+msgid "Time"
+msgstr "الوقت"
+
+#: src/Core/Admin/class-log-list-table.php:62
+msgid "Level"
+msgstr "المستوى"
+
+#: src/Core/Admin/class-log-list-table.php:63
+#: src/Core/Utils/class-log-formatter.php:179
+#: src/Core/Utils/class-log-formatter.php:181
+msgid "Message"
+msgstr "الرسالة"
+
+#: src/Core/Admin/class-log-list-table.php:64
+#: src/Core/Utils/class-log-formatter.php:185
+msgid "Context"
+msgstr "السياق"
+
+#: src/Core/Admin/class-log-list-table.php:65
+#: src/Core/Admin/class-transaction-list-table.php:61
+#: src/Core/Utils/class-log-formatter.php:177
+msgid "Transaction"
+msgstr "المعاملة"
+
+#: src/Core/Admin/class-log-list-table.php:233
+msgid "Show"
+msgstr "عرض"
+
+#: src/Core/Admin/class-log-list-table.php:320
+msgid "No logs found."
+msgstr "لم يتم العثور على سجلات."
+
+#: src/Core/Admin/class-transaction-list-table.php:62
+#: src/Core/Admin/class-transaction-list-table.php:550
+#: src/Core/class-payment-result-shortcode.php:214
+#: src/Core/class-payment-result-shortcode.php:374
+#: src/Core/Email/class-receipt-email.php:256
+msgid "Receipt Code"
+msgstr "رمز الإيصال"
+
+#: src/Core/Admin/class-transaction-list-table.php:63
+#: src/Core/Admin/class-transaction-list-table.php:551
+msgid "User"
+msgstr "المستخدم"
+
+#: src/Core/Admin/class-transaction-list-table.php:64
+#: src/Core/Admin/class-transaction-list-table.php:552
+msgid "Gateway"
+msgstr "البوابة"
+
+#: src/Core/Admin/class-transaction-list-table.php:68
+msgid "Error Info"
+msgstr "معلومات الخطأ"
+
+#: src/Core/Admin/class-transaction-list-table.php:69
+#: src/Core/Admin/class-transaction-list-table.php:557
+msgid "Authority"
+msgstr "سلطة الدفع"
+
+#: src/Core/Admin/class-transaction-list-table.php:521
+msgid "Headers already sent."
+msgstr "تم إرسال الترويسات بالفعل."
+
+#: src/Core/Admin/class-transaction-list-table.php:544
+msgid "Unable to create CSV output."
+msgstr "تعذر إنشاء مخرجات CSV."
+
+#: src/Core/Admin/class-transaction-list-table.php:558
+#: src/Core/class-payment-result-shortcode.php:226
+#: src/Core/class-payment-result-shortcode.php:386
+msgid "Reference ID"
+msgstr "معرّف المرجع"
+
+#: src/Core/Admin/class-transaction-list-table.php:559
+#: src/Core/class-payment-result-shortcode.php:526
+msgid "Created Date"
+msgstr "تاريخ الإنشاء"
+
+#: src/Core/Admin/class-transaction-list-table.php:598
+#: src/Core/Admin/class-transaction-list-table.php:709
+msgid "Guest"
+msgstr "زائر"
+
+#. translators: %s: transaction ID
+#: src/Core/Admin/class-transaction-list-table.php:660
+#, php-format
+msgid "Transaction #%s"
+msgstr "المعاملة #%s"
+
+#: src/Core/Admin/class-transaction-list-table.php:682
+msgid "Refund"
+msgstr "استرداد"
+
+#: src/Core/Admin/class-transaction-list-table.php:714
+msgid "— (free)"
+msgstr "— (مجاني)"
+
+#. translators: 1: original amount, 2: discount amount
+#: src/Core/Admin/class-transaction-list-table.php:741
+#, php-format
+msgid "was %1$s Â· âˆ’%2$s"
+msgstr "كان %1$s · −%2$s"
+
+#: src/Core/Admin/class-transaction-list-table.php:759
+msgid "Recurring subscription"
+msgstr "اشتراك متكرر"
+
+#: src/Core/Admin/class-transaction-list-table.php:801
+msgid "Refunded"
+msgstr "مسترجع"
+
+#: src/Core/Admin/class-transaction-list-table.php:802
+msgid "Partial Refund"
+msgstr "استرداد جزئي"
+
+#: src/Core/Admin/class-transaction-list-table.php:841
+msgid "Error:"
+msgstr "الخطأ:"
+
+#: src/Core/Admin/class-transaction-list-table.php:853
+msgid "Type:"
+msgstr "النوع:"
+
+#: src/Core/Admin/class-transaction-list-table.php:856
+msgid "Code:"
+msgstr "الرمز:"
+
+#: src/Core/Admin/class-transaction-list-table.php:903
+msgid "Delete Selected"
+msgstr "حذف المحدد"
+
+#. translators: %s: upgrade URL
+#: src/Core/Admin/class-transaction-list-table.php:993
+#, php-format
+msgid "Refunds are a GatewayKit Pro feature. Upgrade to Pro to unlock it: %s"
+msgstr "الاسترداد هو ميزة من ميزات GatewayKit Pro. قم بالترقية إلى Pro لفتحها: %s"
+
+#: src/Core/Admin/class-transaction-list-table.php:1113
+msgid "No transactions found."
+msgstr "لم يتم العثور على معاملات."
+
+#: src/Core/callback-handler.php:39
+msgid "Invalid gateway parameter."
+msgstr "معامل بوابة غير صالح."
+
+#: src/Core/callback-handler.php:70
+msgid "Payment cancelled. No redirect URL is configured for this form."
+msgstr "تم إلغاء الدفع. لم يتم تكوين رابط إعادة توجيه لهذا النموذج."
+
+#: src/Core/callback-handler.php:75
+msgid "Payment cancelled."
+msgstr "تم إلغاء الدفع."
+
+#: src/Core/callback-handler.php:87
+msgid "Invalid callback parameters."
+msgstr "معاملات رد اتصال غير صالحة."
+
+#: src/Core/callback-handler.php:102
+#: src/Core/class-plugin.php:1292
+#: src/Core/Elementor/class-elementor-action.php:996
+#: src/Core/Utils/class-error-handler.php:86
+msgid "Payment gateway not found."
+msgstr "لم يتم العثور على بوابة الدفع."
+
+#: src/Core/callback-handler.php:130
+msgid "Redirect URL not configured for success."
+msgstr "لم يتم تكوين رابط إعادة التوجيه لحالة النجاح."
+
+#: src/Core/callback-handler.php:155
+msgid "Redirect URL not configured."
+msgstr "لم يتم تكوين رابط إعادة التوجيه."
+
+#: src/Core/class-gateway-manager.php:354
+msgid "US Dollar (USD)"
+msgstr "دولار أمريكي (USD)"
+
+#: src/Core/class-gateway-manager.php:355
+msgid "Euro (EUR)"
+msgstr "يورو (EUR)"
+
+#: src/Core/class-gateway-manager.php:356
+msgid "British Pound (GBP)"
+msgstr "جنيه إسترليني (GBP)"
+
+#: src/Core/class-gateway-manager.php:357
+msgid "Australian Dollar (AUD)"
+msgstr "دولار أسترالي (AUD)"
+
+#: src/Core/class-gateway-manager.php:358
+msgid "Brazilian Real (BRL)"
+msgstr "ريال برازيلي (BRL)"
+
+#: src/Core/class-gateway-manager.php:359
+msgid "Canadian Dollar (CAD)"
+msgstr "دولار كندي (CAD)"
+
+#: src/Core/class-gateway-manager.php:360
+msgid "Chinese Yuan (CNY)"
+msgstr "يوان صيني (CNY)"
+
+#: src/Core/class-gateway-manager.php:361
+msgid "Czech Koruna (CZK)"
+msgstr "كرونة تشيكية (CZK)"
+
+#: src/Core/class-gateway-manager.php:362
+msgid "Danish Krone (DKK)"
+msgstr "كرونة دنماركية (DKK)"
+
+#: src/Core/class-gateway-manager.php:363
+msgid "Hong Kong Dollar (HKD)"
+msgstr "دولار هونغ كونغ (HKD)"
+
+#: src/Core/class-gateway-manager.php:364
+msgid "Hungarian Forint (HUF)"
+msgstr "فورنت مجري (HUF)"
+
+#: src/Core/class-gateway-manager.php:365
+msgid "Israeli Shekel (ILS)"
+msgstr "شيكل إسرائيلي (ILS)"
+
+#: src/Core/class-gateway-manager.php:366
+msgid "Indian Rupee (INR)"
+msgstr "روبية هندية (INR)"
+
+#: src/Core/class-gateway-manager.php:367
+msgid "Japanese Yen (JPY)"
+msgstr "ين ياباني (JPY)"
+
+#: src/Core/class-gateway-manager.php:368
+msgid "Malaysian Ringgit (MYR)"
+msgstr "رينغيت ماليزي (MYR)"
+
+#: src/Core/class-gateway-manager.php:369
+msgid "Mexican Peso (MXN)"
+msgstr "بيزو مكسيكي (MXN)"
+
+#: src/Core/class-gateway-manager.php:370
+msgid "Taiwan Dollar (TWD)"
+msgstr "دولار تايواني (TWD)"
+
+#: src/Core/class-gateway-manager.php:371
+msgid "New Zealand Dollar (NZD)"
+msgstr "دولار نيوزيلندي (NZD)"
+
+#: src/Core/class-gateway-manager.php:372
+msgid "Norwegian Krone (NOK)"
+msgstr "كرونة نرويجية (NOK)"
+
+#: src/Core/class-gateway-manager.php:373
+msgid "Philippine Peso (PHP)"
+msgstr "بيزو فلبيني (PHP)"
+
+#: src/Core/class-gateway-manager.php:374
+msgid "Polish Zloty (PLN)"
+msgstr "زلوتي بولندي (PLN)"
+
+#: src/Core/class-gateway-manager.php:375
+msgid "Russian Ruble (RUB)"
+msgstr "روبل روسي (RUB)"
+
+#: src/Core/class-gateway-manager.php:376
+msgid "Singapore Dollar (SGD)"
+msgstr "دولار سنغافوري (SGD)"
+
+#: src/Core/class-gateway-manager.php:377
+msgid "Swedish Krona (SEK)"
+msgstr "كرونة سويدية (SEK)"
+
+#: src/Core/class-gateway-manager.php:378
+msgid "Swiss Franc (CHF)"
+msgstr "فرنك سويسري (CHF)"
+
+#: src/Core/class-gateway-manager.php:379
+msgid "Thai Baht (THB)"
+msgstr "بات تايلندي (THB)"
+
+#: src/Core/class-gateway-manager.php:478
+msgid "Gateway not found."
+msgstr "لم يتم العثور على البوابة."
+
+#: src/Core/class-gateway-manager.php:491
+msgid "Gateway is not properly configured. Please complete the required settings."
+msgstr "البوابة غير مكوّنة بشكل صحيح. يرجى إكمال الإعدادات المطلوبة."
+
+#: src/Core/class-gateway-manager.php:497
+msgid "Gateway is properly configured."
+msgstr "البوابة مكوّنة بشكل صحيح."
+
+#: src/Core/class-payment-result-shortcode.php:83
+msgid "Invalid receipt code format. Please use the format XXXXXX-YYYYYY"
+msgstr "صيغة رمز الإيصال غير صالحة. يرجى استخدام الصيغة XXXXXX-YYYYYY"
+
+#: src/Core/class-payment-result-shortcode.php:88
+msgid "Too many failed attempts. Please try again later."
+msgstr "محاولات فاشلة كثيرة. يرجى المحاولة لاحقًا."
+
+#: src/Core/class-payment-result-shortcode.php:100
+msgid "Transaction not found with the provided receipt code."
+msgstr "لم يتم العثور على معاملة برمز الإيصال المقدم."
+
+#: src/Core/class-payment-result-shortcode.php:129
+msgid "Payment Completed Successfully"
+msgstr "اكتمل الدفع بنجاح"
+
+#: src/Core/class-payment-result-shortcode.php:139
+msgid "Payment Pending"
+msgstr "الدفع قيد الانتظار"
+
+#: src/Core/class-payment-result-shortcode.php:144
+msgid "Unknown Status"
+msgstr "حالة غير معروفة"
+
+#: src/Core/class-payment-result-shortcode.php:165
+msgid "Print Receipt"
+msgstr "طباعة الإيصال"
+
+#: src/Core/class-payment-result-shortcode.php:171
+msgid "Download Invoice"
+msgstr "تنزيل الفاتورة"
+
+#: src/Core/class-payment-result-shortcode.php:206
+#: src/Core/class-payment-result-shortcode.php:366
+#: src/Core/Email/class-receipt-email.php:249
+#: src/Core/Email/class-receipt-email.php:311
+#: src/Core/Email/class-receipt-pdf.php:70
+msgid "Payment Receipt"
+msgstr "إيصال الدفع"
+
+#: src/Core/class-payment-result-shortcode.php:217
+#: src/Core/class-payment-result-shortcode.php:377
+msgid "Copy to clipboard"
+msgstr "نسخ إلى الحافظة"
+
+#: src/Core/class-payment-result-shortcode.php:239
+#: src/Core/class-payment-result-shortcode.php:461
+#: src/Core/Email/class-receipt-email.php:268
+msgid "Payment Date"
+msgstr "تاريخ الدفع"
+
+#: src/Core/class-payment-result-shortcode.php:245
+#: src/Core/class-payment-result-shortcode.php:476
+#: src/Core/Elementor/class-elementor-action.php:78
+#: src/Core/Elementor/class-elementor-action.php:90
+#: src/Core/Elementor/class-elementor-action.php:100
+#: src/Core/Email/class-receipt-email.php:264
+#: src/Core/Email/class-receipt-pdf.php:153
+msgid "Payment Gateway"
+msgstr "بوابة الدفع"
+
+#: src/Core/class-payment-result-shortcode.php:329
+msgid "Created"
+msgstr "تم الإنشاء"
+
+#: src/Core/class-payment-result-shortcode.php:344
+#: src/Core/class-payment-result-shortcode.php:533
+msgid "IP Address"
+msgstr "عنوان IP"
+
+#: src/Core/class-payment-result-shortcode.php:425
+msgid "Original Amount"
+msgstr "المبلغ الأصلي"
+
+#: src/Core/class-payment-result-shortcode.php:431
+msgid "Discount Code"
+msgstr "رمز الخصم"
+
+#: src/Core/class-payment-result-shortcode.php:437
+#: src/Core/class-plugin.php:639
+#: src/Core/Email/class-receipt-pdf.php:231
+#: src/Core/Email/class-receipt-pdf.php:248
+msgid "Discount"
+msgstr "الخصم"
+
+#: src/Core/class-payment-result-shortcode.php:443
+msgid "Amount Paid"
+msgstr "المبلغ المدفوع"
+
+#: src/Core/class-payment-result-shortcode.php:453
+msgid "Note"
+msgstr "ملاحظة"
+
+#: src/Core/class-payment-result-shortcode.php:454
+msgid "Fully discounted — no payment was required."
+msgstr "خصم كامل — لم يُطلب أي دفع."
+
+#: src/Core/class-payment-result-shortcode.php:469
+msgid "Completed Date"
+msgstr "تاريخ الإكمال"
+
+#: src/Core/class-payment-result-shortcode.php:477
+msgid "— (no payment processed)"
+msgstr "— (لم تتم معالجة أي دفعة)"
+
+#: src/Core/class-payment-result-shortcode.php:566
+msgid "Enter Receipt Code"
+msgstr "أدخل رمز الإيصال"
+
+#: src/Core/class-payment-result-shortcode.php:569
+msgid "Please enter your receipt code to view your payment details."
+msgstr "يرجى إدخال رمز الإيصال الخاص بك لعرض تفاصيل الدفع."
+
+#: src/Core/class-payment-result-shortcode.php:579
+#: src/Core/Email/class-receipt-email.php:279
+msgid "View Receipt"
+msgstr "عرض الإيصال"
+
+#: src/Core/class-plugin.php:340
+#: src/Core/class-plugin.php:565
+msgid "GatewayKit"
+msgstr "GatewayKit"
+
+#: src/Core/class-plugin.php:511
+msgid "unlocks discount codes, outgoing webhooks, white label mode, payment info fields, advanced transaction log, per-form redirects, partial payments, and currency selector."
+msgstr "تفتح أكواد الخصم، وخطافات الويب الصادرة، ووضع العلامة البيضاء، وحقول معلومات الدفع، وسجل المعاملات المتقدم، وعمليات إعادة التوجيه لكل نموذج، والمدفوعات الجزئية، ومحدد العملة."
+
+#: src/Core/class-plugin.php:513
+msgid "Get GatewayKit Pro &rarr;"
+msgstr "احصل على GatewayKit Pro &rarr;"
+
+#. translators: 1: Plugin name 2: Elementor Pro
+#: src/Core/class-plugin.php:564
+#, php-format
+msgid "\"%1$s\" requires \"%2$s\" to be installed and activated."
+msgstr "تتطلب \"%1$s\" تثبيت \"%2$s\" وتفعيلها."
+
+#: src/Core/class-plugin.php:566
+msgid "Elementor Pro"
+msgstr "Elementor Pro"
+
+#: src/Core/class-plugin.php:637
+msgid "Apply"
+msgstr "تطبيق"
+
+#: src/Core/class-plugin.php:638
+msgid "Applying..."
+msgstr "جارٍ التطبيق..."
+
+#: src/Core/class-plugin.php:640
+msgid "Final Amount"
+msgstr "المبلغ النهائي"
+
+#: src/Core/class-plugin.php:641
+#: src/Core/class-plugin.php:977
+#: src/Features/Discount/class-admin-discounts.php:556
+msgid "Please enter a discount code."
+msgstr "يرجى إدخال رمز خصم."
+
+#: src/Core/class-plugin.php:642
+msgid "Please enter an amount first."
+msgstr "يرجى إدخال المبلغ أولاً."
+
+#: src/Core/class-plugin.php:693
+#: src/Core/Elementor/class-elementor-action.php:584
+msgid "Thank you. Your submission was received."
+msgstr "شكرًا لك. تم استلام إرسالك."
+
+#: src/Core/class-plugin.php:724
+msgid "AJAX error occurred. Please try again."
+msgstr "حدث خطأ في AJAX. يرجى المحاولة مرة أخرى."
+
+#: src/Core/class-plugin.php:725
+msgid "Dismissing..."
+msgstr "جارٍ الإغلاق..."
+
+#: src/Core/class-plugin.php:959
+msgid "Discount codes are not available."
+msgstr "أكواد الخصم غير متاحة."
+
+#: src/Core/class-plugin.php:980
+msgid "Invalid amount."
+msgstr "مبلغ غير صالح."
+
+#: src/Core/class-plugin.php:1055
+msgid "Security check failed. No nonce provided."
+msgstr "فشل فحص الأمان. لم يتم تقديم nonce."
+
+#: src/Core/class-plugin.php:1065
+#: src/Core/Elementor/class-elementor-action.php:450
+#: src/Core/Utils/class-error-handler.php:97
+msgid "Security check failed. Please reload and try again."
+msgstr "فشل فحص الأمان. يرجى إعادة التحميل والمحاولة مرة أخرى."
+
+#: src/Core/class-plugin.php:1073
+msgid "Form submission already being processed by Elementor."
+msgstr "جارٍ معالجة إرسال النموذج بواسطة Elementor بالفعل."
+
+#: src/Core/class-plugin.php:1102
+msgid "Payment processed successfully."
+msgstr "تمت معالجة الدفع بنجاح."
+
+#: src/Core/class-plugin.php:1112
+msgid "Invalid payment request."
+msgstr "طلب دفع غير صالح."
+
+#. translators: %s: missing field name
+#: src/Core/class-plugin.php:1146
+#, php-format
+msgid "Required field missing: %s"
+msgstr "حقل مطلوب مفقود: %s"
+
+#: src/Core/class-plugin.php:1207
+msgid "Payment initiated successfully."
+msgstr "تم بدء الدفع بنجاح."
+
+#: src/Core/class-plugin.php:1301
+#: src/Core/Elementor/class-elementor-action.php:1002
+msgid "Selected payment gateway is not enabled."
+msgstr "بوابة الدفع المحددة غير مفعّلة."
+
+#: src/Core/class-plugin.php:1308
+#: src/Core/Elementor/class-elementor-action.php:1006
+msgid "Selected payment gateway is not properly configured."
+msgstr "بوابة الدفع المحددة غير مكوّنة بشكل صحيح."
+
+#: src/Core/class-plugin.php:1377
+#: src/Core/Elementor/class-elementor-action.php:1069
+msgid "Payment initiation failed. Please check your payment details and try again."
+msgstr "فشل بدء الدفع. يرجى التحقق من تفاصيل الدفع والمحاولة مرة أخرى."
+
+#: src/Core/class-plugin.php:1384
+#: src/Core/Elementor/class-elementor-action.php:1073
+msgid "An error occurred during payment processing."
+msgstr "حدث خطأ أثناء معالجة الدفع."
+
+#: src/Core/class-plugin.php:1440
+msgid "Invalid receipt code format."
+msgstr "صيغة رمز الإيصال غير صالحة."
+
+#: src/Core/class-plugin.php:1452
+msgid "Invoice is only available for completed payments."
+msgstr "الفاتورة متاحة فقط للمدفوعات المكتملة."
+
+#: src/Core/class-plugin.php:1463
+msgid "PDF generator not available."
+msgstr "مولّد PDF غير متاح."
+
+#: src/Core/class-plugin.php:1482
+msgid "Failed to generate invoice."
+msgstr "فشل إنشاء الفاتورة."
+
+#: src/Core/Database/class-transaction-model.php:83
+msgid "Failed to generate unique receipt token. Please try again."
+msgstr "فشل إنشاء رمز إيصال فريد. يرجى المحاولة مرة أخرى."
+
+#: src/Core/Database/class-transaction-model.php:141
+msgid "Failed to create transaction record."
+msgstr "فشل إنشاء سجل المعاملة."
+
+#: src/Core/Database/class-transaction-model.php:507
+msgid "Note cannot be empty."
+msgstr "لا يمكن أن تكون الملاحظة فارغة."
+
+#: src/Core/Database/class-transaction-model.php:523
+msgid "Failed to save note."
+msgstr "فشل حفظ الملاحظة."
+
+#: src/Core/Elementor/class-elementor-action.php:104
+msgid "Select the payment gateway to use."
+msgstr "حدد بوابة الدفع المراد استخدامها."
+
+#: src/Core/Elementor/class-elementor-action.php:111
+msgid "Amount Type"
+msgstr "نوع المبلغ"
+
+#: src/Core/Elementor/class-elementor-action.php:114
+msgid "Fixed Amount"
+msgstr "مبلغ ثابت"
+
+#: src/Core/Elementor/class-elementor-action.php:115
+msgid "From Form Field"
+msgstr "من حقل النموذج"
+
+#: src/Core/Elementor/class-elementor-action.php:130
+msgid "Enter the fixed payment amount."
+msgstr "أدخل مبلغ الدفع الثابت."
+
+#: src/Core/Elementor/class-elementor-action.php:137
+msgid "Amount Field ID"
+msgstr "معرّف حقل المبلغ"
+
+#: src/Core/Elementor/class-elementor-action.php:143
+msgid "Enter the form field ID that contains the amount."
+msgstr "أدخل معرّف حقل النموذج الذي يحتوي على المبلغ."
+
+#: src/Core/Elementor/class-elementor-action.php:150
+msgid "Payment Description"
+msgstr "وصف الدفع"
+
+#: src/Core/Elementor/class-elementor-action.php:152
+#: src/Core/Elementor/class-elementor-action.php:519
+#: src/Core/Elementor/class-elementor-action.php:557
+#: src/Core/Elementor/class-elementor-action.php:732
+msgid "Payment for services"
+msgstr "الدفع مقابل الخدمات"
+
+#: src/Core/Elementor/class-elementor-action.php:153
+msgid "Description shown to the user during payment."
+msgstr "الوصف الظاهر للمستخدم أثناء الدفع."
+
+#: src/Core/Elementor/class-elementor-action.php:160
+msgid "Redirect URL after payment completion"
+msgstr "رابط إعادة التوجيه بعد اكتمال الدفع"
+
+#: src/Core/Elementor/class-elementor-action.php:167
+msgid "URL to redirect after payment completion."
+msgstr "الرابط لإعادة التوجيه بعد اكتمال الدفع."
+
+#: src/Core/Elementor/class-elementor-action.php:178
+msgid "This field is required. The destination page must contain the <code>[gatewaykit_receipt]</code> shortcode to display payment results."
+msgstr "هذا الحقل مطلوب. يجب أن تحتوي صفحة الوجهة على الكود المختصر <code>[gatewaykit_receipt]</code> لعرض نتائج الدفع."
+
+#: src/Core/Elementor/class-elementor-action.php:192
+msgid "Enable Discount Codes"
+msgstr "تفعيل أكواد الخصم"
+
+#: src/Core/Elementor/class-elementor-action.php:194
+#: src/Core/Elementor/class-elementor-action.php:222
+#: src/Core/Elementor/class-elementor-action.php:250
+#: src/Core/Elementor/class-elementor-action.php:309
+#: src/Core/Elementor/class-elementor-action.php:351
+msgid "Yes"
+msgstr "نعم"
+
+#: src/Core/Elementor/class-elementor-action.php:195
+#: src/Core/Elementor/class-elementor-action.php:223
+#: src/Core/Elementor/class-elementor-action.php:251
+#: src/Core/Elementor/class-elementor-action.php:310
+#: src/Core/Elementor/class-elementor-action.php:352
+msgid "No"
+msgstr "لا"
+
+#: src/Core/Elementor/class-elementor-action.php:197
+msgid "Allow customers to enter a discount code on this form."
+msgstr "اسمح للعملاء بإدخال رمز خصم في هذا النموذج."
+
+#: src/Core/Elementor/class-elementor-action.php:205
+msgid "Discount Code Field ID"
+msgstr "معرّف حقل رمز الخصم"
+
+#: src/Core/Elementor/class-elementor-action.php:211
+msgid "Enter the Short Code (field ID) of the text field where the customer types the discount code. You must add that field to the form."
+msgstr "أدخل الكود المختصر (معرّف الحقل) لحقل النص الذي يكتب فيه العميل رمز الخصم. يجب إضافة هذا الحقل إلى النموذج."
+
+#: src/Core/Elementor/class-elementor-action.php:220
+msgid "Email Receipt to Customer"
+msgstr "إرسال الإيصال بالبريد إلى العميل"
+
+#: src/Core/Elementor/class-elementor-action.php:225
+msgid "Send a payment receipt email to the customer after successful payment."
+msgstr "أرسل بريد إيصال الدفع إلى العميل بعد نجاح الدفع."
+
+#: src/Core/Elementor/class-elementor-action.php:233
+#: src/Core/Elementor/class-elementor-action.php:375
+msgid "Customer Email Field ID"
+msgstr "معرّف حقل بريد العميل"
+
+#: src/Core/Elementor/class-elementor-action.php:239
+msgid "Short Code (field ID) of an email field whose submitted value is the customer email."
+msgstr "الكود المختصر (معرّف الحقل) لحقل بريد تكون قيمته المُرسلة هي بريد العميل."
+
+#: src/Core/Elementor/class-elementor-action.php:248
+msgid "Optional Payment (donation style)"
+msgstr "دفع اختياري (بأسلوب التبرع)"
+
+#: src/Core/Elementor/class-elementor-action.php:253
+msgid "Allow the customer to submit the form without making a payment."
+msgstr "اسمح للعميل بإرسال النموذج دون إجراء أي دفع."
+
+#: src/Core/Elementor/class-elementor-action.php:261
+msgid "Payment opt-in Field ID"
+msgstr "معرّف حقل الاشتراك في الدفع"
+
+#: src/Core/Elementor/class-elementor-action.php:267
+msgid "Short Code (field ID) of a checkbox field. When unchecked the form submits without payment."
+msgstr "الكود المختصر (معرّف الحقل) لحقل اختيار. عند عدم التحديد، يُرسل النموذج دون دفع."
+
+#: src/Core/Elementor/class-elementor-action.php:274
+msgid "Message when submitted without payment"
+msgstr "الرسالة عند الإرسال دون دفع"
+
+#: src/Core/Elementor/class-elementor-action.php:280
+msgid "Shown after a no-payment submission. Leave empty for the default message."
+msgstr "تظهر بعد إرسال دون دفع. اتركها فارغة للرسالة الافتراضية."
+
+#: src/Core/Elementor/class-elementor-action.php:289
+msgid "Redirect URL after payment failure"
+msgstr "رابط إعادة التوجيه بعد فشل الدفع"
+
+#: src/Core/Elementor/class-elementor-action.php:296
+msgid "Page to redirect to when the payment fails. Leave empty to reuse the success page."
+msgstr "الصفحة التي سيتم إعادة التوجيه إليها عند فشل الدفع. اتركها فارغة لإعادة استخدام صفحة النجاح."
+
+#: src/Core/Elementor/class-elementor-action.php:307
+msgid "Partial Payment"
+msgstr "الدفع الجزئي"
+
+#: src/Core/Elementor/class-elementor-action.php:312
+msgid "Charge only a percentage of the total amount (e.g. a deposit)."
+msgstr "اقتطع نسبة مئوية فقط من إجمالي المبلغ (مثل دفعة تأمين)."
+
+#: src/Core/Elementor/class-elementor-action.php:319
+msgid "Partial Payment Percentage"
+msgstr "نسبة الدفع الجزئي"
+
+#: src/Core/Elementor/class-elementor-action.php:327
+msgid "Percentage of the total amount to charge (1-100)."
+msgstr "النسبة المئوية من إجمالي المبلغ المراد اقتطاعها (1-100)."
+
+#: src/Core/Elementor/class-elementor-action.php:336
+msgid "Currency Selector Field ID"
+msgstr "معرّف حقل محدد العملة"
+
+#: src/Core/Elementor/class-elementor-action.php:339
+msgid "Optional. Short Code (field ID) of a select field whose submitted value is a currency code (e.g. USD, EUR). The chosen currency is passed to the gateway."
+msgstr "اختياري. الكود المختصر (معرّف الحقل) لحقل قائمة تكون قيمته المُرسلة رمز عملة (مثل USD، EUR). تُمرَّر العملة المختارة إلى البوابة."
+
+#: src/Core/Elementor/class-elementor-action.php:349
+msgid "Recurring Payment (Stripe Subscription)"
+msgstr "الدفع المتكرر (اشتراك Stripe)"
+
+#: src/Core/Elementor/class-elementor-action.php:354
+msgid "Create a Stripe subscription instead of a one-time payment."
+msgstr "أنشئ اشتراك Stripe بدلاً من دفع لمرة واحدة."
+
+#: src/Core/Elementor/class-elementor-action.php:362
+msgid "Stripe Price ID"
+msgstr "معرّف سعر Stripe"
+
+#: src/Core/Elementor/class-elementor-action.php:368
+msgid "The Stripe Price ID (price_...) for the subscription."
+msgstr "معرّف سعر Stripe (price_...) للاشتراك."
+
+#: src/Core/Elementor/class-elementor-action.php:381
+msgid "Optional. Short Code (field ID) of an email field mapped to the Stripe customer."
+msgstr "اختياري. الكود المختصر (معرّف الحقل) لحقل بريد مربوط بعميل Stripe."
+
+#: src/Core/Elementor/class-elementor-action.php:479
+msgid "Form configuration error. Please refresh the page and try again."
+msgstr "خطأ في تكوين النموذج. يرجى تحديث الصفحة والمحاولة مرة أخرى."
+
+#: src/Core/Elementor/class-elementor-action.php:495
+msgid "Payment gateway not selected."
+msgstr "لم يتم تحديد بوابة دفع."
+
+#: src/Core/Elementor/class-elementor-action.php:508
+msgid "Success URL not configured."
+msgstr "لم يتم تكوين رابط النجاح."
+
+#: src/Core/Elementor/class-elementor-action.php:576
+msgid "NO_PAYMENT"
+msgstr "NO_PAYMENT"
+
+#: src/Core/Elementor/class-elementor-action.php:629
+msgid "Invalid discount code."
+msgstr "رمز خصم غير صالح."
+
+#: src/Core/Elementor/class-elementor-action.php:640
+#: src/Features/Discount/class-discount-model.php:458
+msgid "This discount code has reached its usage limit."
+msgstr "وصل رمز الخصم هذا إلى حد استخدامه."
+
+#: src/Core/Elementor/class-elementor-action.php:763
+msgid "FREE"
+msgstr "مجاني"
+
+#: src/Core/Elementor/class-elementor-action.php:799
+msgid "Your discount covered the full amount — no payment required. Your order is complete."
+msgstr "غطّى خصمك المبلغ بالكامل — لا حاجة للدفع. طلبك مكتمل."
+
+#: src/Core/Elementor/class-elementor-action.php:817
+#: src/Core/Utils/class-error-handler.php:82
+msgid "Payment validation failed. Please check your form settings."
+msgstr "فشل التحقق من الدفع. يرجى التحقق من إعدادات النموذج."
+
+#: src/Core/Elementor/class-elementor-action.php:923
+#: src/Core/Utils/class-error-handler.php:85
+msgid "Amount field not found."
+msgstr "لم يتم العثور على حقل المبلغ."
+
+#: src/Core/Elementor/class-elementor-action.php:1140
+msgid "Select Payment Gateway"
+msgstr "اختيار بوابة الدفع"
+
+#. translators: %s: site name
+#: src/Core/Email/class-receipt-email.php:176
+#, php-format
+msgid "Payment Receipt from %s"
+msgstr "إيصال دفع من %s"
+
+#. translators: %s: site name
+#: src/Core/Email/class-receipt-email.php:289
+#, php-format
+msgid "Thank you for your payment. This email is your official receipt from %s."
+msgstr "شكرًا لدفعك. هذا البريد هو إيصالك الرسمي من %s."
+
+#. translators: %s: site name
+#: src/Core/Email/class-receipt-email.php:314
+#, php-format
+msgid "From: %s"
+msgstr "من: %s"
+
+#. translators: %s: receipt code
+#: src/Core/Email/class-receipt-email.php:316
+#, php-format
+msgid "Receipt Code: %s"
+msgstr "رمز الإيصال: %s"
+
+#. translators: %s: amount
+#: src/Core/Email/class-receipt-email.php:318
+#, php-format
+msgid "Amount: %s"
+msgstr "المبلغ: %s"
+
+#. translators: %s: gateway
+#: src/Core/Email/class-receipt-email.php:320
+#, php-format
+msgid "Payment Gateway: %s"
+msgstr "بوابة الدفع: %s"
+
+#. translators: %s: date
+#: src/Core/Email/class-receipt-email.php:322
+#, php-format
+msgid "Payment Date: %s"
+msgstr "تاريخ الدفع: %s"
+
+#. translators: %s: receipt URL
+#: src/Core/Email/class-receipt-email.php:325
+#, php-format
+msgid "View your receipt: %s"
+msgstr "عرض إيصالك: %s"
+
+#: src/Core/Email/class-receipt-pdf.php:70
+msgid "Invoice"
+msgstr "الفاتورة"
+
+#. translators: %s: invoice number
+#: src/Core/Email/class-receipt-pdf.php:74
+#, php-format
+msgid "Invoice #%s"
+msgstr "الفاتورة #%s"
+
+#. translators: %s: receipt number
+#: src/Core/Email/class-receipt-pdf.php:79
+#, php-format
+msgid "Receipt #%s"
+msgstr "الإيصال #%s"
+
+#: src/Core/Email/class-receipt-pdf.php:157
+msgid "Receipt / Invoice ID"
+msgstr "معرّف الإيصال / الفاتورة"
+
+#: src/Core/Email/class-receipt-pdf.php:167
+msgid "Business Name"
+msgstr "اسم النشاط التجاري"
+
+#: src/Core/Email/class-receipt-pdf.php:172
+msgid "Address"
+msgstr "العنوان"
+
+#: src/Core/Email/class-receipt-pdf.php:178
+#: src/Core/Email/class-receipt-pdf.php:205
+msgid "Email"
+msgstr "البريد الإلكتروني"
+
+#: src/Core/Email/class-receipt-pdf.php:184
+msgid "Phone"
+msgstr "الهاتف"
+
+#: src/Core/Email/class-receipt-pdf.php:190
+msgid "Tax ID"
+msgstr "الرقم الضريبي"
+
+#: src/Core/Email/class-receipt-pdf.php:198
+msgid "Bill To"
+msgstr "الفاتورة إلى"
+
+#: src/Core/Email/class-receipt-pdf.php:201
+msgid "Name"
+msgstr "الاسم"
+
+#: src/Core/Email/class-receipt-pdf.php:212
+msgid "Items"
+msgstr "البنود"
+
+#: src/Core/Email/class-receipt-pdf.php:217
+msgid "Qty"
+msgstr "الكمية"
+
+#: src/Core/Email/class-receipt-pdf.php:218
+msgid "Unit Price"
+msgstr "سعر الوحدة"
+
+#: src/Core/Email/class-receipt-pdf.php:219
+msgid "Total"
+msgstr "الإجمالي"
+
+#: src/Core/Email/class-receipt-pdf.php:224
+#: src/Gateways/CoinGate/class-coingate-gateway.php:290
+#: src/Gateways/Coinify/class-coinify-gateway.php:306
+#: src/Gateways/Mollie/class-mollie-gateway.php:297
+#: src/Gateways/NOWPayments/class-nowpayments-gateway.php:302
+#: src/Gateways/Stripe/class-stripe-gateway.php:484
+msgid "Payment"
+msgstr "الدفع"
+
+#: src/Core/Email/class-receipt-pdf.php:243
+msgid "Subtotal"
+msgstr "المجموع الفرعي"
+
+#: src/Core/Email/class-receipt-pdf.php:253
+msgid "Total Paid"
+msgstr "إجمالي المدفوع"
+
+#: src/Core/Email/class-receipt-pdf.php:260
+msgid "Payment Status"
+msgstr "حالة الدفع"
+
+#: src/Core/Email/class-receipt-pdf.php:271
+msgid "Paid On"
+msgstr "تم الدفع في"
+
+#. translators: %1$s: document type (receipt/invoice), %2$s: site name
+#: src/Core/Email/class-receipt-pdf.php:281
+#, php-format
+msgid "Thank you for your payment. This %1$s is your official record from %2$s."
+msgstr "شكرًا لدفعك. هذا %1$s هو سجلك الرسمي من %2$s."
+
+#. translators: %1$s: generation timestamp, %2$s: site URL
+#: src/Core/Email/class-receipt-pdf.php:287
+#, php-format
+msgid "Generated on %1$s via %2$s"
+msgstr "تم الإنشاء في %1$s عبر %2$s"
+
+#: src/Core/Refund/class-paypal-refund.php:47
+msgid "PayPal credentials are not configured."
+msgstr "بيانات اعتماد PayPal غير مكوّنة."
+
+#: src/Core/Refund/class-paypal-refund.php:56
+msgid "Cannot determine the PayPal capture ID for this transaction."
+msgstr "تعذر تحديد معرّف التحصيل الخاص بـ PayPal لهذه المعاملة."
+
+#: src/Core/Refund/class-paypal-refund.php:101
+msgid "Unknown PayPal error."
+msgstr "خطأ PayPal غير معروف."
+
+#: src/Core/Refund/class-paypal-refund.php:178
+msgid "PayPal authentication failed."
+msgstr "فشل مصادقة PayPal."
+
+#: src/Core/Refund/class-refund-service.php:101
+msgid "Only completed transactions can be refunded."
+msgstr "يمكن استرداد المعاملات المكتملة فقط."
+
+#. translators: %s: gateway name
+#: src/Core/Refund/class-refund-service.php:111
+#, php-format
+msgid "Refunds are not supported for %s."
+msgstr "الاسترداد غير مدعوم لـ %s."
+
+#: src/Core/Refund/class-refund-service.php:125
+msgid "Refund amount cannot exceed the original payment amount."
+msgstr "لا يمكن أن يتجاوز مبلغ الاسترداد مبلغ الدفع الأصلي."
+
+#: src/Core/Refund/class-stripe-refund.php:42
+#: src/Gateways/Stripe/class-stripe-gateway.php:375
+msgid "Stripe secret key is not configured."
+msgstr "المفتاح السري لـ Stripe غير مكوّن."
+
+#: src/Core/Refund/class-stripe-refund.php:51
+msgid "Cannot determine the Stripe payment intent for this transaction."
+msgstr "تعذر تحديد نية الدفع في Stripe لهذه المعاملة."
+
+#: src/Core/Refund/class-stripe-refund.php:95
+msgid "Unknown Stripe error."
+msgstr "خطأ Stripe غير معروف."
+
+#: src/Core/Security/class-input-validator.php:47
+msgid "Amount must be a valid number."
+msgstr "يجب أن يكون المبلغ رقمًا صالحًا."
+
+#. translators: %s: minimum allowed amount
+#: src/Core/Security/class-input-validator.php:60
+#, php-format
+msgid "Amount must be at least %s."
+msgstr "يجب أن يكون المبلغ %s على الأقل."
+
+#. translators: %s: maximum allowed amount
+#: src/Core/Security/class-input-validator.php:69
+#, php-format
+msgid "Amount cannot exceed %s."
+msgstr "لا يمكن أن يتجاوز المبلغ %s."
+
+#: src/Core/Security/class-input-validator.php:85
+msgid "Please enter a valid email address."
+msgstr "يرجى إدخال عنوان بريد إلكتروني صالح."
+
+#: src/Core/Security/class-input-validator.php:101
+msgid "Please enter a valid URL."
+msgstr "يرجى إدخال رابط صالح."
+
+#: src/Core/Security/class-input-validator.php:117
+msgid "Redirect URL after payment completion is required."
+msgstr "رابط إعادة التوجيه بعد اكتمال الدفع مطلوب."
+
+#: src/Core/Security/class-input-validator.php:133
+msgid "Payment gateway is required."
+msgstr "بوابة الدفع مطلوبة."
+
+#: src/Core/Security/class-input-validator.php:140
+msgid "Selected payment gateway is not available or not enabled."
+msgstr "بوابة الدفع المحددة غير متاحة أو غير مفعّلة."
+
+#: src/Core/Security/class-input-validator.php:154
+msgid "Form data must be an array."
+msgstr "يجب أن تكون بيانات النموذج مصفوفة."
+
+#: src/Core/Security/class-rate-limiter.php:128
+#: src/Core/Security/class-security-manager.php:132
+msgid "Too many requests. Please try again later."
+msgstr "طلبات كثيرة جدًا. يرجى المحاولة لاحقًا."
+
+#: src/Core/Security/class-security-manager.php:145
+#: src/Core/Security/class-security-manager.php:158
+msgid "Invalid request."
+msgstr "طلب غير صالح."
+
+#: src/Core/Security/class-security-manager.php:501
+msgid "Validation failed."
+msgstr "فشل التحقق."
+
+#: src/Core/Utils/class-error-handler.php:56
+msgid "Payment gateway configuration error. Please contact site administrator."
+msgstr "خطأ في تكوين بوابة الدفع. يرجى التواصل مع مسؤول الموقع."
+
+#: src/Core/Utils/class-error-handler.php:57
+msgid "Payment gateway is not properly configured."
+msgstr "بوابة الدفع غير مكوّنة بشكل صحيح."
+
+#: src/Core/Utils/class-error-handler.php:59
+msgid "Gateway API not initialized."
+msgstr "واجهة برمجة البوابة غير مهيأة."
+
+#: src/Core/Utils/class-error-handler.php:60
+msgid "Selected payment gateway is disabled."
+msgstr "بوابة الدفع المحددة معطّلة."
+
+#: src/Core/Utils/class-error-handler.php:61
+msgid "Payment gateway is not available."
+msgstr "بوابة الدفع غير متاحة."
+
+#: src/Core/Utils/class-error-handler.php:65
+msgid "Unable to process payment. Please check your payment details and try again."
+msgstr "تعذر معالجة الدفع. يرجى التحقق من تفاصيل الدفع والمحاولة مرة أخرى."
+
+#: src/Core/Utils/class-error-handler.php:66
+msgid "Payment gateway error occurred."
+msgstr "حدث خطأ في بوابة الدفع."
+
+#: src/Core/Utils/class-error-handler.php:68
+msgid "Payment gateway request failed."
+msgstr "فشل طلب بوابة الدفع."
+
+#: src/Core/Utils/class-error-handler.php:69
+msgid "Payment verification failed."
+msgstr "فشل التحقق من الدفع."
+
+#: src/Core/Utils/class-error-handler.php:70
+msgid "Payment request failed."
+msgstr "فشل طلب الدفع."
+
+#: src/Core/Utils/class-error-handler.php:74
+msgid "Payment processing error. Please try again later."
+msgstr "خطأ في معالجة الدفع. يرجى المحاولة لاحقًا."
+
+#: src/Core/Utils/class-error-handler.php:75
+msgid "Network or communication error occurred."
+msgstr "حدث خطأ في الشبكة أو الاتصال."
+
+#: src/Core/Utils/class-error-handler.php:77
+msgid "Unexpected error occurred during payment processing."
+msgstr "حدث خطأ غير متوقع أثناء معالجة الدفع."
+
+#: src/Core/Utils/class-error-handler.php:78
+msgid "Error during payment verification."
+msgstr "خطأ أثناء التحقق من الدفع."
+
+#: src/Core/Utils/class-error-handler.php:83
+msgid "Payment data validation failed."
+msgstr "فشل التحقق من بيانات الدفع."
+
+#: src/Core/Utils/class-error-handler.php:90
+msgid "Too many requests. Please wait and try again."
+msgstr "طلبات كثيرة جدًا. يرجى الانتظار والمحاولة مرة أخرى."
+
+#: src/Core/Utils/class-error-handler.php:91
+msgid "Rate limit exceeded for payment processing."
+msgstr "تم تجاوز حد المعدل لمعالجة الدفع."
+
+#: src/Core/Utils/class-error-handler.php:93
+msgid "Rate limit exceeded."
+msgstr "تم تجاوز حد المعدل."
+
+#: src/Core/Utils/class-error-handler.php:98
+msgid "Security validation failed during payment processing."
+msgstr "فشل التحقق الأمني أثناء معالجة الدفع."
+
+#: src/Core/Utils/class-error-handler.php:100
+msgid "Nonce verification failed."
+msgstr "فشل التحقق من nonce."
+
+#: src/Core/Utils/class-error-handler.php:104
+msgid "An unexpected error occurred. Please try again."
+msgstr "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى."
+
+#: src/Core/Utils/class-error-handler.php:105
+msgid "Unknown error occurred during payment processing."
+msgstr "حدث خطأ غير معروف أثناء معالجة الدفع."
+
+#: src/Core/Utils/class-error-handler.php:107
+msgid "Payment initiation failed."
+msgstr "فشل بدء الدفع."
+
+#: src/Core/Utils/class-error-handler.php:108
+msgid "Payment processing error."
+msgstr "خطأ في معالجة الدفع."
+
+#: src/Core/Utils/class-error-handler.php:192
+msgid "Details:"
+msgstr "التفاصيل:"
+
+#: src/Core/Utils/class-log-formatter.php:159
+msgid "No logs to export."
+msgstr "لا توجد سجلات للتصدير."
+
+#. translators: export generation timestamp
+#: src/Core/Utils/class-log-formatter.php:166
+#, php-format
+msgid "Generated: %s"
+msgstr "تم الإنشاء: %s"
+
+#: src/Features/Discount/class-admin-discounts.php:59
+#: src/Features/Discount/class-admin-discounts.php:60
+#: src/Features/Discount/class-admin-discounts.php:114
+msgid "Discounts"
+msgstr "الخصومات"
+
+#: src/Features/Discount/class-admin-discounts.php:89
+msgid "Validating..."
+msgstr "جارٍ التحقق..."
+
+#: src/Features/Discount/class-admin-discounts.php:90
+msgid "Valid discount code"
+msgstr "رمز خصم صالح"
+
+#: src/Features/Discount/class-admin-discounts.php:91
+msgid "Invalid discount code"
+msgstr "رمز خصم غير صالح"
+
+#: src/Features/Discount/class-admin-discounts.php:92
+msgid "Discount amount"
+msgstr "مبلغ الخصم"
+
+#: src/Features/Discount/class-admin-discounts.php:93
+msgid "Final amount"
+msgstr "المبلغ النهائي"
+
+#: src/Features/Discount/class-admin-discounts.php:94
+msgid "Enter a code to validate."
+msgstr "أدخل رمزًا للتحقق منه."
+
+#: src/Features/Discount/class-admin-discounts.php:95
+msgid "Enter a cart amount."
+msgstr "أدخل مبلغ السلة."
+
+#: src/Features/Discount/class-admin-discounts.php:97
+msgid "Test cart amount"
+msgstr "اختبار مبلغ السلة"
+
+#: src/Features/Discount/class-admin-discounts.php:98
+#: src/Features/Discount/class-admin-discounts.php:302
+msgid "Discount code"
+msgstr "رمز الخصم"
+
+#: src/Features/Discount/class-admin-discounts.php:121
+msgid "Add New"
+msgstr "إضافة جديد"
+
+#: src/Features/Discount/class-admin-discounts.php:146
+msgid "Search discounts"
+msgstr "البحث في الخصومات"
+
+#: src/Features/Discount/class-admin-discounts.php:163
+msgid "Discount not found."
+msgstr "لم يتم العثور على الخصم."
+
+#: src/Features/Discount/class-admin-discounts.php:197
+msgid "Edit Discount"
+msgstr "تعديل الخصم"
+
+#: src/Features/Discount/class-admin-discounts.php:197
+msgid "Add New Discount"
+msgstr "إضافة خصم جديد"
+
+#: src/Features/Discount/class-admin-discounts.php:212
+#: src/Features/Discount/class-admin-discounts.php:618
+msgid "Code"
+msgstr "الرمز"
+
+#: src/Features/Discount/class-admin-discounts.php:215
+msgid "The discount code customers will enter. Stored uppercase."
+msgstr "رمز الخصم الذي سيدخله العملاء. يُخزَّن بأحرف كبيرة."
+
+#: src/Features/Discount/class-admin-discounts.php:222
+msgid "Internal note (not shown to customers)."
+msgstr "ملاحظة داخلية (لا تظهر للعملاء)."
+
+#: src/Features/Discount/class-admin-discounts.php:226
+#: src/Features/Discount/class-admin-discounts.php:619
+msgid "Type"
+msgstr "النوع"
+
+#: src/Features/Discount/class-admin-discounts.php:229
+msgid "Fixed amount"
+msgstr "مبلغ ثابت"
+
+#: src/Features/Discount/class-admin-discounts.php:230
+#: src/Features/Discount/class-admin-discounts.php:743
+msgid "Percentage"
+msgstr "نسبة مئوية"
+
+#: src/Features/Discount/class-admin-discounts.php:238
+msgid "Fixed amount to subtract, or percentage (0-100)."
+msgstr "مبلغ ثابت للخصم، أو نسبة مئوية (0-100)."
+
+#: src/Features/Discount/class-admin-discounts.php:242
+msgid "Max discount amount"
+msgstr "الحد الأقصى لمبلغ الخصم"
+
+#: src/Features/Discount/class-admin-discounts.php:245
+msgid "Cap for percentage discounts. Leave blank for no cap."
+msgstr "سقف لخصومات النسبة المئوية. اتركه فارغًا بدون سقف."
+
+#: src/Features/Discount/class-admin-discounts.php:249
+msgid "Minimum cart amount"
+msgstr "الحد الأدنى لمبلغ السلة"
+
+#: src/Features/Discount/class-admin-discounts.php:252
+msgid "Required minimum cart amount for this code. Leave blank for none."
+msgstr "الحد الأدنى المطلوب لمبلغ السلة لهذا الرمز. اتركه فارغًا إن لم يكن مطلوبًا."
+
+#: src/Features/Discount/class-admin-discounts.php:256
+msgid "Usage limit"
+msgstr "حد الاستخدام"
+
+#: src/Features/Discount/class-admin-discounts.php:259
+msgid "Maximum total redemptions. Leave blank for unlimited."
+msgstr "أقصى عدد استخدامات إجمالي. اتركه فارغًا لغير محدود."
+
+#: src/Features/Discount/class-admin-discounts.php:263
+msgid "Per-user limit"
+msgstr "الحد لكل مستخدم"
+
+#: src/Features/Discount/class-admin-discounts.php:266
+msgid "How many times a single user may redeem this code. 0 = unlimited."
+msgstr "كم مرة يمكن لمستخدم واحد استخدام هذا الرمز. 0 = غير محدود."
+
+#: src/Features/Discount/class-admin-discounts.php:270
+msgid "Valid from"
+msgstr "صالح من"
+
+#: src/Features/Discount/class-admin-discounts.php:276
+msgid "Valid until"
+msgstr "صالح حتى"
+
+#: src/Features/Discount/class-admin-discounts.php:282
+#: src/Features/Discount/class-admin-discounts.php:622
+#: src/Features/Discount/class-admin-discounts.php:798
+msgid "Active"
+msgstr "نشط"
+
+#: src/Features/Discount/class-admin-discounts.php:286
+msgid "Enable this discount code"
+msgstr "تفعيل رمز الخصم هذا"
+
+#: src/Features/Discount/class-admin-discounts.php:293
+msgid "Update Discount"
+msgstr "تحديث الخصم"
+
+#: src/Features/Discount/class-admin-discounts.php:293
+msgid "Create Discount"
+msgstr "إنشاء خصم"
+
+#: src/Features/Discount/class-admin-discounts.php:294
+msgid "Cancel"
+msgstr "إلغاء"
+
+#: src/Features/Discount/class-admin-discounts.php:300
+msgid "Test discount code"
+msgstr "اختبار رمز الخصم"
+
+#: src/Features/Discount/class-admin-discounts.php:303
+msgid "Cart amount"
+msgstr "مبلغ السلة"
+
+#: src/Features/Discount/class-admin-discounts.php:304
+msgid "Validate"
+msgstr "تحقق"
+
+#: src/Features/Discount/class-admin-discounts.php:444
+#: src/Features/Discount/class-admin-discounts.php:548
+msgid "You do not have sufficient permissions to perform this action."
+msgstr "ليس لديك الصلاحيات الكافية لتنفيذ هذا الإجراء."
+
+#: src/Features/Discount/class-admin-discounts.php:475
+msgid "No discounts selected."
+msgstr "لم يتم تحديد خصومات."
+
+#: src/Features/Discount/class-admin-discounts.php:570
+msgid "Valid discount code."
+msgstr "رمز خصم صالح."
+
+#: src/Features/Discount/class-admin-discounts.php:580
+msgid "Discount saved successfully."
+msgstr "تم حفظ الخصم بنجاح."
+
+#: src/Features/Discount/class-admin-discounts.php:583
+msgid "Discount deleted."
+msgstr "تم حذف الخصم."
+
+#: src/Features/Discount/class-admin-discounts.php:621
+msgid "Usage"
+msgstr "الاستخدام"
+
+#: src/Features/Discount/class-admin-discounts.php:623
+msgid "Valid"
+msgstr "صالح"
+
+#: src/Features/Discount/class-admin-discounts.php:726
+msgid "Edit"
+msgstr "تعديل"
+
+#: src/Features/Discount/class-admin-discounts.php:727
+#: src/Features/Discount/class-admin-discounts.php:842
+msgid "Delete"
+msgstr "حذف"
+
+#: src/Features/Discount/class-admin-discounts.php:745
+msgid "Fixed"
+msgstr "ثابت"
+
+#. translators: %d: used count
+#: src/Features/Discount/class-admin-discounts.php:777
+#, php-format
+msgid "%d used"
+msgstr "تم استخدامه %d مرة"
+
+#. translators: 1: used count, 2: usage limit
+#: src/Features/Discount/class-admin-discounts.php:784
+#, php-format
+msgid "%1$d / %2$d used"
+msgstr "تم استخدام %1$d من %2$d"
+
+#: src/Features/Discount/class-admin-discounts.php:800
+msgid "Inactive"
+msgstr "غير نشط"
+
+#: src/Features/Discount/class-admin-discounts.php:814
+msgid "Always"
+msgstr "دائمًا"
+
+#: src/Features/Discount/class-admin-discounts.php:829
+msgid "Expired"
+msgstr "منتهي الصلاحية"
+
+#: src/Features/Discount/class-admin-discounts.php:852
+msgid "No discounts found."
+msgstr "لم يتم العثور على خصومات."
+
+#: src/Features/Discount/class-discount-model.php:79
+#: src/Features/Discount/class-discount-model.php:166
+msgid "Discount code is required."
+msgstr "رمز الخصم مطلوب."
+
+#: src/Features/Discount/class-discount-model.php:85
+#: src/Features/Discount/class-discount-model.php:170
+msgid "A discount with this code already exists."
+msgstr "يوجد خصم بهذا الرمز بالفعل."
+
+#: src/Features/Discount/class-discount-model.php:90
+#: src/Features/Discount/class-discount-model.php:183
+msgid "Invalid discount type."
+msgstr "نوع خصم غير صالح."
+
+#: src/Features/Discount/class-discount-model.php:95
+#: src/Features/Discount/class-discount-model.php:192
+msgid "Discount value cannot be negative."
+msgstr "لا يمكن أن تكون قيمة الخصم سالبة."
+
+#: src/Features/Discount/class-discount-model.php:98
+#: src/Features/Discount/class-discount-model.php:196
+msgid "Percentage value cannot exceed 100."
+msgstr "لا يمكن أن تتجاوز النسبة المئوية 100."
+
+#: src/Features/Discount/class-discount-model.php:130
+msgid "Failed to create discount record."
+msgstr "فشل إنشاء سجل الخصم."
+
+#: src/Features/Discount/class-discount-model.php:255
+msgid "Failed to update discount record."
+msgstr "فشل تحديث سجل الخصم."
+
+#: src/Features/Discount/class-discount-model.php:435
+#: src/Features/Discount/class-discount-model.php:506
+msgid "Discount code not found."
+msgstr "لم يتم العثور على رمز الخصم."
+
+#: src/Features/Discount/class-discount-model.php:439
+msgid "This discount code is no longer active."
+msgstr "رمز الخصم هذا لم يعد نشطًا."
+
+#: src/Features/Discount/class-discount-model.php:447
+msgid "This discount code is not valid yet."
+msgstr "رمز الخصم هذا غير صالح بعد."
+
+#: src/Features/Discount/class-discount-model.php:451
+msgid "This discount code has expired."
+msgstr "انتهت صلاحية رمز الخصم هذا."
+
+#. translators: %s: minimum amount
+#: src/Features/Discount/class-discount-model.php:467
+#, php-format
+msgid "This discount requires a minimum amount of %s."
+msgstr "يتطلب هذا الخصم حدًا أدنى من المبلغ قدره %s."
+
+#: src/Features/Discount/class-discount-model.php:476
+msgid "You have already used this discount code the maximum number of times."
+msgstr "لقد استخدمت رمز الخصم هذا بالفعل بالعدد الأقصى من المرات."
+
+#: src/Features/Discount/class-discount-usage-model.php:38
+msgid "Discount ID and Transaction ID are required."
+msgstr "معرّف الخصم ومعرّف المعاملة مطلوبان."
+
+#: src/Features/Discount/class-discount-usage-model.php:67
+msgid "Failed to record discount usage."
+msgstr "فشل تسجيل استخدام الخصم."
+
+#: src/Features/PaymentInfo/class-payment-info-field.php:35
+#: src/Features/PaymentInfo/class-payment-info-field.php:51
+#: src/Features/PaymentInfo/class-payment-info-field.php:103
+msgid "Payment Summary"
+msgstr "ملخص الدفع"
+
+#: src/Features/PaymentInfo/class-payment-info-field.php:49
+msgid "Title"
+msgstr "العنوان"
+
+#: src/Features/PaymentInfo/class-payment-info-field.php:58
+msgid "Show Description"
+msgstr "إظهار الوصف"
+
+#. translators: %1$s: currency code, %2$s: amount, %3$s: gateway name
+#: src/Features/PaymentInfo/class-payment-info-field.php:123
+#, php-format
+msgid "%1$s %2$s via %3$s"
+msgstr "%1$s %2$s عبر %3$s"
+
+#: src/Features/PaymentInfo/class-payment-info-field.php:127
+msgid "You will be redirected to complete your payment."
+msgstr "سيتم إعادة توجيهك لإكمال عملية الدفع."
+
+#: src/Features/Subscriptions/class-subscription-model.php:115
+msgid "Failed to create subscription record."
+msgstr "فشل إنشاء سجل الاشتراك."
+
+#. translators: %s: subscription renewal
+#: src/Features/Subscriptions/class-subscription-service.php:156
+msgid "Subscription renewal"
+msgstr "تجديد الاشتراك"
+
+#: src/Features/WhiteLabel/class-white-label.php:110
+msgid "You do not have permission to access this page."
+msgstr "ليس لديك إذن للوصول إلى هذه الصفحة."
+
+#: src/Features/WhiteLabel/class-white-label.php:115
+msgid "Invalid white-label link."
+msgstr "رابط علامة بيضاء غير صالح."
+
+#: src/Features/WhiteLabel/class-white-label.php:196
+msgid "Link copied!"
+msgstr "تم نسخ الرابط!"
+
+#: src/Gateways/CoinGate/class-coingate-gateway.php:49
+msgid "CoinGate"
+msgstr "CoinGate"
+
+#: src/Gateways/CoinGate/class-coingate-gateway.php:84
+#: src/Gateways/Coinify/class-coinify-gateway.php:84
+#: src/Gateways/NOWPayments/class-nowpayments-gateway.php:82
+#: src/Gateways/PayPal/class-paypal-gateway.php:151
+msgid "Sandbox Mode"
+msgstr "وضع الاختبار (Sandbox)"
+
+#: src/Gateways/CoinGate/class-coingate-gateway.php:85
+msgid "Use the CoinGate sandbox environment for testing."
+msgstr "استخدم بيئة CoinGate التجريبية للاختبار."
+
+#: src/Gateways/CoinGate/class-coingate-gateway.php:89
+msgid "API Token"
+msgstr "رمز API"
+
+#: src/Gateways/CoinGate/class-coingate-gateway.php:90
+msgid "Your CoinGate API token. Stored encrypted."
+msgstr "رمز واجهة API الخاص بـ CoinGate. يُخزَّن مشفّرًا."
+
+#: src/Gateways/CoinGate/class-coingate-gateway.php:102
+msgid "Accept Bitcoin, Ethereum and other cryptocurrencies via CoinGate hosted checkout."
+msgstr "اقبل Bitcoin وEthereum والعملات المشفرة الأخرى عبر صفحة الدفع المستضافة من CoinGate."
+
+#: src/Gateways/CoinGate/class-coingate-gateway.php:204
+msgid "CoinGate API token is not configured."
+msgstr "رمز واجهة CoinGate غير مكوّن."
+
+#: src/Gateways/CoinGate/class-coingate-gateway.php:229
+msgid "Could not connect to CoinGate. Please try again later."
+msgstr "تعذر الاتصال بـ CoinGate. يرجى المحاولة لاحقًا."
+
+#: src/Gateways/CoinGate/class-coingate-gateway.php:236
+msgid "CoinGate request failed."
+msgstr "فشل طلب CoinGate."
+
+#: src/Gateways/CoinGate/class-coingate-gateway.php:263
+#: src/Gateways/Coinify/class-coinify-gateway.php:284
+#: src/Gateways/Mollie/class-mollie-gateway.php:276
+#: src/Gateways/NOWPayments/class-nowpayments-gateway.php:278
+#: src/Gateways/PayPal/class-paypal-gateway.php:439
+#: src/Gateways/Stripe/class-stripe-gateway.php:426
+msgid "Payment amount must be greater than zero."
+msgstr "يجب أن يكون مبلغ الدفع أكبر من صفر."
+
+#: src/Gateways/CoinGate/class-coingate-gateway.php:314
+msgid "CoinGate did not return an order."
+msgstr "لم يُرجع CoinGate طلبًا."
+
+#: src/Gateways/CoinGate/class-coingate-gateway.php:347
+msgid "Could not resolve the CoinGate order."
+msgstr "تعذر حل طلب CoinGate."
+
+#. translators: %s: order status
+#: src/Gateways/CoinGate/class-coingate-gateway.php:367
+#, php-format
+msgid "CoinGate order not paid (status: %s)."
+msgstr "لم يُدفع طلب CoinGate (الحالة: %s)."
+
+#: src/Gateways/CoinGate/class-coingate-gateway.php:379
+msgid "CoinGate payment amount does not match the order amount."
+msgstr "لا يتطابق مبلغ دفع CoinGate مع مبلغ الطلب."
+
+#: src/Gateways/Coinify/class-coinify-gateway.php:50
+msgid "Coinify"
+msgstr "Coinify"
+
+#: src/Gateways/Coinify/class-coinify-gateway.php:85
+msgid "Use the Coinify sandbox environment for testing."
+msgstr "استخدم بيئة Coinify التجريبية للاختبار."
+
+#: src/Gateways/Coinify/class-coinify-gateway.php:89
+#: src/Gateways/Mollie/class-mollie-gateway.php:83
+#: src/Gateways/NOWPayments/class-nowpayments-gateway.php:87
+msgid "API Key"
+msgstr "مفتاح API"
+
+#: src/Gateways/Coinify/class-coinify-gateway.php:90
+msgid "Your Coinify API key. Stored encrypted."
+msgstr "مفتاح واجهة API الخاص بـ Coinify. يُخزَّن مشفّرًا."
+
+#: src/Gateways/Coinify/class-coinify-gateway.php:94
+msgid "API Secret"
+msgstr "سر API"
+
+#: src/Gateways/Coinify/class-coinify-gateway.php:95
+msgid "Your Coinify API secret for webhook signature verification. Stored encrypted."
+msgstr "سر واجهة Coinify للتحقق من توقيع خطاف الويب. يُخزَّن مشفّرًا."
+
+#: src/Gateways/Coinify/class-coinify-gateway.php:107
+msgid "Accept Bitcoin, Ethereum and other cryptocurrencies via Coinify hosted checkout."
+msgstr "اقبل Bitcoin وEthereum والعملات المشفرة الأخرى عبر صفحة الدفع المستضافة من Coinify."
+
+#: src/Gateways/Coinify/class-coinify-gateway.php:225
+msgid "Coinify API key or secret is not configured."
+msgstr "مفتاح واجهة Coinify أو سره غير مكوّن."
+
+#: src/Gateways/Coinify/class-coinify-gateway.php:250
+msgid "Could not connect to Coinify. Please try again later."
+msgstr "تعذر الاتصال بـ Coinify. يرجى المحاولة لاحقًا."
+
+#: src/Gateways/Coinify/class-coinify-gateway.php:257
+msgid "Coinify request failed."
+msgstr "فشل طلب Coinify."
+
+#: src/Gateways/Coinify/class-coinify-gateway.php:335
+msgid "Coinify did not return a payment intent."
+msgstr "لم يُرجع Coinify نية دفع."
+
+#: src/Gateways/Coinify/class-coinify-gateway.php:368
+msgid "Could not resolve the Coinify payment intent."
+msgstr "تعذر حل نية دفع Coinify."
+
+#. translators: %s: intent status
+#: src/Gateways/Coinify/class-coinify-gateway.php:388
+#, php-format
+msgid "Coinify intent not paid (status: %s)."
+msgstr "لم تُدفع نية Coinify (الحالة: %s)."
+
+#: src/Gateways/Coinify/class-coinify-gateway.php:400
+msgid "Coinify payment amount does not match the intent amount."
+msgstr "لا يتطابق مبلغ دفع Coinify مع مبلغ النية."
+
+#: src/Gateways/Mollie/class-mollie-gateway.php:43
+msgid "Mollie"
+msgstr "Mollie"
+
+#: src/Gateways/Mollie/class-mollie-gateway.php:78
+#: src/Gateways/Stripe/class-stripe-gateway.php:110
+msgid "Test Mode"
+msgstr "وضع الاختبار"
+
+#: src/Gateways/Mollie/class-mollie-gateway.php:79
+msgid "Use your Mollie test API key (starts with test_)."
+msgstr "استخدم مفتاح واجهة اختبار Mollie (يبدأ بـ test_)."
+
+#: src/Gateways/Mollie/class-mollie-gateway.php:84
+msgid "Your Mollie API key (live_... or test_...). Stored encrypted."
+msgstr "مفتاح واجهة Mollie (live_... أو test_...). يُخزَّن مشفّرًا."
+
+#: src/Gateways/Mollie/class-mollie-gateway.php:96
+msgid "Accept iDEAL, credit card, Bancontact and all Mollie methods through one hosted checkout."
+msgstr "اقبل iDEAL وبطاقات الائتمان وBancontact وجميع طرق Mollie عبر صفحة دفع مستضافة واحدة."
+
+#: src/Gateways/Mollie/class-mollie-gateway.php:225
+msgid "Mollie API key is not configured."
+msgstr "مفتاح واجهة Mollie غير مكوّن."
+
+#: src/Gateways/Mollie/class-mollie-gateway.php:245
+msgid "Could not connect to Mollie. Please try again later."
+msgstr "تعذر الاتصال بـ Mollie. يرجى المحاولة لاحقًا."
+
+#: src/Gateways/Mollie/class-mollie-gateway.php:252
+msgid "Mollie request failed."
+msgstr "فشل طلب Mollie."
+
+#: src/Gateways/Mollie/class-mollie-gateway.php:322
+msgid "Mollie did not return a payment."
+msgstr "لم يُرجع Mollie عملية دفع."
+
+#: src/Gateways/Mollie/class-mollie-gateway.php:355
+msgid "Could not resolve the Mollie payment."
+msgstr "تعذر حل عملية دفع Mollie."
+
+#. translators: %s: payment status
+#: src/Gateways/Mollie/class-mollie-gateway.php:375
+#, php-format
+msgid "Mollie payment not paid (status: %s)."
+msgstr "لم تُدفع عملية Mollie (الحالة: %s)."
+
+#: src/Gateways/Mollie/class-mollie-gateway.php:388
+msgid "Mollie payment amount does not match the order amount."
+msgstr "لا يتطابق مبلغ دفع Mollie مع مبلغ الطلب."
+
+#: src/Gateways/NOWPayments/class-nowpayments-gateway.php:48
+msgid "NOWPayments"
+msgstr "NOWPayments"
+
+#: src/Gateways/NOWPayments/class-nowpayments-gateway.php:83
+msgid "Use the NOWPayments sandbox environment for testing."
+msgstr "استخدم بيئة NOWPayments التجريبية للاختبار."
+
+#: src/Gateways/NOWPayments/class-nowpayments-gateway.php:88
+msgid "Your NOWPayments API key. Stored encrypted."
+msgstr "مفتاح واجهة NOWPayments. يُخزَّن مشفّرًا."
+
+#: src/Gateways/NOWPayments/class-nowpayments-gateway.php:92
+msgid "IPN Secret"
+msgstr "سر IPN"
+
+#: src/Gateways/NOWPayments/class-nowpayments-gateway.php:93
+msgid "Instant Payment Notification secret for webhook signature verification. Stored encrypted. If empty, IPN webhooks are rejected for security."
+msgstr "سر إشعار الدفع الفوري للتحقق من توقيع خطاف الويب. يُخزَّن مشفّرًا. إذا كان فارغًا، تُرفض خطافات ويب IPN لأسباب أمنية."
+
+#: src/Gateways/NOWPayments/class-nowpayments-gateway.php:105
+msgid "Accept Bitcoin, Ethereum, and 150+ cryptocurrencies via NOWPayments hosted invoices."
+msgstr "اقبل Bitcoin وEthereum وأكثر من 150 عملة مشفرة عبر فواتير NOWPayments المستضافة."
+
+#: src/Gateways/NOWPayments/class-nowpayments-gateway.php:222
+msgid "NOWPayments API key is not configured."
+msgstr "مفتاح واجهة NOWPayments غير مكوّن."
+
+#: src/Gateways/NOWPayments/class-nowpayments-gateway.php:247
+msgid "Could not connect to NOWPayments. Please try again later."
+msgstr "تعذر الاتصال بـ NOWPayments. يرجى المحاولة لاحقًا."
+
+#: src/Gateways/NOWPayments/class-nowpayments-gateway.php:254
+msgid "NOWPayments request failed."
+msgstr "فشل طلب NOWPayments."
+
+#: src/Gateways/NOWPayments/class-nowpayments-gateway.php:325
+msgid "NOWPayments did not return an invoice."
+msgstr "لم يُرجع NOWPayments فاتورة."
+
+#: src/Gateways/NOWPayments/class-nowpayments-gateway.php:357
+msgid "Could not resolve the NOWPayments invoice."
+msgstr "تعذر حل فاتورة NOWPayments."
+
+#. translators: %s: invoice status
+#: src/Gateways/NOWPayments/class-nowpayments-gateway.php:377
+#, php-format
+msgid "NOWPayments invoice not paid (status: %s)."
+msgstr "لم تُدفع فاتورة NOWPayments (الحالة: %s)."
+
+#: src/Gateways/NOWPayments/class-nowpayments-gateway.php:389
+msgid "NOWPayments payment amount does not match the invoice amount."
+msgstr "لا يتطابق مبلغ دفع NOWPayments مع مبلغ الفاتورة."
+
+#: src/Gateways/PayPal/class-paypal-gateway.php:117
+msgid "PayPal"
+msgstr "PayPal"
+
+#: src/Gateways/PayPal/class-paypal-gateway.php:152
+msgid "Use PayPal sandbox (test) credentials."
+msgstr "استخدم بيانات اعتماد PayPal التجريبية (للاختبار)."
+
+#: src/Gateways/PayPal/class-paypal-gateway.php:156
+msgid "Client ID"
+msgstr "معرّف العميل"
+
+#: src/Gateways/PayPal/class-paypal-gateway.php:157
+msgid "Your PayPal REST app client ID."
+msgstr "معرّف عميل تطبيق PayPal REST."
+
+#: src/Gateways/PayPal/class-paypal-gateway.php:161
+msgid "Client Secret"
+msgstr "سر العميل"
+
+#: src/Gateways/PayPal/class-paypal-gateway.php:162
+msgid "Your PayPal REST app client secret."
+msgstr "سر عميل تطبيق PayPal REST."
+
+#: src/Gateways/PayPal/class-paypal-gateway.php:166
+msgid "Webhook ID"
+msgstr "معرّف خطاف الويب"
+
+#: src/Gateways/PayPal/class-paypal-gateway.php:167
+msgid "The PayPal Webhook ID (from your REST app, under Webhooks). Required for verifying webhook signatures. Leave empty to fall back to order re-fetch verification (less secure)."
+msgstr "معرّف خطاف ويب PayPal (من تطبيق REST الخاص بك، ضمن Webhooks). مطلوب للتحقق من توقيعات خطاف الويب. اتركه فارغًا للتراجع إلى التحقق بإعادة جلب الطلب (أقل أمانًا)."
+
+#: src/Gateways/PayPal/class-paypal-gateway.php:179
+msgid "Accept payments via PayPal using the Orders REST API v2."
+msgstr "اقبل المدفوعات عبر PayPal باستخدام واجهة Orders REST API الإصدار 2."
+
+#: src/Gateways/PayPal/class-paypal-gateway.php:286
+msgid "PayPal client ID or secret is not configured."
+msgstr "معرّف عميل PayPal أو سره غير مكوّن."
+
+#: src/Gateways/PayPal/class-paypal-gateway.php:316
+#: src/Gateways/PayPal/class-paypal-gateway.php:381
+msgid "Could not connect to PayPal. Please try again later."
+msgstr "تعذر الاتصال بـ PayPal. يرجى المحاولة لاحقًا."
+
+#: src/Gateways/PayPal/class-paypal-gateway.php:324
+msgid "PayPal authentication failed. Check your client ID and secret."
+msgstr "فشل مصادقة PayPal. تحقق من معرّف العميل والسر."
+
+#: src/Gateways/PayPal/class-paypal-gateway.php:408
+msgid "PayPal request failed. Please try again or contact support."
+msgstr "فشل طلب PayPal. يرجى المحاولة مرة أخرى أو التواصل مع الدعم."
+
+#: src/Gateways/PayPal/class-paypal-gateway.php:512
+msgid "PayPal did not return an order ID."
+msgstr "لم يُرجع PayPal معرّف طلب."
+
+#: src/Gateways/PayPal/class-paypal-gateway.php:543
+msgid "Missing PayPal order ID."
+msgstr "معرّف طلب PayPal مفقود."
+
+#. translators: %s: PayPal payment status
+#: src/Gateways/PayPal/class-paypal-gateway.php:587
+#, php-format
+msgid "PayPal payment not completed (status: %s)."
+msgstr "لم يكتمل دفع PayPal (الحالة: %s)."
+
+#: src/Gateways/PayPal/class-paypal-gateway.php:605
+msgid "PayPal payment capture details are missing."
+msgstr "تفاصيل تحصيل دفع PayPal مفقودة."
+
+#: src/Gateways/PayPal/class-paypal-gateway.php:613
+msgid "PayPal payment amount does not match the order amount."
+msgstr "لا يتطابق مبلغ دفع PayPal مع مبلغ الطلب."
+
+#: src/Gateways/PayPal/class-paypal-gateway.php:647
+msgid "Invalid webhook payload."
+msgstr "حمولة خطاف ويب غير صالحة."
+
+#. translators: %s: webhook event type
+#: src/Gateways/PayPal/class-paypal-gateway.php:654
+#, php-format
+msgid "Unsupported webhook event: %s"
+msgstr "حدث خطاف ويب غير مدعوم: %s"
+
+#: src/Gateways/PayPal/class-paypal-gateway.php:665
+msgid "PayPal webhook signature verification failed."
+msgstr "فشل التحقق من توقيع خطاف ويب PayPal."
+
+#: src/Gateways/PayPal/class-paypal-gateway.php:685
+msgid "Could not determine PayPal order from webhook."
+msgstr "تعذر تحديد طلب PayPal من خطاف الويب."
+
+#. translators: %s: PayPal order status
+#: src/Gateways/PayPal/class-paypal-gateway.php:702
+#, php-format
+msgid "PayPal order not completed (status: %s)."
+msgstr "لم يكتمل طلب PayPal (الحالة: %s)."
+
+#. translators: %s: missing header key name
+#: src/Gateways/PayPal/class-paypal-gateway.php:763
+#, php-format
+msgid "Missing PayPal webhook header: %s"
+msgstr "ترويسة خطاف ويب PayPal مفقودة: %s"
+
+#: src/Gateways/Stripe/class-stripe-gateway.php:55
+msgid "Stripe"
+msgstr "Stripe"
+
+#: src/Gateways/Stripe/class-stripe-gateway.php:111
+msgid "Use Stripe sandbox (test) keys. Check this when using rk_test_ / sk_test_ keys."
+msgstr "استخدم مفاتيح Stripe التجريبية (للاختبار). حدد هذا عند استخدام مفاتيح rk_test_ / sk_test_."
+
+#: src/Gateways/Stripe/class-stripe-gateway.php:115
+msgid "Publishable Key (optional)"
+msgstr "المفتاح القابل للنشر (اختياري)"
+
+#: src/Gateways/Stripe/class-stripe-gateway.php:116
+msgid "Optional. Not used by the hosted Checkout flow. Paste pk_live_... or pk_test_... only if you need it elsewhere."
+msgstr "اختياري. لا يُستخدم في تدفق Checkout المستضاف. الصق pk_live_... أو pk_test_... فقط إذا كنت بحاجة إليه في مكان آخر."
+
+#: src/Gateways/Stripe/class-stripe-gateway.php:121
+msgid "Your server-side key: a restricted key (rk_live_... / rk_test_ — recommended) or a secret key (sk_live_... / sk_test_...). Stored encrypted."
+msgstr "مفتاحك من جانب الخادم: مفتاح مقيد (rk_live_... / rk_test_ — موصى به) أو مفتاح سري (sk_live_... / sk_test_...). يُخزَّن مشفّرًا."
+
+#: src/Gateways/Stripe/class-stripe-gateway.php:125
+msgid "Webhook Signing Secret"
+msgstr "سر توقيع خطاف الويب"
+
+#: src/Gateways/Stripe/class-stripe-gateway.php:126
+msgid "The signing secret for your Stripe webhook endpoint (whsec_...). Required to verify webhooks."
+msgstr "سر التوقيع لنقطة نهاية خطاف ويب Stripe (whsec_...). مطلوب للتحقق من خطافات الويب."
+
+#: src/Gateways/Stripe/class-stripe-gateway.php:144
+msgid "Accept credit/debit cards and more via Stripe Checkout (hosted page). 3D Secure handled automatically. <strong>Restricted keys (rk_test_/rk_live_) with \"Checkout Sessions\" read/write permissions are recommended for security.</strong>"
+msgstr "اقبل بطاقات الائتمان/الخصم والمزيد عبر Stripe Checkout (صفحة مستضافة). يتم التعامل مع 3D Secure تلقائيًا. <strong>يُوصى باستخدام المفاتيح المقيدة (rk_test_/rk_live_) مع أذونات القراءة/الكتابة لـ \"Checkout Sessions\" لأسباب أمنية.</strong>"
+
+#: src/Gateways/Stripe/class-stripe-gateway.php:268
+msgid "Secret key is not configured. Enter your restricted key (rk_test_/rk_live_) or secret key (sk_test_/sk_live_)."
+msgstr "المفتاح السري غير مكوّن. أدخل مفتاحك المقيد (rk_test_/rk_live_) أو مفتاحك السري (sk_test_/sk_live_)."
+
+#: src/Gateways/Stripe/class-stripe-gateway.php:282
+msgid "Secret key format not recognized. It must start with sk_test_, rk_test_, sk_live_, or rk_live_."
+msgstr "صيغة المفتاح السري غير معروفة. يجب أن يبدأ بـ sk_test_ أو rk_test_ أو sk_live_ أو rk_live_."
+
+#: src/Gateways/Stripe/class-stripe-gateway.php:289
+msgid "Test Mode is ON but the key looks like a LIVE key (sk_live_/rk_live_). Either turn Test Mode off or use a test key."
+msgstr "وضع الاختبار مفعّل ولكن المفتاح يبدو كمفتاح مباشر (sk_live_/rk_live_). إما أوقف وضع الاختبار أو استخدم مفتاح اختبار."
+
+#: src/Gateways/Stripe/class-stripe-gateway.php:295
+msgid "Test Mode is OFF but the key is a TEST key (sk_test_/rk_test_). Enable Test Mode to test, or use a live key."
+msgstr "وضع الاختبار متوقف ولكن المفتاح مفتاح اختبار (sk_test_/rk_test_). فعّل وضع الاختبار للاختبار، أو استخدم مفتاحًا مباشرًا."
+
+#: src/Gateways/Stripe/class-stripe-gateway.php:316
+msgid "Could not reach Stripe. Check your server connection/cURL and try again."
+msgstr "تعذر الوصول إلى Stripe. تحقق من اتصال خادمك/وحدات cURL وحاول مرة أخرى."
+
+#: src/Gateways/Stripe/class-stripe-gateway.php:325
+msgid "test"
+msgstr "اختبار"
+
+#: src/Gateways/Stripe/class-stripe-gateway.php:325
+msgid "live"
+msgstr "مباشر"
+
+#. translators: %s: test or live
+#: src/Gateways/Stripe/class-stripe-gateway.php:330
+#, php-format
+msgid "Connected successfully. Your %s-mode key is valid and Checkout Sessions access is confirmed."
+msgstr "تم الاتصال بنجاح. مفتاح وضع %s صالح وتم تأكيد الوصول إلى Checkout Sessions."
+
+#: src/Gateways/Stripe/class-stripe-gateway.php:342
+msgid "Stripe rejected the key (unauthorized). The key is invalid, revoked, or the wrong type. Generate a new restricted key (rk_) or secret key (sk_) in the Stripe Dashboard."
+msgstr "رفضت Stripe المفتاح (غير مصرح). المفتاح غير صالح أو ملغي أو من النوع الخاطئ. أنشئ مفتاحًا مقيدًا جديدًا (rk_) أو مفتاحًا سريًا (sk_) في لوحة تحكم Stripe."
+
+#: src/Gateways/Stripe/class-stripe-gateway.php:351
+msgid "The key authenticated, but it lacks read access to Checkout Sessions. Grant Checkout Sessions permission to this restricted key in the Stripe Dashboard, or payments may fail."
+msgstr "تمت مصادقة المفتاح، لكنه يفتقر إلى إذن القراءة لـ Checkout Sessions. امنح هذا المفتاح المقيد إذن Checkout Sessions في لوحة تحكم Stripe، وإلا فقد تفشل المدفوعات."
+
+#. translators: %d: HTTP status code
+#: src/Gateways/Stripe/class-stripe-gateway.php:357
+#, php-format
+msgid "Stripe returned an unexpected response (HTTP %d)."
+msgstr "أرجعت Stripe استجابة غير متوقعة (HTTP %d)."
+
+#: src/Gateways/Stripe/class-stripe-gateway.php:395
+msgid "Could not connect to Stripe. Please try again later."
+msgstr "تعذر الاتصال بـ Stripe. يرجى المحاولة لاحقًا."
+
+#: src/Gateways/Stripe/class-stripe-gateway.php:402
+msgid "Stripe request failed."
+msgstr "فشل طلب Stripe."
+
+#: src/Gateways/Stripe/class-stripe-gateway.php:509
+msgid "Stripe did not return a checkout session."
+msgstr "لم تُرجع Stripe جلسة دفع."
+
+#: src/Gateways/Stripe/class-stripe-gateway.php:543
+msgid "Missing Stripe session id."
+msgstr "معرّف جلسة Stripe مفقود."
+
+#. translators: %1$s: session status, %2$s: payment status
+#: src/Gateways/Stripe/class-stripe-gateway.php:564
+#, php-format
+msgid "Stripe payment not completed (session: %1$s, payment: %2$s)."
+msgstr "لم يكتمل دفع Stripe (الجلسة: %1$s، الدفع: %2$s)."
+
+#: src/Gateways/Stripe/class-stripe-gateway.php:578
+msgid "Stripe payment amount does not match the order amount."
+msgstr "لا يتطابق مبلغ دفع Stripe مع مبلغ الطلب."
