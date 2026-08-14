@@ -163,36 +163,36 @@ class GatewayKit_Gateway_Manager {
 		// Check cache first
 		$cache_key = 'gatewaykit_available_gateways';
 		$cache_ttl = 300; // 5 minutes cache
-		
-		$cached_gateways = get_transient($cache_key);
-		if ($cached_gateways !== false) {
-			if (defined('WP_DEBUG') && WP_DEBUG) {
-				$this->logger->debug('Available gateways loaded from cache');
+
+		$cached_gateways = get_transient( $cache_key );
+		if ( $cached_gateways !== false ) {
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				$this->logger->debug( 'Available gateways loaded from cache' );
 			}
 			return $cached_gateways;
 		}
 
-		$available = array();
-		$enabled_gateways = get_option('gatewaykit_enabled_gateways', array());
+		$available        = array();
+		$enabled_gateways = get_option( 'gatewaykit_enabled_gateways', array() );
 
-		foreach ($this->gateways as $gateway_id => $class_name) {
+		foreach ( $this->gateways as $gateway_id => $class_name ) {
 			// Only include enabled gateways
-			if (!isset($enabled_gateways[$gateway_id]) || $enabled_gateways[$gateway_id] !== '1') {
+			if ( ! isset( $enabled_gateways[ $gateway_id ] ) || $enabled_gateways[ $gateway_id ] !== '1' ) {
 				continue;
 			}
 
-			$gateway = $this->get_gateway($gateway_id);
+			$gateway = $this->get_gateway( $gateway_id );
 
-			if ($gateway && $gateway->is_available()) {
-				$available[$gateway_id] = $gateway;
+			if ( $gateway && $gateway->is_available() ) {
+				$available[ $gateway_id ] = $gateway;
 			}
 		}
 
 		// Cache the result
-		set_transient($cache_key, $available, $cache_ttl);
-		
-		if (defined('WP_DEBUG') && WP_DEBUG) {
-			$this->logger->debug('Available gateways cached for 5 minutes');
+		set_transient( $cache_key, $available, $cache_ttl );
+
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			$this->logger->debug( 'Available gateways cached for 5 minutes' );
 		}
 
 		return $available;
@@ -248,7 +248,7 @@ class GatewayKit_Gateway_Manager {
 				$this->logger->error(
 					'Gateway settings validation failed',
 					array(
-						'gateway_id' => $gateway_id,
+						'gateway_id'    => $gateway_id,
 						'error_message' => $error_message,
 					)
 				);
@@ -417,28 +417,28 @@ class GatewayKit_Gateway_Manager {
 		// Check cache first
 		$cache_key = 'gatewaykit_gateway_stats';
 		$cache_ttl = 300; // 5 minutes cache
-		
-		$cached_stats = get_transient($cache_key);
-		if ($cached_stats !== false) {
-			if (defined('WP_DEBUG') && WP_DEBUG) {
-				$this->logger->debug('Gateway stats loaded from cache');
+
+		$cached_stats = get_transient( $cache_key );
+		if ( $cached_stats !== false ) {
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				$this->logger->debug( 'Gateway stats loaded from cache' );
 			}
 			return $cached_stats;
 		}
 
-		$stats = array();
+		$stats              = array();
 		$available_gateways = $this->get_available_gateways();
 
-		foreach ($available_gateways as $gateway_id => $gateway) {
-			$stats[$gateway_id] = $this->get_gateway_stats($gateway_id);
-			$stats[$gateway_id]['name'] = $gateway->get_gateway_name();
+		foreach ( $available_gateways as $gateway_id => $gateway ) {
+			$stats[ $gateway_id ]         = $this->get_gateway_stats( $gateway_id );
+			$stats[ $gateway_id ]['name'] = $gateway->get_gateway_name();
 		}
 
 		// Cache the result
-		set_transient($cache_key, $stats, $cache_ttl);
-		
-		if (defined('WP_DEBUG') && WP_DEBUG) {
-			$this->logger->debug('Gateway stats cached for 10 minutes');
+		set_transient( $cache_key, $stats, $cache_ttl );
+
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			$this->logger->debug( 'Gateway stats cached for 10 minutes' );
 		}
 
 		return $stats;

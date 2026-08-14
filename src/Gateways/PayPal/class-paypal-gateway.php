@@ -146,12 +146,12 @@ class GatewayKit_PayPal_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 	 */
 	public function get_settings_fields() {
 		return array(
-			'sandbox_mode' => array(
+			'sandbox_mode'  => array(
 				'type'        => 'checkbox',
 				'label'       => __( 'Sandbox Mode', 'gatewaykit' ),
 				'description' => __( 'Use PayPal sandbox (test) credentials.', 'gatewaykit' ),
 			),
-			'client_id' => array(
+			'client_id'     => array(
 				'type'        => 'text',
 				'label'       => __( 'Client ID', 'gatewaykit' ),
 				'description' => __( 'Your PayPal REST app client ID.', 'gatewaykit' ),
@@ -161,7 +161,7 @@ class GatewayKit_PayPal_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 				'label'       => __( 'Client Secret', 'gatewaykit' ),
 				'description' => __( 'Your PayPal REST app client secret.', 'gatewaykit' ),
 			),
-			'webhook_id' => array(
+			'webhook_id'    => array(
 				'type'        => 'text',
 				'label'       => __( 'Webhook ID', 'gatewaykit' ),
 				'description' => __( 'The PayPal Webhook ID (from your REST app, under Webhooks). Required for verifying webhook signatures. Leave empty to fall back to order re-fetch verification (less secure).', 'gatewaykit' ),
@@ -205,8 +205,22 @@ class GatewayKit_PayPal_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 	 * @var string[]
 	 */
 	private static $zero_decimal = array(
-		'BIF', 'CLP', 'DJF', 'GNF', 'JPY', 'KMF', 'KRW', 'MGA',
-		'PYG', 'RWF', 'UGX', 'VND', 'VUV', 'XAF', 'XOF', 'XPF',
+		'BIF',
+		'CLP',
+		'DJF',
+		'GNF',
+		'JPY',
+		'KMF',
+		'KRW',
+		'MGA',
+		'PYG',
+		'RWF',
+		'UGX',
+		'VND',
+		'VUV',
+		'XAF',
+		'XOF',
+		'XPF',
 	);
 
 	/**
@@ -299,7 +313,14 @@ class GatewayKit_PayPal_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 		$body = json_decode( wp_remote_retrieve_body( $response ), true );
 
 		if ( 200 !== (int) $code || empty( $body['access_token'] ) ) {
-			$this->log( 'error', 'PayPal token request returned non-200', array( 'status' => $code, 'body' => $body ) );
+			$this->log(
+				'error',
+				'PayPal token request returned non-200',
+				array(
+					'status' => $code,
+					'body'   => $body,
+				)
+			);
 			return new WP_Error( 'paypal_auth_failed', __( 'PayPal authentication failed. Check your client ID and secret.', 'gatewaykit' ) );
 		}
 
@@ -366,7 +387,15 @@ class GatewayKit_PayPal_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 		$decoded_raw = ( null === $decoded ) ? $raw_body : $decoded;
 
 		if ( $code < 200 || $code >= 300 ) {
-			$this->log( 'error', 'PayPal API error', array( 'path' => $path, 'status' => $code, 'body' => $decoded_raw ) );
+			$this->log(
+				'error',
+				'PayPal API error',
+				array(
+					'path'   => $path,
+					'status' => $code,
+					'body'   => $decoded_raw,
+				)
+			);
 			$message = $this->extract_error_message( $decoded_raw );
 			return new WP_Error( 'paypal_api_error', $message );
 		}
@@ -430,8 +459,8 @@ class GatewayKit_PayPal_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 		$cancel_url = add_query_arg( $cancel_args, $callback_url );
 
 		$order_body = array(
-			'intent'          => 'CAPTURE',
-			'purchase_units'  => array(
+			'intent'         => 'CAPTURE',
+			'purchase_units' => array(
 				array(
 					'amount' => array(
 						'currency_code' => $currency,
@@ -439,12 +468,12 @@ class GatewayKit_PayPal_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 					),
 				),
 			),
-			'payment_source'  => array(
+			'payment_source' => array(
 				'paypal' => array(
 					'experience_context' => array(
-						'return_url' => $return_url,
-						'cancel_url' => $cancel_url,
-						'user_action'=> 'PAY_NOW',
+						'return_url'  => $return_url,
+						'cancel_url'  => $cancel_url,
+						'user_action' => 'PAY_NOW',
 					),
 				),
 			),
@@ -497,11 +526,19 @@ class GatewayKit_PayPal_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 		// Cache the approval URL so get_redirect_url() can resolve it.
 		set_transient( 'gatewaykit_paypal_redirect_' . $order_id, $redirect_url, DAY_IN_SECONDS );
 
-		$this->log( 'info', 'PayPal order created', array( 'order_id' => $order_id, 'amount' => $formatted, 'currency' => $currency ) );
+		$this->log(
+			'info',
+			'PayPal order created',
+			array(
+				'order_id' => $order_id,
+				'amount'   => $formatted,
+				'currency' => $currency,
+			)
+		);
 
 		return array(
-			'status'      => 'success',
-			'authority'   => $order_id,
+			'status'       => 'success',
+			'authority'    => $order_id,
 			'redirect_url' => $redirect_url,
 		);
 	}
@@ -586,7 +623,14 @@ class GatewayKit_PayPal_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 		}
 
 		if ( abs( (float) $captured_value - $expected ) > 0.01 ) {
-			$this->log( 'error', 'PayPal amount mismatch', array( 'expected' => $expected, 'captured' => $captured_value ) );
+			$this->log(
+				'error',
+				'PayPal amount mismatch',
+				array(
+					'expected' => $expected,
+					'captured' => $captured_value,
+				)
+			);
 			return array(
 				'status'        => 'failed',
 				'error_message' => __( 'PayPal payment amount does not match the order amount.', 'gatewaykit' ),
@@ -595,7 +639,14 @@ class GatewayKit_PayPal_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 
 		$ref_id = $this->get_capture_id( $order_body );
 
-		$this->log( 'info', 'PayPal payment verified', array( 'order_id' => $authority, 'ref_id' => $ref_id ) );
+		$this->log(
+			'info',
+			'PayPal payment verified',
+			array(
+				'order_id' => $authority,
+				'ref_id'   => $ref_id,
+			)
+		);
 
 		return array(
 			'status' => 'success',
@@ -623,14 +674,22 @@ class GatewayKit_PayPal_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 	 */
 	public function verify_webhook_event( $event, $raw_body = '' ) {
 		if ( ! is_array( $event ) ) {
-			return array( 'status' => 'failed', 'error_message' => __( 'Invalid webhook payload.', 'gatewaykit' ) );
+			return array(
+				'status'        => 'failed',
+				'error_message' => __( 'Invalid webhook payload.', 'gatewaykit' ),
+			);
 		}
 
 		$event_type = isset( $event['event_type'] ) ? $event['event_type'] : '';
 
 		if ( 'PAYMENT.CAPTURE.COMPLETED' !== $event_type ) {
-			/* translators: %s: webhook event type */
-			return array( 'status' => 'ignored', 'error_message' => sprintf( __( 'Unsupported webhook event: %s', 'gatewaykit' ), $event_type ) );
+			// translators: %s: webhook event type.
+			$error_message = sprintf( __( 'Unsupported webhook event: %s', 'gatewaykit' ), $event_type );
+
+			return array(
+				'status'        => 'ignored',
+				'error_message' => $error_message,
+			);
 		}
 
 		// Layer 1: signature verification.
@@ -648,7 +707,10 @@ class GatewayKit_PayPal_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 		}
 		if ( true !== $sig ) {
 			$this->log( 'error', 'PayPal webhook signature invalid — rejecting forged or tampered payload' );
-			return array( 'status' => 'failed', 'error_message' => __( 'PayPal webhook signature verification failed.', 'gatewaykit' ) );
+			return array(
+				'status'        => 'failed',
+				'error_message' => __( 'PayPal webhook signature verification failed.', 'gatewaykit' ),
+			);
 		}
 
 		// The order id can be in resource.supplementary_data.order_id or in links.
@@ -668,14 +730,20 @@ class GatewayKit_PayPal_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 		}
 
 		if ( empty( $order_id ) ) {
-			return array( 'status' => 'failed', 'error_message' => __( 'Could not determine PayPal order from webhook.', 'gatewaykit' ) );
+			return array(
+				'status'        => 'failed',
+				'error_message' => __( 'Could not determine PayPal order from webhook.', 'gatewaykit' ),
+			);
 		}
 
 		// Layer 2: Authoritative check — re-fetch the order from PayPal.
 		$order = $this->api_request( '/v2/checkout/orders/' . rawurlencode( $order_id ), array(), 'GET' );
 
 		if ( is_wp_error( $order ) ) {
-			return array( 'status' => 'failed', 'error_message' => $order->get_error_message() );
+			return array(
+				'status'        => 'failed',
+				'error_message' => $order->get_error_message(),
+			);
 		}
 
 		$order_body = isset( $order['body'] ) ? $order['body'] : array();
@@ -691,7 +759,14 @@ class GatewayKit_PayPal_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 
 		$ref_id = $capture_id ? $capture_id : $this->get_capture_id( $order_body );
 
-		$this->log( 'info', 'PayPal webhook verified', array( 'order_id' => $order_id, 'ref_id' => $ref_id ) );
+		$this->log(
+			'info',
+			'PayPal webhook verified',
+			array(
+				'order_id' => $order_id,
+				'ref_id'   => $ref_id,
+			)
+		);
 
 		return array(
 			'status'   => 'success',

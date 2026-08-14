@@ -364,7 +364,7 @@ class GatewayKit_Database_Manager {
 
 			if ( $exists ) {
 				// Count rows via a prepared identifier.
-				$count           = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM %i", $table_raw ) );
+				$count           = $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i', $table_raw ) );
 				$status[ $name ] = array(
 					'exists' => true,
 					'count'  => intval( $count ),
@@ -395,7 +395,7 @@ class GatewayKit_Database_Manager {
 
 		foreach ( $tables as $table ) {
 			$result = $wpdb->query(
-				$wpdb->prepare( "OPTIMIZE TABLE %i", $table )
+				$wpdb->prepare( 'OPTIMIZE TABLE %i', $table )
 			);
 			if ( $result === false ) {
 				GatewayKit_Logger::get_instance()->error(

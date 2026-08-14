@@ -54,7 +54,7 @@ class GatewayKit_Input_Validator {
 		// legitimately lowers the final total below the normal floor).
 		if ( empty( $options['skip_min'] ) ) {
 			$default_min = 0.50;
-			$min_amount = apply_filters( 'gatewaykit_min_amount', $default_min );
+			$min_amount  = apply_filters( 'gatewaykit_min_amount', $default_min );
 			if ( $amount < $min_amount ) {
 				/* translators: %s: minimum allowed amount */
 				return new WP_Error( 'amount_too_low', sprintf( __( 'Amount must be at least %s.', 'gatewaykit' ), $min_amount ) );
@@ -63,7 +63,7 @@ class GatewayKit_Input_Validator {
 
 		// Check maximum amount
 		$default_max = 1000000;
-		$max_amount = apply_filters( 'gatewaykit_max_amount', $default_max );
+		$max_amount  = apply_filters( 'gatewaykit_max_amount', $default_max );
 		if ( $amount > $max_amount ) {
 			/* translators: %s: maximum allowed amount */
 			return new WP_Error( 'amount_too_high', sprintf( __( 'Amount cannot exceed %s.', 'gatewaykit' ), $max_amount ) );
@@ -144,8 +144,8 @@ class GatewayKit_Input_Validator {
 			return new WP_Error( 'invalid_success_url', __( 'Invalid redirect URL.', 'gatewaykit' ) );
 		}
 
-		$site_host  = strtolower( (string) wp_parse_url( home_url(), PHP_URL_HOST ) );
-		$allowed    = array( $site_host );
+		$site_host   = strtolower( (string) wp_parse_url( home_url(), PHP_URL_HOST ) );
+		$allowed     = array( $site_host );
 		$extra_hosts = apply_filters( 'gatewaykit_allowed_success_hosts', array() );
 		if ( is_array( $extra_hosts ) ) {
 			foreach ( $extra_hosts as $extra ) {

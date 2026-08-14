@@ -36,7 +36,8 @@ class GatewayKit_Payment_Links {
 	 * Constructor — hooks admin menu and AJAX handler.
 	 */
 	public function __construct() {
-		add_action( 'admin_menu', array( $this, 'add_menu' ), 20 );
+		// NOTE: the menu is registered directly by GatewayKit::register_admin_menus()
+		// (ordered in the admin menu) — not via an admin_menu hook.
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
 		add_action( 'wp_ajax_gatewaykit_create_payment_link', array( $this, 'ajax_create_payment_link' ) );
 	}
@@ -319,7 +320,12 @@ class GatewayKit_Payment_Links {
 		array_unshift( $links, $entry );
 		update_option( 'gatewaykit_payment_links', array_slice( $links, 0, self::MAX_LINKS ) );
 
-		wp_send_json_success( array( 'url' => $entry['url'], 'entry' => $entry ) );
+		wp_send_json_success(
+			array(
+				'url'   => $entry['url'],
+				'entry' => $entry,
+			)
+		);
 	}
 
 	/**

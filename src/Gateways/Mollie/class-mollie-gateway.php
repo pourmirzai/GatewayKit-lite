@@ -51,9 +51,27 @@ class GatewayKit_Mollie_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 	 */
 	public function get_supported_currencies() {
 		return array(
-			'USD', 'EUR', 'GBP', 'AUD', 'CAD', 'CZK', 'DKK', 'HKD', 'HUF',
-			'ILS', 'JPY', 'MYR', 'MXN', 'NZD', 'NOK', 'PLN', 'RUB', 'SGD',
-			'SEK', 'CHF', 'THB',
+			'USD',
+			'EUR',
+			'GBP',
+			'AUD',
+			'CAD',
+			'CZK',
+			'DKK',
+			'HKD',
+			'HUF',
+			'ILS',
+			'JPY',
+			'MYR',
+			'MXN',
+			'NZD',
+			'NOK',
+			'PLN',
+			'RUB',
+			'SGD',
+			'SEK',
+			'CHF',
+			'THB',
 		);
 	}
 
@@ -78,7 +96,7 @@ class GatewayKit_Mollie_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 				'label'       => __( 'Test Mode', 'gatewaykit' ),
 				'description' => __( 'Use your Mollie test API key (starts with test_).', 'gatewaykit' ),
 			),
-			'api_key' => array(
+			'api_key'      => array(
 				'type'        => 'password',
 				'label'       => __( 'API Key', 'gatewaykit' ),
 				'description' => __( 'Your Mollie API key (live_... or test_...). Stored encrypted.', 'gatewaykit' ),
@@ -145,8 +163,24 @@ class GatewayKit_Mollie_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 	 * @var string[]
 	 */
 	private static $zero_decimal = array(
-		'BIF', 'CLP', 'DJF', 'GNF', 'ISK', 'JPY', 'KMF', 'KRW', 'LAK', 'MGA',
-		'PYG', 'RWF', 'UGX', 'VND', 'VUV', 'XAF', 'XOF', 'XPF',
+		'BIF',
+		'CLP',
+		'DJF',
+		'GNF',
+		'ISK',
+		'JPY',
+		'KMF',
+		'KRW',
+		'LAK',
+		'MGA',
+		'PYG',
+		'RWF',
+		'UGX',
+		'VND',
+		'VUV',
+		'XAF',
+		'XOF',
+		'XPF',
 	);
 
 	/**
@@ -227,7 +261,15 @@ class GatewayKit_Mollie_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 
 		if ( $code < 200 || $code >= 300 ) {
 			$message = isset( $decoded['detail'] ) ? $decoded['detail'] : __( 'Mollie request failed.', 'gatewaykit' );
-			$this->log( 'error', 'Mollie API error', array( 'path' => $path, 'status' => $code, 'body' => $decoded ) );
+			$this->log(
+				'error',
+				'Mollie API error',
+				array(
+					'path'   => $path,
+					'status' => $code,
+					'body'   => $decoded,
+				)
+			);
 			return new WP_Error( 'mollie_api_error', $message );
 		}
 
@@ -259,18 +301,18 @@ class GatewayKit_Mollie_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 		// Mollie does not echo the payment id back on redirect, so we generate a
 		// local reference token, embed it in the redirect URL, and map it to the
 		// Mollie payment id once created.
-		$ref = 'mollie_' . wp_generate_password( 16, false );
+		$ref          = 'mollie_' . wp_generate_password( 16, false );
 		$redirect_url = add_query_arg( array( 'authority' => $ref ), $callback_url );
 
 		$body = array(
-			'amount' => array(
+			'amount'      => array(
 				'currency' => $currency,
 				'value'    => $this->format_value( $formatted ),
 			),
-			'description'  => $description ? mb_substr( (string) $description, 0, 255 ) : __( 'Payment', 'gatewaykit' ),
-			'redirectUrl'  => $redirect_url,
-			'webhookUrl'   => $this->get_webhook_url(),
-			'metadata'     => array(
+			'description' => $description ? mb_substr( (string) $description, 0, 255 ) : __( 'Payment', 'gatewaykit' ),
+			'redirectUrl' => $redirect_url,
+			'webhookUrl'  => $this->get_webhook_url(),
+			'metadata'    => array(
 				'gatewaykit_ref' => $ref,
 			),
 		);
@@ -302,7 +344,16 @@ class GatewayKit_Mollie_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 		set_transient( 'gatewaykit_mollie_pid_' . $payment_id, $ref, $ttl );
 		set_transient( 'gatewaykit_mollie_redirect_' . $ref, $checkout_url, DAY_IN_SECONDS );
 
-		$this->log( 'info', 'Mollie payment created', array( 'payment_id' => $payment_id, 'ref' => $ref, 'amount' => $formatted, 'currency' => $currency ) );
+		$this->log(
+			'info',
+			'Mollie payment created',
+			array(
+				'payment_id' => $payment_id,
+				'ref'        => $ref,
+				'amount'     => $formatted,
+				'currency'   => $currency,
+			)
+		);
 
 		return array(
 			'status'       => 'success',
@@ -352,10 +403,17 @@ class GatewayKit_Mollie_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 		}
 
 		// Validate amount.
-		$expected  = $this->format_amount( $amount );
-		$paid      = isset( $payment['amount']['value'] ) ? (float) $payment['amount']['value'] : $expected;
+		$expected = $this->format_amount( $amount );
+		$paid     = isset( $payment['amount']['value'] ) ? (float) $payment['amount']['value'] : $expected;
 		if ( abs( $paid - $expected ) > 0.01 ) {
-			$this->log( 'error', 'Mollie amount mismatch', array( 'expected' => $expected, 'paid' => $paid ) );
+			$this->log(
+				'error',
+				'Mollie amount mismatch',
+				array(
+					'expected' => $expected,
+					'paid'     => $paid,
+				)
+			);
 			return array(
 				'status'        => 'failed',
 				'error_message' => __( 'Mollie payment amount does not match the order amount.', 'gatewaykit' ),
@@ -364,7 +422,14 @@ class GatewayKit_Mollie_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 
 		$ref_id = $payment_id;
 
-		$this->log( 'info', 'Mollie payment verified', array( 'payment_id' => $payment_id, 'ref_id' => $ref_id ) );
+		$this->log(
+			'info',
+			'Mollie payment verified',
+			array(
+				'payment_id' => $payment_id,
+				'ref_id'     => $ref_id,
+			)
+		);
 
 		return array(
 			'status' => 'success',
@@ -435,22 +500,29 @@ class GatewayKit_Mollie_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 				$expected_amount = (float) $transaction->amount;
 
 				if ( abs( $paid_amount - $expected_amount ) > 0.01 ) {
-					$this->log( 'error', sprintf(
-						'Webhook amount mismatch: expected %.2f, received %.2f — marking as failed',
-						$expected_amount, $paid_amount
-					), array(
-						'transaction_id' => $transaction->id,
-						'gateway'        => $this->get_gateway_id(),
-					) );
+					$this->log(
+						'error',
+						sprintf(
+							'Webhook amount mismatch: expected %.2f, received %.2f — marking as failed',
+							$expected_amount,
+							$paid_amount
+						),
+						array(
+							'transaction_id' => $transaction->id,
+							'gateway'        => $this->get_gateway_id(),
+						)
+					);
 					$transaction->update( array( 'status' => 'failed' ) );
 					return;
 				}
 
-				$transaction->update( array(
-					'status'       => 'completed',
-					'ref_id'       => $payment_id,
-					'completed_at' => current_time( 'mysql' ),
-				) );
+				$transaction->update(
+					array(
+						'status'       => 'completed',
+						'ref_id'       => $payment_id,
+						'completed_at' => current_time( 'mysql' ),
+					)
+				);
 				do_action( 'gatewaykit_payment_completed', $transaction );
 			} elseif ( in_array( $status, array( 'failed', 'canceled', 'expired' ), true ) ) {
 				$transaction->update( array( 'status' => 'failed' ) );

@@ -112,15 +112,9 @@ class GatewayKit_Admin_Settings {
 			GatewayKit_Logger::get_instance()->debug( 'Adding admin menu at hook: ' . current_filter() . ', priority: ' . has_action( 'admin_menu', array( $this, 'add_admin_menu' ) ) );
 		}
 
-		// Submenu for transactions
-		add_submenu_page(
-			'gatewaykit',
-			__( 'Transactions', 'gatewaykit' ),
-			__( 'Transactions', 'gatewaykit' ),
-			'manage_options',
-			'gatewaykit-transactions',
-			array( $this, 'transactions_page' )
-		);
+		// NOTE: the Transactions submenu is registered separately via
+		// add_transactions_menu() so GatewayKit::register_admin_menus() can
+		// control the exact admin-menu ordering.
 
 		// Submenu for settings
 		add_submenu_page(
@@ -155,6 +149,24 @@ class GatewayKit_Admin_Settings {
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 			GatewayKit_Logger::get_instance()->debug( 'Admin menu added successfully' );
 		}
+	}
+
+	/**
+	 * Register the Transactions submenu separately so callers control ordering.
+	 */
+	public function add_transactions_menu() {
+		if ( ! is_admin() ) {
+			return;
+		}
+
+		add_submenu_page(
+			'gatewaykit',
+			__( 'Transactions', 'gatewaykit' ),
+			__( 'Transactions', 'gatewaykit' ),
+			'manage_options',
+			'gatewaykit-transactions',
+			array( $this, 'transactions_page' )
+		);
 	}
 
 	/**
@@ -199,11 +211,11 @@ class GatewayKit_Admin_Settings {
 	 * @param mixed $value Raw input.
 	 * @return string
 	 */
-public function sanitize_currency_setting( $value ) {
-    $value     = strtoupper( sanitize_key( $value ) );
-    $available = GatewayKit_Gateway_Manager::get_instance()->get_available_currencies();
-    return isset( $available[ $value ] ) ? $value : '';
-}
+	public function sanitize_currency_setting( $value ) {
+		$value     = strtoupper( sanitize_key( $value ) );
+		$available = GatewayKit_Gateway_Manager::get_instance()->get_available_currencies();
+		return isset( $available[ $value ] ) ? $value : '';
+	}
 
 	/**
 	 * Sanitize the log level option.
@@ -269,7 +281,7 @@ public function sanitize_currency_setting( $value ) {
 
 			if ( false !== strpos( $line, '/' ) ) {
 				list( $ip, $mask ) = explode( '/', $line, 2 );
-				$mask = (int) $mask;
+				$mask              = (int) $mask;
 				if ( ! filter_var( $ip, FILTER_VALIDATE_IP ) ) {
 					continue;
 				}
@@ -311,8 +323,8 @@ public function sanitize_currency_setting( $value ) {
 			return array();
 		}
 
-		$sanitized          = array();
-		$sensitive_fields   = array( 'client_secret', 'api_key', 'secret_key', 'password', 'access_token', 'webhook_secret' );
+		$sanitized        = array();
+		$sensitive_fields = array( 'client_secret', 'api_key', 'secret_key', 'password', 'access_token', 'webhook_secret' );
 
 		foreach ( $settings as $key => $value ) {
 			$key_clean = sanitize_key( $key );
@@ -320,7 +332,7 @@ public function sanitize_currency_setting( $value ) {
 			if ( in_array( $key_clean, $sensitive_fields, true ) ) {
 				// Sensitive fields: remove null bytes and trim, preserve special characters
 				// that sanitize_text_field would strip (e.g. base64 secrets with +/=).
-				$clean                 = str_replace( chr( 0 ), '', (string) $value );
+				$clean                   = str_replace( chr( 0 ), '', (string) $value );
 				$sanitized[ $key_clean ] = trim( wp_strip_all_tags( $clean ) );
 			} elseif ( is_array( $value ) ) {
 				$sanitized[ $key_clean ] = array_map( 'sanitize_text_field', $value );
@@ -333,8 +345,8 @@ public function sanitize_currency_setting( $value ) {
 	}
 
 	/**
-		* Handle transaction export requests before any output
-		*/
+	 * Handle transaction export requests before any output
+	 */
 	public function handle_transaction_exports() {
 		// Admin page routing; protected by capability checks below, no nonce needed for reading the page slug.
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended
@@ -377,40 +389,51 @@ public function sanitize_currency_setting( $value ) {
 				exit;
 			}
 		}
-		
-		
+
 		// Handle notices after actions
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended
 		if ( isset( $_GET['deleted'] ) ) {
 			$deleted_count = absint( wp_unslash( $_GET['deleted'] ) );
 			if ( $deleted_count > 0 ) {
-				add_action( 'admin_notices', function() use ( $deleted_count ) {
-					/* translators: %s: number of deleted transactions */
-					echo '<div class="notice notice-success is-dismissible"><p>' . esc_html( sprintf( _n( '%s transaction deleted.', '%s transactions deleted.', $deleted_count, 'gatewaykit' ), $deleted_count ) ) . '</p></div>';
-				} );
+				add_action(
+					'admin_notices',
+					function () use ( $deleted_count ) {
+						/* translators: %s: number of deleted transactions */
+						echo '<div class="notice notice-success is-dismissible"><p>' . esc_html( sprintf( _n( '%s transaction deleted.', '%s transactions deleted.', $deleted_count, 'gatewaykit' ), $deleted_count ) ) . '</p></div>';
+					}
+				);
 			}
 		}
 
 		if ( isset( $_GET['gatewaykit_notice'] ) && sanitize_key( wp_unslash( $_GET['gatewaykit_notice'] ) ) === 'no_transactions_selected_for_export' ) {
-			add_action( 'admin_notices', function() {
-				echo '<div class="notice notice-error is-dismissible"><p>' . esc_html__( 'No transactions selected for export.', 'gatewaykit' ) . '</p></div>';
-			} );
+			add_action(
+				'admin_notices',
+				function () {
+					echo '<div class="notice notice-error is-dismissible"><p>' . esc_html__( 'No transactions selected for export.', 'gatewaykit' ) . '</p></div>';
+				}
+			);
 		}
 
 		if ( isset( $_GET['gatewaykit_notice'] ) ) {
 			$notice_type = sanitize_key( wp_unslash( $_GET['gatewaykit_notice'] ) );
 
 			if ( 'refund_success' === $notice_type ) {
-				add_action( 'admin_notices', function() {
-					echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Refund processed successfully.', 'gatewaykit' ) . '</p></div>';
-				} );
+				add_action(
+					'admin_notices',
+					function () {
+						echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Refund processed successfully.', 'gatewaykit' ) . '</p></div>';
+					}
+				);
 			}
 
 			if ( 'refund_failed' === $notice_type ) {
 				$message = isset( $_GET['gatewaykit_message'] ) ? sanitize_text_field( wp_unslash( $_GET['gatewaykit_message'] ) ) : '';
-				add_action( 'admin_notices', function() use ( $message ) {
-					echo '<div class="notice notice-error is-dismissible"><p>' . esc_html__( 'Refund failed: ', 'gatewaykit' ) . esc_html( $message ) . '</p></div>';
-				} );
+				add_action(
+					'admin_notices',
+					function () use ( $message ) {
+						echo '<div class="notice notice-error is-dismissible"><p>' . esc_html__( 'Refund failed: ', 'gatewaykit' ) . esc_html( $message ) . '</p></div>';
+					}
+				);
 			}
 		}
 		// phpcs:enable
@@ -462,24 +485,28 @@ public function sanitize_currency_setting( $value ) {
 		$result         = $refund_service->process_refund( $transaction_id );
 
 		if ( is_wp_error( $result ) ) {
-			wp_safe_redirect( add_query_arg(
-				array(
-					'page'               => 'gatewaykit-transactions',
-					'gatewaykit_notice'  => 'refund_failed',
-					'gatewaykit_message' => rawurlencode( $result->get_error_message() ),
-				),
-				admin_url( 'admin.php' )
-			) );
+			wp_safe_redirect(
+				add_query_arg(
+					array(
+						'page'               => 'gatewaykit-transactions',
+						'gatewaykit_notice'  => 'refund_failed',
+						'gatewaykit_message' => rawurlencode( $result->get_error_message() ),
+					),
+					admin_url( 'admin.php' )
+				)
+			);
 			exit;
 		}
 
-		wp_safe_redirect( add_query_arg(
-			array(
-				'page'              => 'gatewaykit-transactions',
-				'gatewaykit_notice' => 'refund_success',
-			),
-			admin_url( 'admin.php' )
-		) );
+		wp_safe_redirect(
+			add_query_arg(
+				array(
+					'page'              => 'gatewaykit-transactions',
+					'gatewaykit_notice' => 'refund_success',
+				),
+				admin_url( 'admin.php' )
+			)
+		);
 		exit;
 	}
 
@@ -493,64 +520,32 @@ public function sanitize_currency_setting( $value ) {
 
 		// Use minified assets in production, full assets in debug mode
 		$suffix = defined( 'WP_DEBUG' ) && WP_DEBUG ? '' : '.min';
-		
+
 		// Enqueue required styles
 		wp_enqueue_style( 'gatewaykit-admin-styles', GATEWAYKIT_PLUGIN_URL . 'assets/css/admin' . $suffix . '.css', array(), GATEWAYKIT_VERSION );
 		wp_enqueue_style( 'gatewaykit-validation-states', GATEWAYKIT_PLUGIN_URL . 'assets/css/validation-states.css', array( 'gatewaykit-admin-styles' ), GATEWAYKIT_VERSION );
 
 		// Create dashboard widgets instance
 		$dashboard_widgets = new GatewayKit_Dashboard_Widgets();
+		$brand_name        = apply_filters( 'gatewaykit_brand', __( 'GatewayKit', 'gatewaykit' ) );
 
 		?>
 		<div class="wrap">
-			<h1><?php esc_html_e( 'GatewayKit Dashboard', 'gatewaykit' ); ?></h1>
+			<h1><?php /* translators: %s: Brand name. */ printf( esc_html__( '%s Dashboard', 'gatewaykit' ), esc_html( $brand_name ) ); ?></h1>
 
 			<div class="gatewaykit-dashboard-container">
-				<!-- Main Dashboard Content -->
-				<div class="gatewaykit-dashboard-main">
-					<!-- Dashboard Header -->
-					<div class="gatewaykit-dashboard-header">
-						<h2><?php esc_html_e( 'Payment Overview', 'gatewaykit' ); ?></h2>
-						<p><?php esc_html_e( 'Statistics and details of your GatewayKit payments', 'gatewaykit' ); ?></p>
-					</div>
-
-					<!-- Payment Overview Widget -->
-					<div class="gatewaykit-dashboard-widget">
-						<div class="gatewaykit-widget-header">
-							<h2><?php esc_html_e( 'Payment Overview', 'gatewaykit' ); ?></h2>
-						</div>
-						<div class="gatewaykit-widget-content">
-							<?php $dashboard_widgets->payment_overview_widget(); ?>
-						</div>
-					</div>
-
-					<!-- Recent Transactions Widget -->
-					<div class="gatewaykit-dashboard-widget">
-						<div class="gatewaykit-widget-header">
-							<h2><?php esc_html_e( 'Recent Transactions', 'gatewaykit' ); ?></h2>
-						</div>
-						<div class="gatewaykit-widget-content">
-							<?php $dashboard_widgets->recent_transactions_widget(); ?>
-						</div>
-					</div>
-
-					<!-- Gateway Performance Widget -->
-					<div class="gatewaykit-dashboard-widget">
-						<div class="gatewaykit-widget-header">
-							<h2><?php esc_html_e( 'Gateway Performance', 'gatewaykit' ); ?></h2>
-						</div>
-						<div class="gatewaykit-widget-content">
-							<?php $dashboard_widgets->gateway_performance_widget(); ?>
-						</div>
-					</div>
-
-					<!-- Quick Actions -->
+					<!-- Quick Actions (full width, top) -->
 					<div class="gatewaykit-dashboard-widget">
 						<div class="gatewaykit-widget-header">
 							<h2><?php esc_html_e( 'Quick Actions', 'gatewaykit' ); ?></h2>
 						</div>
 						<div class="gatewaykit-widget-content">
 							<div class="gatewaykit-quick-actions">
+								<?php if ( gatewaykit_is_pro_licensed() ) : ?>
+									<a href="<?php echo esc_url( admin_url( 'admin.php?page=gatewaykit-analytics' ) ); ?>" class="button button-primary">
+										<?php esc_html_e( 'View Analytics', 'gatewaykit' ); ?>
+									</a>
+								<?php endif; ?>
 								<a href="<?php echo esc_url( admin_url( 'admin.php?page=gatewaykit-transactions' ) ); ?>" class="button button-primary">
 									<?php esc_html_e( 'View All Transactions', 'gatewaykit' ); ?>
 								</a>
@@ -566,7 +561,39 @@ public function sanitize_currency_setting( $value ) {
 							</div>
 						</div>
 					</div>
-				</div>
+
+					<!-- Two-column grid for remaining widgets -->
+					<div class="gatewaykit-dashboard-grid">
+						<!-- Payment Overview Widget -->
+						<div class="gatewaykit-dashboard-widget">
+							<div class="gatewaykit-widget-header">
+								<h2><?php esc_html_e( 'Payment Overview', 'gatewaykit' ); ?></h2>
+							</div>
+							<div class="gatewaykit-widget-content">
+								<?php $dashboard_widgets->payment_overview_widget(); ?>
+							</div>
+						</div>
+
+						<!-- Recent Transactions Widget -->
+						<div class="gatewaykit-dashboard-widget">
+							<div class="gatewaykit-widget-header">
+								<h2><?php esc_html_e( 'Recent Transactions', 'gatewaykit' ); ?></h2>
+							</div>
+							<div class="gatewaykit-widget-content">
+								<?php $dashboard_widgets->recent_transactions_widget(); ?>
+							</div>
+						</div>
+
+						<!-- Gateway Performance Widget -->
+						<div class="gatewaykit-dashboard-widget">
+							<div class="gatewaykit-widget-header">
+								<h2><?php esc_html_e( 'Gateway Performance', 'gatewaykit' ); ?></h2>
+							</div>
+							<div class="gatewaykit-widget-content">
+								<?php $dashboard_widgets->gateway_performance_widget(); ?>
+							</div>
+						</div>
+					</div>
 			</div>
 		</div>
 		<?php
@@ -607,9 +634,10 @@ public function sanitize_currency_setting( $value ) {
 				echo '<div class="notice notice-error is-dismissible"><p>' . esc_html__( 'Form validation error. Please refresh the page and try again.', 'gatewaykit' ) . '</p></div>';
 		}
 
+		$brand_name = apply_filters( 'gatewaykit_brand', __( 'GatewayKit', 'gatewaykit' ) );
 		?>
 		<div class="wrap">
-			<h1><?php esc_html_e( 'GatewayKit Settings', 'gatewaykit' ); ?></h1>
+			<h1><?php /* translators: %s: Brand name. */ printf( esc_html__( '%s Settings', 'gatewaykit' ), esc_html( $brand_name ) ); ?></h1>
 			
 			<div class="gatewaykit-settings-header">
 				<p class="gatewaykit-settings-description"><?php esc_html_e( 'Configure your payment gateways and general settings.', 'gatewaykit' ); ?></p>
@@ -618,21 +646,32 @@ public function sanitize_currency_setting( $value ) {
 				</a>
 			</div>
 
+			<?php
+			$active_tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'general'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+			// The White Label tab renders its OWN options.php form, so it must
+			// stay OUTSIDE the main settings form. Nested forms are invalid
+			// HTML — the browser folds the inner fields into the outer form,
+			// whose handler never saves gatewaykit_whitelabel_* options
+			// (ERR-041). The hidden `tab` field lets save_settings() know which
+			// tab was submitted (ERR-043).
+			if ( 'whitelabel' !== $active_tab ) :
+				?>
 			<form method="post" action="">
 				<?php wp_nonce_field( 'gatewaykit_settings_save', 'gatewaykit_settings_nonce' ); ?>
+				<input type="hidden" name="tab" value="<?php echo esc_attr( $active_tab ); ?>" />
 
 			<div class="gatewaykit-settings-container">
 				<?php $this->render_settings_tabs(); ?>
 			</div>
 
-			<?php
-			// Hide the main submit button when on the WL tab (it has its own form).
-			$active_tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'general'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			if ( 'whitelabel' !== $active_tab ) :
-			?>
 				<?php submit_button( __( 'Save Settings', 'gatewaykit' ) ); ?>
+			</form>
+			<?php else : ?>
+			<div class="gatewaykit-settings-container">
+				<?php $this->render_settings_tabs(); ?>
+			</div>
 			<?php endif; ?>
-		</form>
 		</div>
 		<?php
 	}
@@ -643,12 +682,20 @@ public function sanitize_currency_setting( $value ) {
 	private function render_settings_tabs() {
 		$active_tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'general'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-		// Check if WL section is unlocked via magic link.
+		// Check if the White Label class is available (the separate "White Label"
+		// menu item handles discovery — the tab should always be accessible).
+		$wl_available = class_exists( 'GatewayKit_WhiteLabel' );
+
+		// WL mode status + magic-link unlock state.
+		$wl_enabled  = false;
 		$wl_unlocked = false;
-		if ( class_exists( 'GatewayKit_WhiteLabel' ) ) {
+		if ( $wl_available ) {
+			$wl_enabled  = GatewayKit_WhiteLabel::get_instance()->is_enabled();
 			$user_id     = get_current_user_id();
 			$wl_unlocked = (bool) get_transient( 'gatewaykit_wl_unlocked_' . $user_id );
 		}
+		// Settings are editable when WL is OFF (first-time config) OR when unlocked via magic link.
+		$wl_can_edit = $wl_available && ( ! $wl_enabled || $wl_unlocked );
 		?>
 		<div class="gatewaykit-settings-tabs">
 			<nav class="gatewaykit-settings-tabs-nav">
@@ -661,14 +708,19 @@ public function sanitize_currency_setting( $value ) {
 				<a href="?page=<?php echo esc_attr( self::PAGE_SLUG ); ?>&tab=gateways" class="gatewaykit-settings-tab-link <?php echo $active_tab === 'gateways' ? 'active' : ''; ?>">
 					<?php esc_html_e( 'Gateway Settings', 'gatewaykit' ); ?>
 				</a>
-				<a href="?page=<?php echo esc_attr( self::PAGE_SLUG ); ?>&tab=tools" class="gatewaykit-settings-tab-link <?php echo $active_tab === 'tools' ? 'active' : ''; ?>">
-					<?php esc_html_e( 'Tools', 'gatewaykit' ); ?>
-				</a>
-				<?php if ( $wl_unlocked ) : ?>
-					<a href="?page=<?php echo esc_attr( self::PAGE_SLUG ); ?>&tab=whitelabel" class="gatewaykit-settings-tab-link <?php echo $active_tab === 'whitelabel' ? 'active' : ''; ?>">
-						<?php esc_html_e( 'White Label', 'gatewaykit' ); ?>
+				<?php if ( defined( 'GATEWAYKIT_PRO_VERSION' ) ) : ?>
+					<a href="?page=<?php echo esc_attr( self::PAGE_SLUG ); ?>&tab=webhooks" class="gatewaykit-settings-tab-link <?php echo $active_tab === 'webhooks' ? 'active' : ''; ?>">
+						<?php esc_html_e( 'Webhooks', 'gatewaykit' ); ?>
 					</a>
 				<?php endif; ?>
+				<a href="?page=<?php echo esc_attr( self::PAGE_SLUG ); ?>&tab=tools" class="gatewaykit-settings-tab-link <?php echo $active_tab === 'tools' ? 'active' : ''; ?>">
+					<?php esc_html_e( 'Database', 'gatewaykit' ); ?>
+				</a>
+			<?php if ( $wl_available && $wl_can_edit ) : ?>
+				<a href="?page=<?php echo esc_attr( self::PAGE_SLUG ); ?>&tab=whitelabel" class="gatewaykit-settings-tab-link <?php echo $active_tab === 'whitelabel' ? 'active' : ''; ?>">
+					<?php esc_html_e( 'White Label', 'gatewaykit' ); ?>
+				</a>
+			<?php endif; ?>
 			</nav>
 
 			<div class="gatewaykit-settings-tabs-content">
@@ -678,8 +730,17 @@ public function sanitize_currency_setting( $value ) {
 					<?php $this->render_email_settings(); ?>
 				<?php elseif ( $active_tab === 'tools' ) : ?>
 					<?php $this->render_database_tools(); ?>
-				<?php elseif ( $active_tab === 'whitelabel' && $wl_unlocked ) : ?>
-					<?php $this->render_whitelabel_settings(); ?>
+				<?php elseif ( $active_tab === 'webhooks' && defined( 'GATEWAYKIT_PRO_VERSION' ) ) : ?>
+					<?php $this->render_webhooks_settings(); ?>
+				<?php elseif ( $active_tab === 'whitelabel' && $wl_available ) : ?>
+					<?php if ( $wl_can_edit ) : ?>
+						<?php $this->render_whitelabel_settings(); ?>
+					<?php else : ?>
+						<div class="gatewaykit-settings-section">
+							<h2><?php esc_html_e( 'White Label', 'gatewaykit' ); ?></h2>
+							<p><?php esc_html_e( 'White Label mode is active, so these settings are hidden. Use the magic link sent to your email to re-access them temporarily.', 'gatewaykit' ); ?></p>
+						</div>
+					<?php endif; ?>
 				<?php else : ?>
 					<?php $this->render_gateway_settings(); ?>
 				<?php endif; ?>
@@ -701,9 +762,9 @@ public function sanitize_currency_setting( $value ) {
 					<th scope="row"><?php esc_html_e( 'Currency', 'gatewaykit' ); ?></th>
 					<td>
 						<?php
-						$gm                = GatewayKit_Gateway_Manager::get_instance();
-						$currencies        = $gm->get_available_currencies();
-						$default_currency  = $gm->get_default_currency();
+						$gm               = GatewayKit_Gateway_Manager::get_instance();
+						$currencies       = $gm->get_available_currencies();
+						$default_currency = $gm->get_default_currency();
 						$current_currency = strtoupper( get_option( 'gatewaykit_currency', $default_currency ) );
 						?>
 						<select name="gatewaykit_currency">
@@ -779,65 +840,66 @@ public function sanitize_currency_setting( $value ) {
 		</table>
 		</div>
 		<?php
-		// Webhook settings (Pro only).
-		if ( defined( 'GATEWAYKIT_PRO_VERSION' ) ) {
-			$webhook_events = get_option( 'gatewaykit_webhook_events', array() );
-			?>
-			<div class="gatewaykit-settings-section" style="margin-top: 20px;">
-				<h2><?php esc_html_e( 'Outgoing Webhooks (Pro)', 'gatewaykit' ); ?></h2>
-				<p class="description"><?php esc_html_e( 'Send payment events to Zapier, Make, N8N, or any webhook receiver.', 'gatewaykit' ); ?></p>
-				<table class="form-table">
-					<tr>
-						<th scope="row"><?php esc_html_e( 'Webhook URLs', 'gatewaykit' ); ?></th>
-						<td>
-							<textarea name="gatewaykit_webhook_urls" rows="4" cols="60" class="large-text"><?php echo esc_textarea( get_option( 'gatewaykit_webhook_urls', '' ) ); ?></textarea>
-							<p class="description"><?php esc_html_e( 'One URL per line. Each enabled event will POST a JSON payload to all URLs.', 'gatewaykit' ); ?></p>
-						</td>
-					</tr>
-					<tr>
-						<th scope="row"><?php esc_html_e( 'Events', 'gatewaykit' ); ?></th>
-						<td>
-							<label>
-								<input type="checkbox" name="gatewaykit_webhook_events[]" value="payment_completed" <?php checked( in_array( 'payment_completed', $webhook_events, true ) ); ?> />
-								<?php esc_html_e( 'Payment Completed', 'gatewaykit' ); ?>
-							</label><br/>
-							<label>
-								<input type="checkbox" name="gatewaykit_webhook_events[]" value="payment_failed" <?php checked( in_array( 'payment_failed', $webhook_events, true ) ); ?> />
-								<?php esc_html_e( 'Payment Failed', 'gatewaykit' ); ?>
-							</label>
-							<p class="description"><?php esc_html_e( 'Select which events trigger a webhook delivery.', 'gatewaykit' ); ?></p>
-						</td>
-					</tr>
+	}
+
+	/**
+	 * Render outgoing webhooks settings (Pro only).
+	 */
+	private function render_webhooks_settings() {
+		$webhook_events = get_option( 'gatewaykit_webhook_events', array() );
+		?>
+		<div class="gatewaykit-settings-section">
+			<h2><?php esc_html_e( 'Outgoing Webhooks', 'gatewaykit' ); ?></h2>
+			<p class="description"><?php esc_html_e( 'Send payment events to Zapier, Make, N8N, or any webhook receiver.', 'gatewaykit' ); ?></p>
+			<table class="form-table">
+				<tr>
+					<th scope="row"><?php esc_html_e( 'Webhook URLs', 'gatewaykit' ); ?></th>
+					<td>
+						<textarea name="gatewaykit_webhook_urls" rows="4" cols="60" class="large-text"><?php echo esc_textarea( get_option( 'gatewaykit_webhook_urls', '' ) ); ?></textarea>
+						<p class="description"><?php esc_html_e( 'One URL per line. Each enabled event will POST a JSON payload to all URLs.', 'gatewaykit' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><?php esc_html_e( 'Events', 'gatewaykit' ); ?></th>
+					<td>
+						<label>
+							<input type="checkbox" name="gatewaykit_webhook_events[]" value="payment_completed" <?php checked( in_array( 'payment_completed', $webhook_events, true ) ); ?> />
+							<?php esc_html_e( 'Payment Completed', 'gatewaykit' ); ?>
+						</label><br/>
+						<label>
+							<input type="checkbox" name="gatewaykit_webhook_events[]" value="payment_failed" <?php checked( in_array( 'payment_failed', $webhook_events, true ) ); ?> />
+							<?php esc_html_e( 'Payment Failed', 'gatewaykit' ); ?>
+						</label>
+						<p class="description"><?php esc_html_e( 'Select which events trigger a webhook delivery.', 'gatewaykit' ); ?></p>
+					</td>
+				</tr>
 					<tr>
 						<th scope="row"><?php esc_html_e( 'Secret Key', 'gatewaykit' ); ?></th>
 						<td>
-							<input type="password" name="gatewaykit_webhook_secret" value="<?php echo esc_attr( get_option( 'gatewaykit_webhook_secret', '' ) ); ?>" class="regular-text" />
-							<p class="description"><?php esc_html_e( 'Optional. When set, each delivery includes an X-GatewayKit-Signature header (HMAC-SHA256) for verification.', 'gatewaykit' ); ?></p>
+							<input type="password" name="gatewaykit_webhook_secret" value="" class="regular-text" placeholder="<?php esc_attr_e( 'Leave blank to keep the current secret', 'gatewaykit' ); ?>" autocomplete="new-password" />
+							<p class="description"><?php esc_html_e( 'Optional. When set, each delivery includes an X-GatewayKit-Signature header (HMAC-SHA256) for verification. The stored secret is never shown; leave blank to keep the existing one.', 'gatewaykit' ); ?></p>
 						</td>
 					</tr>
-					<tr>
-						<th scope="row"><?php esc_html_e( 'Test Webhook', 'gatewaykit' ); ?></th>
-						<td>
-							<button type="button" class="button button-secondary gatewaykit-test-webhook">
-								<?php esc_html_e( 'Send Test', 'gatewaykit' ); ?>
-							</button>
-							<span class="description"><?php esc_html_e( 'Send a test payload to all configured URLs to verify your setup.', 'gatewaykit' ); ?></span>
-							<div class="gatewaykit-test-webhook-result" style="display:none; margin-top:10px;"></div>
-						</td>
-					</tr>
-				</table>
-			</div>
-			<?php
-		}
-
-
-		}
+				<tr>
+					<th scope="row"><?php esc_html_e( 'Test Webhook', 'gatewaykit' ); ?></th>
+					<td>
+						<button type="button" class="button button-secondary gatewaykit-test-webhook">
+							<?php esc_html_e( 'Send Test', 'gatewaykit' ); ?>
+						</button>
+						<span class="description"><?php esc_html_e( 'Send a test payload to all configured URLs to verify your setup.', 'gatewaykit' ); ?></span>
+						<div class="gatewaykit-test-webhook-result" style="display:none; margin-top:10px;"></div>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<?php
+	}
 
 		/**
 		 * Render email settings
 		 */
-		private function render_email_settings() {
-			?>
+	private function render_email_settings() {
+		?>
 			<div class="gatewaykit-settings-section">
 				<h2><?php esc_html_e( 'Customer Email Receipt', 'gatewaykit' ); ?></h2>
 				<p class="description"><?php esc_html_e( 'Default settings for customer payment receipt emails. Per-form toggles are in the Elementor form action settings.', 'gatewaykit' ); ?></p>
@@ -868,7 +930,7 @@ public function sanitize_currency_setting( $value ) {
 						<td>
 							<label>
 								<input type="checkbox" name="gatewaykit_receipt_email_attach_pdf" value="1" <?php checked( get_option( 'gatewaykit_receipt_email_attach_pdf', '1' ), '1' ); ?> />
-								<?php esc_html_e( 'Attach a PDF receipt to the confirmation email.', 'gatewaykit' ); ?>
+							<?php esc_html_e( 'Attach a PDF receipt to the confirmation email.', 'gatewaykit' ); ?>
 							</label>
 							<p class="description"><?php esc_html_e( 'When enabled, a professionally formatted PDF receipt will be generated and attached to the customer receipt email.', 'gatewaykit' ); ?></p>
 						</td>
@@ -876,7 +938,7 @@ public function sanitize_currency_setting( $value ) {
 				</table>
 			</div>
 			<?php
-		}
+	}
 
 		/**
 		 * Render white-label settings (only reachable via magic link).
@@ -894,6 +956,7 @@ public function sanitize_currency_setting( $value ) {
 
 			<form method="post" action="options.php">
 				<?php settings_fields( 'gatewaykit_whitelabel' ); ?>
+				<input type="hidden" name="gatewaykit_whitelabel_secret" value="<?php echo esc_attr( $secret ); ?>" />
 				<table class="form-table">
 					<tr>
 						<th scope="row"><?php esc_html_e( 'Enable White Label', 'gatewaykit' ); ?></th>
@@ -923,7 +986,7 @@ public function sanitize_currency_setting( $value ) {
 							<p class="description"><?php esc_html_e( 'Bookmark this link or click "Email me the link" to re-access White Label settings after this tab hides.', 'gatewaykit' ); ?></p>
 							<button type="button" class="button" id="gatewaykit-wl-copy-url"><?php esc_html_e( 'Copy Link', 'gatewaykit' ); ?></button>
 							<?php
-							$user_id = get_current_user_id();
+							$user_id  = get_current_user_id();
 							$mail_url = wp_nonce_url(
 								add_query_arg( array( 'gatewaykit_wl_email' => '1' ), admin_url( 'admin.php?page=gatewaykit-settings&tab=whitelabel' ) ),
 								'gatewaykit_wl_email_nonce'
@@ -1172,11 +1235,6 @@ public function sanitize_currency_setting( $value ) {
 			'gatewaykit_trusted_proxies',
 		);
 
-		// Webhook settings (Pro only).
-		if ( defined( 'GATEWAYKIT_PRO_VERSION' ) ) {
-			$general_settings[] = 'gatewaykit_webhook_secret';
-		}
-
 		// Email receipt settings.
 		$general_settings[] = 'gatewaykit_receipt_email_from_name';
 		$general_settings[] = 'gatewaykit_receipt_email_from_address';
@@ -1208,20 +1266,27 @@ public function sanitize_currency_setting( $value ) {
 			}
 		}
 
-		// Webhook settings — textarea and checkbox array (Pro only).
-		if ( defined( 'GATEWAYKIT_PRO_VERSION' ) ) {
+		// Webhook settings — textarea, checkbox array, and secret (Pro only).
+		// Scoped to the Webhooks tab: the hidden `tab` input guarantees that
+		// saving any OTHER tab can never wipe configured webhook events or
+		// touch the secret (ERR-043).
+		if ( defined( 'GATEWAYKIT_PRO_VERSION' ) && 'webhooks' === $active_tab ) {
 			if ( isset( $_POST['gatewaykit_webhook_urls'] ) ) {
-				$raw_urls     = wp_unslash( $_POST['gatewaykit_webhook_urls'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitized immediately below
+				$raw_urls       = wp_unslash( $_POST['gatewaykit_webhook_urls'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitized immediately below
 				$sanitized_urls = $this->sanitize_webhook_urls( $raw_urls );
 				update_option( 'gatewaykit_webhook_urls', $sanitized_urls );
 			}
 			if ( isset( $_POST['gatewaykit_webhook_events'] ) && is_array( $_POST['gatewaykit_webhook_events'] ) ) {
-				$raw_events     = wp_unslash( $_POST['gatewaykit_webhook_events'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitized immediately below
+				$raw_events       = wp_unslash( $_POST['gatewaykit_webhook_events'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitized immediately below
 				$sanitized_events = $this->sanitize_webhook_events( $raw_events );
 				update_option( 'gatewaykit_webhook_events', $sanitized_events );
-			} elseif ( isset( $_POST['gatewaykit_webhook_events'] ) || isset( $_POST['submit'] ) ) {
-				// Webhook events section was submitted (even if all checkboxes unchecked).
+			} elseif ( isset( $_POST['submit'] ) ) {
+				// Webhook events section was submitted with all checkboxes unchecked.
 				update_option( 'gatewaykit_webhook_events', array() );
+			}
+			// Only overwrite the secret when a non-empty replacement is provided.
+			if ( isset( $_POST['gatewaykit_webhook_secret'] ) && '' !== trim( wp_unslash( $_POST['gatewaykit_webhook_secret'] ) ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitized immediately below
+				update_option( 'gatewaykit_webhook_secret', sanitize_text_field( wp_unslash( $_POST['gatewaykit_webhook_secret'] ) ) );
 			}
 		}
 
@@ -1250,10 +1315,9 @@ public function sanitize_currency_setting( $value ) {
 			}
 		}
 
-
 		// Save enabled gateways with validation
 		if ( isset( $_POST['gatewaykit_gateway_enabled'] ) ) {
-			$enabled_raw      = wp_unslash( $_POST['gatewaykit_gateway_enabled'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- array of gateway enable flags; each key sanitized in the loop below
+			$enabled_raw       = wp_unslash( $_POST['gatewaykit_gateway_enabled'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- array of gateway enable flags; each key sanitized in the loop below
 			$enabled_gateways  = array();
 			$validation_errors = array();
 
@@ -1262,10 +1326,10 @@ public function sanitize_currency_setting( $value ) {
 				if ( '1' === (string) $enabled ) {
 					// Validate gateway settings before enabling
 					$gateway = $gateway_manager->get_gateway( $gateway_id );
-				if ( $gateway && ! $gateway->is_available() ) {
-					$validation_errors[] = sprintf(
+					if ( $gateway && ! $gateway->is_available() ) {
+						$validation_errors[] = sprintf(
 						/* translators: %s: gateway name */
-						__( 'Gateway "%s" cannot be enabled because its settings are incomplete. Please enter the required settings first.', 'gatewaykit' ),
+							__( 'Gateway "%s" cannot be enabled because its settings are incomplete. Please enter the required settings first.', 'gatewaykit' ),
 							$gateway->get_gateway_name()
 						);
 					} else {
@@ -1312,49 +1376,36 @@ public function sanitize_currency_setting( $value ) {
 			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'gatewaykit' ) );
 		}
 
-		$current_user = wp_get_current_user();
 		?>
 		<div class="wrap">
 			<h1 class="wp-heading-inline"><?php esc_html_e( 'Payment Transactions', 'gatewaykit' ); ?></h1>
 
-			<div class="gatewaykit-page-header">
-				<div class="gatewaykit-page-header-left">
-					<p class="gatewaykit-page-description"><?php esc_html_e( 'View and manage all payment transactions.', 'gatewaykit' ); ?></p>
-				</div>
-				<div class="gatewaykit-page-header-right">
-					<span class="gatewaykit-current-user">
-						<?php echo get_avatar( $current_user->ID, 32 ); ?>
-						<span class="gatewaykit-user-name"><?php echo esc_html( $current_user->display_name ); ?></span>
-					</span>
-				</div>
-			</div>
-
 			<?php
-		$transaction_table = new GatewayKit_Transaction_List_Table();
-		$transaction_table->prepare_items();
+			$transaction_table = new GatewayKit_Transaction_List_Table();
+			$transaction_table->prepare_items();
 
-		// CSV export is a Pro-only feature. When unlicensed we render the
-		// button disabled with an inline upgrade hint so the entry point
-		// stays visible (discoverable upsell) without ever executing the
-		// export. The export endpoint itself is also gated (defense in
-		// depth) in handle_transaction_exports().
-		$can_export = gatewaykit_is_pro_licensed();
-		$upgrade_url = gatewaykit_get_upgrade_url();
+			// CSV export is a Pro-only feature. When unlicensed we render the
+			// button disabled with an inline upgrade hint so the entry point
+			// stays visible (discoverable upsell) without ever executing the
+			// export. The export endpoint itself is also gated (defense in
+			// depth) in handle_transaction_exports().
+			$can_export  = gatewaykit_is_pro_licensed();
+			$upgrade_url = gatewaykit_get_upgrade_url();
 
-		// Read filter context from GET so hidden export fields carry the
-		// currently-active filters. These are also used by the filter form
-		// further down. Protected by the manage_options capability check
-		// (standard WP pattern, no nonce for filtering).
+			// Read filter context from GET so hidden export fields carry the
+			// currently-active filters. These are also used by the filter form
+			// further down. Protected by the manage_options capability check
+			// (standard WP pattern, no nonce for filtering).
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended
-		$cur_orderby   = isset( $_GET['orderby'] ) ? sanitize_key( wp_unslash( $_GET['orderby'] ) ) : '';
-		$cur_order     = isset( $_GET['order'] ) ? sanitize_key( wp_unslash( $_GET['order'] ) ) : '';
-		$cur_status    = isset( $_GET['status'] ) ? sanitize_key( wp_unslash( $_GET['status'] ) ) : '';
-		$cur_gateway   = isset( $_GET['gateway'] ) ? sanitize_key( wp_unslash( $_GET['gateway'] ) ) : '';
-		$cur_date_from = isset( $_GET['date_from'] ) ? sanitize_text_field( wp_unslash( $_GET['date_from'] ) ) : '';
-		$cur_date_to   = isset( $_GET['date_to'] ) ? sanitize_text_field( wp_unslash( $_GET['date_to'] ) ) : '';
-		$cur_search    = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
+			$cur_orderby   = isset( $_GET['orderby'] ) ? sanitize_key( wp_unslash( $_GET['orderby'] ) ) : '';
+			$cur_order     = isset( $_GET['order'] ) ? sanitize_key( wp_unslash( $_GET['order'] ) ) : '';
+			$cur_status    = isset( $_GET['status'] ) ? sanitize_key( wp_unslash( $_GET['status'] ) ) : '';
+			$cur_gateway   = isset( $_GET['gateway'] ) ? sanitize_key( wp_unslash( $_GET['gateway'] ) ) : '';
+			$cur_date_from = isset( $_GET['date_from'] ) ? sanitize_text_field( wp_unslash( $_GET['date_from'] ) ) : '';
+			$cur_date_to   = isset( $_GET['date_to'] ) ? sanitize_text_field( wp_unslash( $_GET['date_to'] ) ) : '';
+			$cur_search    = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
 		// phpcs:enable
-		?>
+			?>
 
 			<?php if ( $can_export ) : ?>
 				<!-- Export All Transactions Form (Pro) -->
@@ -1482,9 +1533,8 @@ public function sanitize_currency_setting( $value ) {
 				<div class="gatewaykit-modal-body">
 					<div id="gatewaykit-notes-content">
 						<p><?php esc_html_e( 'Loading...', 'gatewaykit' ); ?></p>
+						</div>
 					</div>
-				</div>
-				</div>
 			</div>
 		</div>
 		<?php
@@ -1788,9 +1838,6 @@ public function sanitize_currency_setting( $value ) {
 
 
 	/**
-	 * Enqueue scripts and styles
-	 */
-	/**
 	 * AJAX handler to get form data for a transaction
 	 */
 	public function ajax_get_form_data() {
@@ -1825,7 +1872,7 @@ public function sanitize_currency_setting( $value ) {
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- admin AJAX; real-time single-record lookup by PK
 		$transaction = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT id, user_id, form_id, post_id, gateway, authority, ref_id, amount, discount_id, discount_amount, currency, description, status, gateway_response, form_data, user_data, callback_url, success_url, failure_url, receipt_token, receipt_token_created_at, ip_address, user_agent, created_at, updated_at, completed_at FROM %i WHERE id = %d",
+				'SELECT id, user_id, form_id, post_id, gateway, authority, ref_id, amount, discount_id, discount_amount, currency, description, status, gateway_response, form_data, user_data, callback_url, success_url, failure_url, receipt_token, receipt_token_created_at, ip_address, user_agent, created_at, updated_at, completed_at FROM %i WHERE id = %d',
 				$table_name,
 				$transaction_id
 			)
@@ -1897,8 +1944,8 @@ public function sanitize_currency_setting( $value ) {
 	}
 
 	/**
-		* AJAX handler to get error details for a transaction
-		*/
+	 * AJAX handler to get error details for a transaction
+	 */
 	public function ajax_get_error_details() {
 		// Rate limiting check
 		$rate_limiter = GatewayKit_Rate_Limiter::get_instance();
@@ -1940,14 +1987,14 @@ public function sanitize_currency_setting( $value ) {
 
 		// Format error type label
 		$error_type_labels = array(
-			'license'     => __( 'License Error', 'gatewaykit' ),
-			'gateway'     => __( 'Gateway Error', 'gatewaykit' ),
+			'license'       => __( 'License Error', 'gatewaykit' ),
+			'gateway'       => __( 'Gateway Error', 'gatewaykit' ),
 			'configuration' => __( 'Configuration Error', 'gatewaykit' ),
-			'network'     => __( 'Network Error', 'gatewaykit' ),
-			'validation'  => __( 'Validation Error', 'gatewaykit' ),
-			'unknown'     => __( 'Unknown Error', 'gatewaykit' ),
+			'network'       => __( 'Network Error', 'gatewaykit' ),
+			'validation'    => __( 'Validation Error', 'gatewaykit' ),
+			'unknown'       => __( 'Unknown Error', 'gatewaykit' ),
 		);
-		$error_type_label = isset( $error_type_labels[ $error_type ] ) ? $error_type_labels[ $error_type ] : ucfirst( $error_type ?: 'unknown' );
+		$error_type_label  = isset( $error_type_labels[ $error_type ] ) ? $error_type_labels[ $error_type ] : ucfirst( $error_type ?: 'unknown' );
 
 		// Format timestamp
 		$formatted_timestamp = '';
@@ -1957,12 +2004,12 @@ public function sanitize_currency_setting( $value ) {
 
 		// Prepare response
 		$response = array(
-			'error_message'   => $error_message ?: __( 'No error message available', 'gatewaykit' ),
-			'error_code'      => $error_code ?: '',
-			'error_type'      => $error_type ?: 'unknown',
+			'error_message'    => $error_message ?: __( 'No error message available', 'gatewaykit' ),
+			'error_code'       => $error_code ?: '',
+			'error_type'       => $error_type ?: 'unknown',
 			'error_type_label' => $error_type_label,
-			'error_details'   => $error_details ?: array(),
-			'error_timestamp' => $formatted_timestamp,
+			'error_details'    => $error_details ?: array(),
+			'error_timestamp'  => $formatted_timestamp,
 		);
 
 		// Send JSON response
@@ -2001,8 +2048,8 @@ public function sanitize_currency_setting( $value ) {
 		}
 
 		// Collect raw (unsaved) settings overrides sent from the admin form.
-		$overrides      = array();
-		$raw_settings   = isset( $_POST['settings'] ) ? wp_unslash( $_POST['settings'] ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- array of settings; each value sanitized in the loop below
+		$overrides    = array();
+		$raw_settings = isset( $_POST['settings'] ) ? wp_unslash( $_POST['settings'] ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- array of settings; each value sanitized in the loop below
 		if ( is_array( $raw_settings ) ) {
 			foreach ( $raw_settings as $key => $value ) {
 				if ( is_string( $value ) ) {
@@ -2067,8 +2114,8 @@ public function sanitize_currency_setting( $value ) {
 			return;
 		}
 
-		$text     = GatewayKit_Log_Formatter::get_instance()->format_for_export( $logs, true );
-		$preview  = GatewayKit_Log_Formatter::get_instance()->format_log_entry( $logs[0] );
+		$text    = GatewayKit_Log_Formatter::get_instance()->format_for_export( $logs, true );
+		$preview = GatewayKit_Log_Formatter::get_instance()->format_log_entry( $logs[0] );
 
 		wp_send_json_success(
 			array(
@@ -2167,21 +2214,21 @@ public function sanitize_currency_setting( $value ) {
 		}
 
 		$payload = array(
-			'event'           => 'webhook_test',
-			'transaction_id'  => 0,
-			'status'          => 'test',
-			'amount'          => 0.0,
-			'currency'        => 'USD',
-			'gateway'         => 'test',
-			'description'     => __( 'This is a test webhook delivery from GatewayKit.', 'gatewaykit' ),
-			'receipt_token'   => '',
-			'created_at'      => current_time( 'mysql' ),
-			'completed_at'    => current_time( 'mysql' ),
-			'customer'        => array(
+			'event'          => 'webhook_test',
+			'transaction_id' => 0,
+			'status'         => 'test',
+			'amount'         => 0.0,
+			'currency'       => 'USD',
+			'gateway'        => 'test',
+			'description'    => __( 'This is a test webhook delivery from GatewayKit.', 'gatewaykit' ),
+			'receipt_token'  => '',
+			'created_at'     => current_time( 'mysql' ),
+			'completed_at'   => current_time( 'mysql' ),
+			'customer'       => array(
 				'email' => 'test@example.com',
 				'name'  => 'Test User',
 			),
-			'test'            => true,
+			'test'           => true,
 		);
 
 		/**
@@ -2209,11 +2256,14 @@ public function sanitize_currency_setting( $value ) {
 				$headers['X-GatewayKit-Signature'] = $signature;
 			}
 
-			$response = wp_remote_post( $url, array(
-				'headers' => $headers,
-				'body'    => $body,
-				'timeout' => 15,
-			) );
+			$response = wp_remote_post(
+				$url,
+				array(
+					'headers' => $headers,
+					'body'    => $body,
+					'timeout' => 15,
+				)
+			);
 
 			$status_code = is_wp_error( $response ) ? 0 : wp_remote_retrieve_response_code( $response );
 
@@ -2234,14 +2284,16 @@ public function sanitize_currency_setting( $value ) {
 		}
 
 		if ( $all_success ) {
-			wp_send_json_success( array(
-				'message' => sprintf(
+			wp_send_json_success(
+				array(
+					'message' => sprintf(
 					/* translators: %d: number of URLs */
-					__( 'Test webhook sent successfully to %d URL(s).', 'gatewaykit' ),
-					count( $results )
-				),
-				'results' => $results,
-			) );
+						__( 'Test webhook sent successfully to %d URL(s).', 'gatewaykit' ),
+						count( $results )
+					),
+					'results' => $results,
+				)
+			);
 		} else {
 			$failed = array();
 			foreach ( $results as $r ) {
@@ -2249,14 +2301,16 @@ public function sanitize_currency_setting( $value ) {
 					$failed[] = $r['url'] . ' (' . ( '' !== $r['error'] ? $r['error'] : 'HTTP ' . $r['status_code'] ) . ')';
 				}
 			}
-			wp_send_json_error( array(
-				'message' => sprintf(
+			wp_send_json_error(
+				array(
+					'message' => sprintf(
 					/* translators: %s: list of failed URLs */
-					__( 'Test webhook failed for: %s', 'gatewaykit' ),
-					implode( ', ', $failed )
-				),
-				'results' => $results,
-			) );
+						__( 'Test webhook failed for: %s', 'gatewaykit' ),
+						implode( ', ', $failed )
+					),
+					'results' => $results,
+				)
+			);
 		}
 	}
 
@@ -2298,7 +2352,7 @@ public function sanitize_currency_setting( $value ) {
 
 		// Use minified assets in production, full assets in debug mode
 		$suffix = defined( 'WP_DEBUG' ) && WP_DEBUG ? '' : '.min';
-		
+
 		wp_enqueue_style( 'gatewaykit-admin-styles', GATEWAYKIT_PLUGIN_URL . 'assets/css/admin' . $suffix . '.css', array(), GATEWAYKIT_VERSION );
 		wp_enqueue_style( 'gatewaykit-validation-states', GATEWAYKIT_PLUGIN_URL . 'assets/css/validation-states.css', array( 'gatewaykit-admin-styles' ), GATEWAYKIT_VERSION );
 		wp_enqueue_script( 'gatewaykit-admin-scripts', GATEWAYKIT_PLUGIN_URL . 'assets/js/admin' . $suffix . '.js', array( 'jquery' ), GATEWAYKIT_VERSION, true );
@@ -2319,44 +2373,44 @@ public function sanitize_currency_setting( $value ) {
 			'gatewaykit-admin-scripts',
 			'gatewaykit_admin_vars',
 			array(
-				'confirm_delete'      => __( 'Are you sure you want to delete the selected transactions?', 'gatewaykit' ),
-				'validation_error'    => __( 'Please check the form for errors.', 'gatewaykit' ),
-				'testing'             => __( 'Testing...', 'gatewaykit' ),
-				'test_failed'         => __( 'Test failed', 'gatewaykit' ),
-				'ajax_error'          => __( 'AJAX error occurred', 'gatewaykit' ),
-				'loading'             => __( 'Loading...', 'gatewaykit' ),
-				'transaction_details' => __( 'Transaction Details', 'gatewaykit' ),
-				'id'                  => __( 'ID', 'gatewaykit' ),
-				'amount'              => __( 'Amount', 'gatewaykit' ),
-				'status'              => __( 'Status', 'gatewaykit' ),
-				'date'                => __( 'Date', 'gatewaykit' ),
-				'user_id'             => __( 'User ID', 'gatewaykit' ),
-				'description'         => __( 'Description', 'gatewaykit' ),
-				'form_data'           => __( 'Form Data', 'gatewaykit' ),
-				'field'               => __( 'Field', 'gatewaykit' ),
-				'value'               => __( 'Value', 'gatewaykit' ),
-				'no_form_data'        => __( 'No form data available.', 'gatewaykit' ),
-				'user_data'           => __( 'User Data', 'gatewaykit' ),
-				'error'               => __( 'Error', 'gatewaykit' ),
-				'unknown_error'       => __( 'Unknown error', 'gatewaykit' ),
-				'ajax_error_occurred' => __( 'AJAX error occurred.', 'gatewaykit' ),
-				'default_currency'    => GatewayKit_Gateway_Manager::get_instance()->get_default_currency(),
-				'transaction_url'     => esc_url( admin_url( 'admin.php?page=gatewaykit-transactions&transaction=' ) ),
+				'confirm_delete'       => __( 'Are you sure you want to delete the selected transactions?', 'gatewaykit' ),
+				'validation_error'     => __( 'Please check the form for errors.', 'gatewaykit' ),
+				'testing'              => __( 'Testing...', 'gatewaykit' ),
+				'test_failed'          => __( 'Test failed', 'gatewaykit' ),
+				'ajax_error'           => __( 'AJAX error occurred', 'gatewaykit' ),
+				'loading'              => __( 'Loading...', 'gatewaykit' ),
+				'transaction_details'  => __( 'Transaction Details', 'gatewaykit' ),
+				'id'                   => __( 'ID', 'gatewaykit' ),
+				'amount'               => __( 'Amount', 'gatewaykit' ),
+				'status'               => __( 'Status', 'gatewaykit' ),
+				'date'                 => __( 'Date', 'gatewaykit' ),
+				'user_id'              => __( 'User ID', 'gatewaykit' ),
+				'description'          => __( 'Description', 'gatewaykit' ),
+				'form_data'            => __( 'Form Data', 'gatewaykit' ),
+				'field'                => __( 'Field', 'gatewaykit' ),
+				'value'                => __( 'Value', 'gatewaykit' ),
+				'no_form_data'         => __( 'No form data available.', 'gatewaykit' ),
+				'user_data'            => __( 'User Data', 'gatewaykit' ),
+				'error'                => __( 'Error', 'gatewaykit' ),
+				'unknown_error'        => __( 'Unknown error', 'gatewaykit' ),
+				'ajax_error_occurred'  => __( 'AJAX error occurred.', 'gatewaykit' ),
+				'default_currency'     => GatewayKit_Gateway_Manager::get_instance()->get_default_currency(),
+				'transaction_url'      => esc_url( admin_url( 'admin.php?page=gatewaykit-transactions&transaction=' ) ),
 				'merchant_id_required' => __( 'Merchant ID is required', 'gatewaykit' ),
-				'invalid_api_key'     => __( 'Invalid API key format', 'gatewaykit' ),
-				'enabled'             => __( 'Enabled', 'gatewaykit' ),
-				'disabled'            => __( 'Disabled', 'gatewaykit' ),
-				'copied'              => __( 'Copied!', 'gatewaykit' ),
-				'notes'               => __( 'Notes', 'gatewaykit' ),
-				'no_notes'            => __( 'No notes yet.', 'gatewaykit' ),
+				'invalid_api_key'      => __( 'Invalid API key format', 'gatewaykit' ),
+				'enabled'              => __( 'Enabled', 'gatewaykit' ),
+				'disabled'             => __( 'Disabled', 'gatewaykit' ),
+				'copied'               => __( 'Copied!', 'gatewaykit' ),
+				'notes'                => __( 'Notes', 'gatewaykit' ),
+				'no_notes'             => __( 'No notes yet.', 'gatewaykit' ),
 				'add_note_placeholder' => __( 'Add a note...', 'gatewaykit' ),
-				'save_note'           => __( 'Save Note', 'gatewaykit' ),
-				'saving'              => __( 'Saving...', 'gatewaykit' ),
-				'unknown_user'        => __( 'Unknown', 'gatewaykit' ),
-				'sending_test'        => __( 'Sending...', 'gatewaykit' ),
-				'discount_code'       => __( 'Discount Code', 'gatewaykit' ),
-				'discount_amount'     => __( 'Discount Amount', 'gatewaykit' ),
-				'original_amount'     => __( 'Original Amount', 'gatewaykit' ),
+				'save_note'            => __( 'Save Note', 'gatewaykit' ),
+				'saving'               => __( 'Saving...', 'gatewaykit' ),
+				'unknown_user'         => __( 'Unknown', 'gatewaykit' ),
+				'sending_test'         => __( 'Sending...', 'gatewaykit' ),
+				'discount_code'        => __( 'Discount Code', 'gatewaykit' ),
+				'discount_amount'      => __( 'Discount Amount', 'gatewaykit' ),
+				'original_amount'      => __( 'Original Amount', 'gatewaykit' ),
 			)
 		);
 

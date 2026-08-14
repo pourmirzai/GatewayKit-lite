@@ -69,7 +69,7 @@ class GatewayKit_PayPal_Refund {
 
 		$body = array(
 			'amount' => array(
-				'value'    => number_format( $amount, 2, '.', '' ),
+				'value'         => number_format( $amount, 2, '.', '' ),
 				'currency_code' => strtoupper( $transaction->currency ),
 			),
 		);
@@ -103,8 +103,8 @@ class GatewayKit_PayPal_Refund {
 		}
 
 		return array(
-			'refund_id'       => $data['id'],
-			'amount'          => $amount,
+			'refund_id'        => $data['id'],
+			'amount'           => $amount,
 			'gateway_response' => array(
 				'status' => isset( $data['status'] ) ? $data['status'] : '',
 			),
@@ -159,14 +159,17 @@ class GatewayKit_PayPal_Refund {
 			return $cached;
 		}
 
-		$response = wp_remote_post( $base_url . '/v1/oauth2/token', array(
-			'headers' => array(
-				'Authorization' => 'Basic ' . base64_encode( $client_id . ':' . $client_secret ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
-				'Content-Type'  => 'application/x-www-form-urlencoded',
-			),
-			'body'    => 'grant_type=client_credentials',
-			'timeout' => 20,
-		) );
+		$response = wp_remote_post(
+			$base_url . '/v1/oauth2/token',
+			array(
+				'headers' => array(
+					'Authorization' => 'Basic ' . base64_encode( $client_id . ':' . $client_secret ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
+					'Content-Type'  => 'application/x-www-form-urlencoded',
+				),
+				'body'    => 'grant_type=client_credentials',
+				'timeout' => 20,
+			)
+		);
 
 		if ( is_wp_error( $response ) ) {
 			return new WP_Error( 'auth_failed', $response->get_error_message() );

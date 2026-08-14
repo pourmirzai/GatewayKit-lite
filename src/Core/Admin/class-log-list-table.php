@@ -193,8 +193,8 @@ class GatewayKit_Log_List_Table extends WP_List_Table {
 	 * @return string
 	 */
 	public function column_level( $item ) {
-		$formatter   = GatewayKit_Log_Formatter::get_instance();
-		$entry       = $formatter->format_log_entry( $item );
+		$formatter = GatewayKit_Log_Formatter::get_instance();
+		$entry     = $formatter->format_log_entry( $item );
 
 		return '<span class="gatewaykit-log-level ' . esc_attr( $entry['level_class'] ) . '">' . esc_html( $entry['level'] ) . '</span>';
 	}

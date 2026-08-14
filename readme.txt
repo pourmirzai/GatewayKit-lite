@@ -4,7 +4,7 @@ Tags: elementor, payment, paypal, stripe, mollie
 Requires at least: 6.2
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.3.1
+Stable tag: 1.3.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -17,6 +17,8 @@ Accept payments through Elementor Pro Forms using PayPal, Stripe, Mollie, and mo
 GatewayKit turns any Elementor Pro Form into a payment form. Build custom forms with your own fields, and customers are redirected to a hosted checkout to complete payment — no shopping cart or WooCommerce required.
 
 If you sell a single product, collect donations, or invoice clients, you don't need a full store — you just need a form that takes payment. GatewayKit is designed for single-product sales, donations, invoices, event registrations, and simple payment flows where WooCommerce would be overkill.
+
+**Try the live demo:** See GatewayKit in action on our demo site — [wp-test.pourmirzai.com](https://wp-test.pourmirzai.com/).
 
 **Translations:** GatewayKit is available in English, Spanish, French, German, Brazilian Portuguese, and Arabic.
 
@@ -84,7 +86,7 @@ All nine payment gateways are included in the free plugin: PayPal, Stripe, Molli
 
 = Are payment credentials stored securely? =
 
-Yes. All API keys and secrets are encrypted at rest (AES-256-CBC) and decrypted only in memory when a payment is processed. Logs automatically redact sensitive data, and the plugin never tracks users or calls home.
+Yes. All API keys and secrets are encrypted at rest (AES-256-CBC) and decrypted only in memory when a payment is processed. Logs automatically redact sensitive data. GatewayKit itself does not track your visitors, and your data is never sold or shared — payment details are sent only to the payment providers you configure, and license/update checks run through Freemius's SDK (which you can opt out of).
 
 = The activation link in my opt-in email returns a 403 error. What should I do? =
 
@@ -111,6 +113,33 @@ The same guidance applies if license-key activation fails for the same reason.
 9. Receipt page when opened directly via transaction query.
 
 == Changelog ==
+
+= 1.3.3 =
+
+**Critical fixes**
+
+* White Label magic link no longer breaks after saving settings — the secret is no longer wiped by options.php
+* Fixed analytics charts showing "No data" on the Analytics page
+* Top Forms now shows page/form names instead of raw IDs
+* Fixed analytics filter styling to match standard WordPress admin UI
+* Redesigned dashboard to a cleaner two-column layout
+
+**Polish**
+
+* Applied White Label branding to all admin page titles
+* Removed redundant White Label submenu from the dashboard menu
+* Improved subscriptions page filter styling and spacing
+
+= 1.3.2 =
+
+**New**
+
+* Subscriptions overview page (Pro) — track active, past-due, cancelled, and paused subscriptions in one place
+* Analytics, Discounts, and Subscriptions now appear in the GatewayKit menu for everyone — Pro users get the full feature, free users get a clear upgrade path
+
+**Polish**
+
+* Minor admin styling and translation improvements
 
 = 1.3.1 =
 
@@ -245,6 +274,12 @@ When a user submits a payment form, the plugin sends the payment amount, currenc
 * Privacy Policy: https://www.mercadopago.com/privacy-experience
 
 == Upgrade Notice ==
+
+= 1.3.3 =
+Critical White Label fix: magic links no longer break on save. If you are locked out, use `?gatewaykit_wl=GatewayKit_WL_emergency_key` after updating.
+
+= 1.3.2 =
+Manage your Stripe subscriptions from a dedicated overview page in the admin.
 
 = 1.3.0 =
 Three new regional gateways (Razorpay, Paystack, Mercado Pago), Apple Pay, Google Pay, Klarna, Afterpay, embedded checkout, and shareable Payment Links.

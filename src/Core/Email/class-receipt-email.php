@@ -111,10 +111,10 @@ class GatewayKit_Receipt_Email {
 		if ( $attach_pdf ) {
 			$pdf_content = $this->generate_pdf( $transaction );
 			if ( $pdf_content ) {
-				$filename = GatewayKit_Receipt_PDF::get_filename( $transaction, 'receipt' );
+				$filename   = GatewayKit_Receipt_PDF::get_filename( $transaction, 'receipt' );
 				$upload_dir = wp_upload_dir();
-				$temp_file = $upload_dir['basedir'] . '/gatewaykit-temp-' . $filename;
-				
+				$temp_file  = $upload_dir['basedir'] . '/gatewaykit-temp-' . $filename;
+
 				if ( file_put_contents( $temp_file, $pdf_content ) !== false ) {
 					$attachments[] = $temp_file;
 				}
@@ -129,9 +129,22 @@ class GatewayKit_Receipt_Email {
 		}
 
 		if ( $result ) {
-			GatewayKit_Logger::get_instance()->info( 'Receipt email sent', array( 'transaction_id' => $transaction->get( 'id' ), 'to' => $to, 'has_pdf' => ! empty( $attachments ) ) );
+			GatewayKit_Logger::get_instance()->info(
+				'Receipt email sent',
+				array(
+					'transaction_id' => $transaction->get( 'id' ),
+					'to'             => $to,
+					'has_pdf'        => ! empty( $attachments ),
+				)
+			);
 		} else {
-			GatewayKit_Logger::get_instance()->error( 'Receipt email failed', array( 'transaction_id' => $transaction->get( 'id' ), 'to' => $to ) );
+			GatewayKit_Logger::get_instance()->error(
+				'Receipt email failed',
+				array(
+					'transaction_id' => $transaction->get( 'id' ),
+					'to'             => $to,
+				)
+			);
 		}
 	}
 
@@ -153,10 +166,13 @@ class GatewayKit_Receipt_Email {
 			try {
 				return GatewayKit_Receipt_PDF::generate( $transaction, 'receipt' );
 			} catch ( \Throwable $e ) {
-				GatewayKit_Logger::get_instance()->error( 'PDF generation failed', array(
-					'transaction_id' => $transaction->get( 'id' ),
-					'error'          => $e->getMessage(),
-				) );
+				GatewayKit_Logger::get_instance()->error(
+					'PDF generation failed',
+					array(
+						'transaction_id' => $transaction->get( 'id' ),
+						'error'          => $e->getMessage(),
+					)
+				);
 			}
 		}
 
@@ -212,17 +228,17 @@ class GatewayKit_Receipt_Email {
 	 * @return string
 	 */
 	private function build_html( $transaction ) {
-		$site_name = get_bloginfo( 'name' );
-		$receipt_code = $transaction->receipt_token;
-		$paid_amount = (float) $transaction->amount;
+		$site_name       = get_bloginfo( 'name' );
+		$receipt_code    = $transaction->receipt_token;
+		$paid_amount     = (float) $transaction->amount;
 		$discount_amount = (float) ( $transaction->discount_amount ?? 0 );
-		$has_discount = $discount_amount > 0;
+		$has_discount    = $discount_amount > 0;
 		$original_amount = $paid_amount + $discount_amount;
-		$currency = $transaction->currency;
-		$gateway = ucfirst( $transaction->gateway );
-		$date = date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $transaction->completed_at ) );
-		$receipt_base = ! empty( $transaction->success_url ) ? $transaction->success_url : home_url( '/' );
-		$receipt_url = add_query_arg( 'gatewaykit_receipt', $receipt_code, $receipt_base );
+		$currency        = $transaction->currency;
+		$gateway         = ucfirst( $transaction->gateway );
+		$date            = date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $transaction->completed_at ) );
+		$receipt_base    = ! empty( $transaction->success_url ) ? $transaction->success_url : home_url( '/' );
+		$receipt_url     = add_query_arg( 'gatewaykit_receipt', $receipt_code, $receipt_base );
 
 		$description = $transaction->description;
 		if ( empty( $description ) ) {
@@ -349,9 +365,9 @@ class GatewayKit_Receipt_Email {
 	 * @return string
 	 */
 	private function build_plain( $transaction ) {
-		$paid_amount = (float) $transaction->amount;
+		$paid_amount     = (float) $transaction->amount;
 		$discount_amount = (float) ( $transaction->discount_amount ?? 0 );
-		$currency = $transaction->currency;
+		$currency        = $transaction->currency;
 
 		$lines = array(
 			__( 'Payment Receipt', 'gatewaykit' ),

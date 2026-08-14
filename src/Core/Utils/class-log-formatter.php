@@ -221,8 +221,8 @@ class GatewayKit_Log_Formatter {
 			return '';
 		}
 
-		$indent  = str_repeat( '  ', $depth );
-		$lines   = array();
+		$indent = str_repeat( '  ', $depth );
+		$lines  = array();
 
 		foreach ( $context as $key => $value ) {
 			$key = sanitize_text_field( (string) $key );

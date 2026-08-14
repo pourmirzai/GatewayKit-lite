@@ -13,7 +13,6 @@
  *     `src/Gateways/NewGateway/` folder never requires editing Core — the
  *     architectural goal of the single-branch monorepo.
  *
-
  * @package GatewayKit
  */
 
@@ -77,6 +76,7 @@ class GatewayKit_Autoloader {
 		'PayPal_Refund'             => 'Core/Refund/class-paypal-refund.php',
 		'Subscription_Model'        => 'Features/Subscriptions/class-subscription-model.php',
 		'Subscription_Service'      => 'Features/Subscriptions/class-subscription-service.php',
+		'Admin_Subscriptions'       => 'Features/Subscriptions/class-admin-subscriptions.php',
 	);
 
 	/**

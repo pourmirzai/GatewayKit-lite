@@ -179,18 +179,37 @@ class GatewayKit_Logger {
 	private function sanitize_context( $context ) {
 		// Comprehensive sensitive data patterns for better security
 		$sensitive_patterns = array(
-			'password', 'token', 'key', 'secret', 'merchant_id', 'authorization',
-			'authority', 'receipt_token', 'ref_id', 'api_key', 'access_token',
-			'refresh_token', 'client_secret', 'private_key', 'public_key',
-			'card_number', 'cvv', 'expiry', 'cardholder', 'ssn',
-			'bank_account', 'routing_number', 'credit_card', 'debit_card'
+			'password',
+			'token',
+			'key',
+			'secret',
+			'merchant_id',
+			'authorization',
+			'authority',
+			'receipt_token',
+			'ref_id',
+			'api_key',
+			'access_token',
+			'refresh_token',
+			'client_secret',
+			'private_key',
+			'public_key',
+			'card_number',
+			'cvv',
+			'expiry',
+			'cardholder',
+			'ssn',
+			'bank_account',
+			'routing_number',
+			'credit_card',
+			'debit_card',
 		);
-		
+
 		$sanitized = array();
 
 		foreach ( $context as $key => $value ) {
 			$key_lower = strtolower( $key );
-			
+
 			// Check for sensitive patterns in key
 			$is_sensitive = false;
 			foreach ( $sensitive_patterns as $pattern ) {
@@ -199,7 +218,7 @@ class GatewayKit_Logger {
 					break;
 				}
 			}
-			
+
 			if ( $is_sensitive ) {
 				// Partial redaction for debugging (show first/last few chars)
 				if ( is_string( $value ) && strlen( $value ) > 8 ) {
@@ -283,7 +302,7 @@ class GatewayKit_Logger {
 
 		$logs = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT id, transaction_id, level, message, context, created_at FROM %i WHERE transaction_id = %d ORDER BY created_at DESC LIMIT %d",
+				'SELECT id, transaction_id, level, message, context, created_at FROM %i WHERE transaction_id = %d ORDER BY created_at DESC LIMIT %d',
 				$table_name,
 				$transaction_id,
 				$limit
@@ -307,7 +326,7 @@ class GatewayKit_Logger {
 
 		$logs = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT id, transaction_id, level, message, context, created_at FROM %i WHERE level = %s ORDER BY created_at DESC LIMIT %d",
+				'SELECT id, transaction_id, level, message, context, created_at FROM %i WHERE level = %s ORDER BY created_at DESC LIMIT %d',
 				$table_name,
 				$level,
 				$limit
@@ -379,7 +398,7 @@ class GatewayKit_Logger {
 		$table_name = $wpdb->prefix . 'gatewaykit_payment_logs';
 
 		return $wpdb->get_row(
-			$wpdb->prepare( "SELECT id, transaction_id, level, message, context, created_at FROM %i WHERE id = %d", $table_name, (int) $log_id )
+			$wpdb->prepare( 'SELECT id, transaction_id, level, message, context, created_at FROM %i WHERE id = %d', $table_name, (int) $log_id )
 		);
 	}
 
@@ -397,7 +416,7 @@ class GatewayKit_Logger {
 			return array();
 		}
 
-		$table_name = $wpdb->prefix . 'gatewaykit_payment_logs';
+		$table_name   = $wpdb->prefix . 'gatewaykit_payment_logs';
 		$placeholders = implode( ',', array_fill( 0, count( $log_ids ), '%d' ) );
 
 		return $wpdb->get_results(
@@ -438,7 +457,7 @@ class GatewayKit_Logger {
 		}
 
 		if ( ! empty( $filters['search'] ) ) {
-			$search  = '%' . $wpdb->esc_like( sanitize_text_field( $filters['search'] ) ) . '%';
+			$search   = '%' . $wpdb->esc_like( sanitize_text_field( $filters['search'] ) ) . '%';
 			$where   .= ( '' === $where ? ' WHERE ' : ' AND ' ) . 'message LIKE %s';
 			$params[] = $search;
 		}
@@ -458,7 +477,7 @@ class GatewayKit_Logger {
 
 		$wpdb->query(
 			$wpdb->prepare(
-				"DELETE FROM %i WHERE created_at < DATE_SUB(NOW(), INTERVAL %d DAY)",
+				'DELETE FROM %i WHERE created_at < DATE_SUB(NOW(), INTERVAL %d DAY)',
 				$table_name,
 				$days
 			)

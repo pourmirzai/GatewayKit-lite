@@ -1,5 +1,32 @@
 # GatewayKit Changelog
 
+## 1.3.3
+
+**Critical fixes**
+
+- White Label magic link no longer breaks after saving settings — the secret is no longer wiped by options.php
+- Fixed analytics charts showing "No data" on the Analytics page
+- Top Forms now shows page/form names instead of raw IDs
+- Fixed analytics filter styling to match standard WordPress admin UI
+- Redesigned dashboard to a cleaner two-column layout
+
+**Polish**
+
+- Applied White Label branding to all admin page titles
+- Removed redundant White Label submenu from the dashboard menu
+- Improved subscriptions page filter styling and spacing
+
+## 1.3.2
+
+**New**
+
+- Subscriptions overview page (Pro) — track active, past-due, cancelled, and paused subscriptions in one place
+- Analytics, Discounts, and Subscriptions now appear in the GatewayKit menu for everyone — Pro users get the full feature, free users get a clear upgrade path
+
+**Polish**
+
+- Minor admin styling and translation improvements
+
 ## 1.3.1
 
 **Critical fixes**

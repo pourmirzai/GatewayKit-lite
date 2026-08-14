@@ -164,8 +164,8 @@ class GatewayKit_Payment_Result_Shortcode {
 			$invoice_base = ! empty( $transaction->success_url ) ? $transaction->success_url : home_url( '/' );
 			$invoice_url  = add_query_arg( 'gatewaykit_invoice', $transaction->receipt_token, $invoice_base );
 			$html        .= '<a href="' . esc_url( $invoice_url ) . '" class="gk-receipt-btn gk-receipt-btn--primary gatewaykit-download-invoice" target="_blank" rel="noopener noreferrer">';
-			$html       .= esc_html__( 'Download Invoice', 'gatewaykit' );
-			$html       .= '</a>';
+			$html        .= esc_html__( 'Download Invoice', 'gatewaykit' );
+			$html        .= '</a>';
 		}
 
 		$html .= '</div>'; // .gk-receipt-banner__actions.

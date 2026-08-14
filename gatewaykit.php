@@ -3,7 +3,7 @@
  * Plugin Name: GatewayKit – Payment Gateway for Elementor Forms
  * Plugin URI:  https://pourmirzai.com/gatewaykit
  * Description: Accept payments through Elementor Pro Forms with PayPal, Stripe, Mollie, CoinGate, Coinify, NOWPayments, Razorpay, Paystack, and Mercado Pago. Upgrade to GatewayKit Pro for discount codes, webhooks, white label, and more.
- * Version:     1.3.1
+ * Version:     1.3.3
  * Author:      Morteza Pourmirzai
  * Author URI:  https://pourmirzai.com
  * Text Domain: gatewaykit
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Lite build identity.
 if ( ! defined( 'GATEWAYKIT_LITE_VERSION' ) ) {
-	define( 'GATEWAYKIT_LITE_VERSION', '1.3.1' );
+	define( 'GATEWAYKIT_LITE_VERSION', '1.3.3' );
 }
 
 /*
@@ -205,24 +205,24 @@ define( 'GATEWAYKIT_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'GATEWAYKIT_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 
 /*
- |------------------------------------------------------------------------------------------------------------------------------------------
- | Pro license detection helpers (Lite-side)
- |------------------------------------------------------------------------------------------------------------------------------------------
- | The real license gate lives in `gatewaykit_pro_is_licensed()` inside the
- | Pro add-on (gatewaykit-pro.php), but that function only exists AFTER the
- | Pro add-on is loaded. Lite Core needs a safe way to detect a licensed Pro
- | install so it can show Pro-only features (e.g. CSV export) as locked /
- | unlocked on the shared admin pages. These wrappers are guarded by
- | `function_exists()` so they are no-ops when Pro is not installed.
- |
- | See ARCH-022: Pro must NEVER add its own submenu — it enhances the shared
- | Lite admin pages instead.
- |
- | NOTE: these helpers live in the SHARED BOOT section so they ship in BOTH
- | dev (repo-root gatewaykit.php) and the composed Lite entry file produced
- | by `php bin/build.php lite`. Pro (entry_source=gatewaykit-pro.php) skips
- | composition entirely, so it never re-declares these — Pro keeps its own
- | `gatewaykit_pro_is_licensed()` instead.
+|------------------------------------------------------------------------------------------------------------------------------------------
+| Pro license detection helpers (Lite-side)
+|------------------------------------------------------------------------------------------------------------------------------------------
+| The real license gate lives in `gatewaykit_pro_is_licensed()` inside the
+| Pro add-on (gatewaykit-pro.php), but that function only exists AFTER the
+| Pro add-on is loaded. Lite Core needs a safe way to detect a licensed Pro
+| install so it can show Pro-only features (e.g. CSV export) as locked /
+| unlocked on the shared admin pages. These wrappers are guarded by
+| `function_exists()` so they are no-ops when Pro is not installed.
+|
+| See ARCH-022: Pro must NEVER add its own submenu — it enhances the shared
+| Lite admin pages instead.
+|
+| NOTE: these helpers live in the SHARED BOOT section so they ship in BOTH
+| dev (repo-root gatewaykit.php) and the composed Lite entry file produced
+| by `php bin/build.php lite`. Pro (entry_source=gatewaykit-pro.php) skips
+| composition entirely, so it never re-declares these — Pro keeps its own
+| `gatewaykit_pro_is_licensed()` instead.
  */
 if ( ! function_exists( 'gatewaykit_is_pro_licensed' ) ) {
 	/**
@@ -276,15 +276,18 @@ if ( ! function_exists( 'gatewaykit_fputcsv' ) ) {
 		// Mitigate CSV formula injection: prefix cells starting with
 		// dangerous characters with a single quote so spreadsheet
 		// applications treat them as text, not formulas.
-		$fields = array_map( function ( $value ) {
-			if ( is_string( $value ) && '' !== $value ) {
-				$first = $value[0];
-				if ( false !== strpos( "=+-@\t\r", $first ) ) {
-					$value = "'" . $value;
+		$fields = array_map(
+			function ( $value ) {
+				if ( is_string( $value ) && '' !== $value ) {
+						$first = $value[0];
+					if ( false !== strpos( "=+-@\t\r", $first ) ) {
+						$value = "'" . $value;
+					}
 				}
-			}
-			return $value;
-		}, $fields );
+				return $value;
+			},
+			$fields
+		);
 
 		return fputcsv( $handle, $fields );
 	}

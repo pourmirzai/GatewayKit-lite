@@ -594,6 +594,32 @@
     color: #383d41;
 }
 
+/* Subscription list status badges (Subscriptions admin page) */
+.gatewaykit-sub-status-active {
+	background: #d4edda;
+	color: #155724;
+}
+
+.gatewaykit-sub-status-cancelled {
+	background: #f8d7da;
+	color: #721c24;
+}
+
+.gatewaykit-sub-status-past_due {
+	background: #fff3cd;
+	color: #856404;
+}
+
+.gatewaykit-sub-status-paused {
+	background: #cce5ff;
+	color: #004085;
+}
+
+.gatewaykit-sub-status-unknown {
+	background: #e2e3e5;
+	color: #383d41;
+}
+
 /* Log levels */
 .gatewaykit-log-level {
     font-weight: bold;
@@ -1289,51 +1315,49 @@
    Dashboard Page Styles
    ======================================== */
 
-/* Dashboard Container with Sidebar Layout */
+/* Dashboard Container */
 .gatewaykit-dashboard-container {
-    display: flex;
+    display: block;
+    margin-top: 20px;
+}
+
+/* Two-column grid for dashboard widgets */
+.gatewaykit-dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     gap: 20px;
     margin-top: 20px;
-    align-items: flex-start;
-    flex-wrap: nowrap;
 }
 
-/* Promotional Sidebar */
-.gatewaykit-dashboard-sidebar {
-    width: 180px;
-    min-width: 180px;
-    flex-shrink: 0;
-    order: -1;
-    /* Ensure sidebar appears first in RTL */
-}
-
-.gatewaykit-promo-banner {
-    display: block;
-    width: 100%;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
+/* Dashboard Widget */
+.gatewaykit-dashboard-widget {
     background: #fff;
     border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    transition: all 0.3s ease;
 }
 
-.gatewaykit-promo-banner:hover {
-    box-shadow: 0 4px 16px rgba(136, 2, 127, 0.2);
-    transform: translateY(-2px);
+.gatewaykit-dashboard-widget:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.gatewaykit-promo-banner img {
-    width: 100%;
-    height: auto;
-    display: block;
+.gatewaykit-widget-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    padding: 16px 20px;
+    border-bottom: 1px solid #e5e7eb;
 }
 
-/* Dashboard Main Content */
-.gatewaykit-dashboard-main {
-    flex: 1;
-    min-width: 0;
-    max-width: calc(100% - 200px);
+.gatewaykit-widget-header h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
+}
+
+.gatewaykit-widget-content {
+    padding: 20px;
 }
 
 /* Dashboard Header */
@@ -1409,38 +1433,6 @@
     font-size: 14px;
     opacity: 0.95;
     color: #fff;
-}
-
-/* Dashboard Widget */
-.gatewaykit-dashboard-widget {
-    background: #fff;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    transition: all 0.3s ease;
-}
-
-.gatewaykit-dashboard-widget:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.gatewaykit-widget-header {
-    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-    padding: 16px 20px;
-    border-bottom: 1px solid #e5e7eb;
-}
-
-.gatewaykit-widget-header h2 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 600;
-    color: #111827;
-}
-
-.gatewaykit-widget-content {
-    padding: 20px;
 }
 
 /* Enhanced Statistics Grid */
@@ -1673,17 +1665,8 @@
 }
 
 @media screen and (max-width: 900px) {
-    .gatewaykit-dashboard-container {
-        flex-direction: column;
-    }
-
-    .gatewaykit-dashboard-sidebar {
-        display: none;
-        /* Hide sidebar on mobile */
-    }
-
-    .gatewaykit-dashboard-main {
-        width: 100%;
+    .gatewaykit-dashboard-grid {
+        grid-template-columns: 1fr;
     }
 
     .gatewaykit-dashboard-overview .gatewaykit-stat-grid {
@@ -1736,7 +1719,7 @@
 
 @media screen and (max-width: 480px) {
     .gatewaykit-dashboard-container {
-        gap: 16px;
+        display: block;
     }
 
     .gatewaykit-dashboard-header {
@@ -2022,6 +2005,32 @@
     color: #fff !important;
     transform: translateY(-1px);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+}
+
+/* Upgrade CTA box — full-page lock screen for Pro features (unlicensed). */
+.gatewaykit-upgrade-box {
+    margin: 20px 0;
+    padding: 32px;
+    max-width: 640px;
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-left: 4px solid #4f46e5;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.gatewaykit-upgrade-box h2 {
+    margin-top: 0;
+    font-size: 1.3em;
+}
+
+.gatewaykit-upgrade-box p {
+    font-size: 14px;
+    color: #50575e;
+    max-width: 600px;
+}
+
+.gatewaykit-upgrade-box .button-hero {
+    margin-top: 16px;
 }
 
 /* Date range filter block — used in the transactions-page filter bar.
@@ -2345,4 +2354,58 @@
     color: var(--gatewaykit-danger-color);
     font-size: 12px;
     font-style: italic;
+}
+
+/* ========================================
+   Subscriptions Page Styles
+   ======================================== */
+
+.gatewaykit-subs-filter {
+    margin: 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.gatewaykit-subs-filter select {
+    min-width: 160px;
+}
+
+.gatewaykit-subs-table {
+    margin-top: 10px;
+}
+
+/* Subscription status badges */
+.gatewaykit-status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.gatewaykit-sub-status-active {
+    background: #d1e7dd;
+    color: #0a3622;
+}
+
+.gatewaykit-sub-status-cancelled {
+    background: #f8d7da;
+    color: #842029;
+}
+
+.gatewaykit-sub-status-past_due {
+    background: #fff3cd;
+    color: #664d03;
+}
+
+.gatewaykit-sub-status-paused {
+    background: #cfe2ff;
+    color: #084298;
+}
+
+.gatewaykit-sub-status-unknown {
+    background: #e2e3e5;
+    color: #41464b;
 }

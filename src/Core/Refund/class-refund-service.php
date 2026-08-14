@@ -140,12 +140,15 @@ class GatewayKit_Refund_Service {
 		$result = $handler->refund( $transaction, $amount, $reason );
 
 		if ( is_wp_error( $result ) ) {
-			GatewayKit_Logger::get_instance()->error( 'Refund failed', array(
-				'transaction_id' => $transaction_id,
-				'gateway'        => $gateway_id,
-				'amount'         => $amount,
-				'error'          => $result->get_error_message(),
-			) );
+			GatewayKit_Logger::get_instance()->error(
+				'Refund failed',
+				array(
+					'transaction_id' => $transaction_id,
+					'gateway'        => $gateway_id,
+					'amount'         => $amount,
+					'error'          => $result->get_error_message(),
+				)
+			);
 			wp_cache_delete( $lock_key, 'gatewaykit' );
 			return $result;
 		}
@@ -178,33 +181,40 @@ class GatewayKit_Refund_Service {
 				sprintf(
 					/* translators: 1: requested amount, 2: already refunded, 3: original amount */
 					__( 'Refund amount (%1$s) plus already refunded (%2$s) exceeds the original payment (%3$s).', 'gatewaykit' ),
-					$amount, $already_refunded, $original_amount
+					$amount,
+					$already_refunded,
+					$original_amount
 				)
 			);
 		}
 
-		$refund_history                    = isset( $existing_response['refunds'] ) ? $existing_response['refunds'] : array();
-		$refund_history[]                  = array(
-			'refund_id'     => $refund_id,
-			'amount'        => $amount,
-			'reason'        => $reason,
-			'refunded_at'   => current_time( 'mysql' ),
-			'is_partial'    => $is_partial,
-			'gateway_data'  => $gateway_resp,
+		$refund_history                      = isset( $existing_response['refunds'] ) ? $existing_response['refunds'] : array();
+		$refund_history[]                    = array(
+			'refund_id'    => $refund_id,
+			'amount'       => $amount,
+			'reason'       => $reason,
+			'refunded_at'  => current_time( 'mysql' ),
+			'is_partial'   => $is_partial,
+			'gateway_data' => $gateway_resp,
 		);
-		$existing_response['refunds']      = $refund_history;
+		$existing_response['refunds']        = $refund_history;
 		$existing_response['total_refunded'] = ( isset( $existing_response['total_refunded'] ) ? (float) $existing_response['total_refunded'] : 0 ) + $amount;
 
-		$updated = $transaction->update( array(
-			'status'            => $new_status,
-			'gateway_response'  => $existing_response,
-		) );
+		$updated = $transaction->update(
+			array(
+				'status'           => $new_status,
+				'gateway_response' => $existing_response,
+			)
+		);
 
 		if ( false === $updated ) {
 			wp_cache_delete( $lock_key, 'gatewaykit' );
 			GatewayKit_Logger::get_instance()->error(
 				'Refund succeeded at gateway but DB update failed — status inconsistency',
-				array( 'transaction_id' => $transaction_id, 'gateway' => $gateway_id )
+				array(
+					'transaction_id' => $transaction_id,
+					'gateway'        => $gateway_id,
+				)
 			);
 			return new WP_Error(
 				'db_update_failed',
@@ -214,13 +224,16 @@ class GatewayKit_Refund_Service {
 
 		wp_cache_delete( $lock_key, 'gatewaykit' );
 
-		GatewayKit_Logger::get_instance()->info( 'Refund processed', array(
-			'transaction_id' => $transaction_id,
-			'gateway'        => $gateway_id,
-			'amount'         => $amount,
-			'refund_id'      => $refund_id,
-			'is_partial'     => $is_partial,
-		) );
+		GatewayKit_Logger::get_instance()->info(
+			'Refund processed',
+			array(
+				'transaction_id' => $transaction_id,
+				'gateway'        => $gateway_id,
+				'amount'         => $amount,
+				'refund_id'      => $refund_id,
+				'is_partial'     => $is_partial,
+			)
+		);
 
 		return array(
 			'transaction_id' => $transaction_id,

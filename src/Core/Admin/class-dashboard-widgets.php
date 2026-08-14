@@ -23,7 +23,7 @@ class GatewayKit_Dashboard_Widgets {
 	public function __construct() {
 		add_action( 'wp_dashboard_setup', array( $this, 'add_dashboard_widgets' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_dashboard_styles' ) );
-		
+
 		// Clear cache when transactions are modified
 		add_action( 'gatewaykit_transaction_created', array( $this, 'clear_dashboard_cache' ) );
 		add_action( 'gatewaykit_transaction_updated', array( $this, 'clear_dashboard_cache' ) );
@@ -90,18 +90,18 @@ class GatewayKit_Dashboard_Widgets {
 		// Check cache first
 		$cache_key = 'gatewaykit_dashboard_stats';
 		$cache_ttl = 300; // 5 minutes cache
-		
-		$cached_stats = get_transient($cache_key);
-		if ($cached_stats !== false) {
+
+		$cached_stats = get_transient( $cache_key );
+		if ( $cached_stats !== false ) {
 			$stats = $cached_stats;
 		} else {
 			$table_name = $wpdb->prefix . 'gatewaykit_payment_transactions';
 
-		// Get statistics for last 30 days (cached via transient above).
+			// Get statistics for last 30 days (cached via transient above).
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- transient-cached (5 min); admin-only dashboard widget
-		$stats = $wpdb->get_row(
-			$wpdb->prepare(
-				"SELECT
+			$stats = $wpdb->get_row(
+				$wpdb->prepare(
+					"SELECT
                     COUNT(*) as total_transactions,
                     SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as successful_transactions,
                     SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) as failed_transactions,
@@ -109,12 +109,12 @@ class GatewayKit_Dashboard_Widgets {
                     AVG(CASE WHEN status = 'completed' THEN amount ELSE NULL END) as avg_amount
                 FROM %i
                 WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)",
-				$table_name
-			)
-		);
+					$table_name
+				)
+			);
 		// phpcs:enable
 
-			if (!$stats) {
+			if ( ! $stats ) {
 				$stats = (object) array(
 					'total_transactions'      => 0,
 					'successful_transactions' => 0,
@@ -125,11 +125,11 @@ class GatewayKit_Dashboard_Widgets {
 			}
 
 			// Cache the result
-			set_transient($cache_key, $stats, $cache_ttl);
+			set_transient( $cache_key, $stats, $cache_ttl );
 		}
 
 		$success_rate = $stats->total_transactions > 0
-			? round(($stats->successful_transactions / $stats->total_transactions) * 100, 1)
+			? round( ( $stats->successful_transactions / $stats->total_transactions ) * 100, 1 )
 			: 0;
 
 		$currency = strtoupper( get_option( 'gatewaykit_currency', GatewayKit_Gateway_Manager::get_instance()->get_default_currency() ) );
@@ -189,28 +189,28 @@ class GatewayKit_Dashboard_Widgets {
 		// Check cache first
 		$cache_key = 'gatewaykit_recent_transactions';
 		$cache_ttl = 180; // 3 minutes cache
-		
-		$cached_transactions = get_transient($cache_key);
-		if ($cached_transactions !== false) {
+
+		$cached_transactions = get_transient( $cache_key );
+		if ( $cached_transactions !== false ) {
 			$recent_transactions = $cached_transactions;
 		} else {
 			$table_name = $wpdb->prefix . 'gatewaykit_payment_transactions';
 
-		// Cached via transient above.
+			// Cached via transient above.
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- transient-cached (3 min); admin-only dashboard widget
-		$recent_transactions = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT id, amount, currency, status, created_at
+			$recent_transactions = $wpdb->get_results(
+				$wpdb->prepare(
+					'SELECT id, amount, currency, status, created_at
                 FROM %i
                 ORDER BY created_at DESC
-                LIMIT 5",
-				$table_name
-			)
-		);
+                LIMIT 5',
+					$table_name
+				)
+			);
 		// phpcs:enable
 
 			// Cache the result
-			set_transient($cache_key, $recent_transactions, $cache_ttl);
+			set_transient( $cache_key, $recent_transactions, $cache_ttl );
 		}
 
 		if ( empty( $recent_transactions ) ) {
@@ -307,7 +307,7 @@ class GatewayKit_Dashboard_Widgets {
 	 * Clear dashboard cache
 	 */
 	public function clear_dashboard_cache() {
-		delete_transient('gatewaykit_dashboard_stats');
-		delete_transient('gatewaykit_recent_transactions');
+		delete_transient( 'gatewaykit_dashboard_stats' );
+		delete_transient( 'gatewaykit_recent_transactions' );
 	}
 }

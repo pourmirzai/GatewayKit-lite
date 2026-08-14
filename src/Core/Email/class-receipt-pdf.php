@@ -71,17 +71,17 @@ class GatewayKit_Receipt_PDF {
 	 * @return string HTML content.
 	 */
 	private static function build_html( GatewayKit_Transaction_Model $transaction, string $type ): string {
-		$site_name  = get_bloginfo( 'name' );
-		$site_url   = home_url();
-		$logo_url   = self::get_site_logo_url();
-		$currency   = $transaction->currency;
-		$paid_amount   = (float) $transaction->amount;
+		$site_name       = get_bloginfo( 'name' );
+		$site_url        = home_url();
+		$logo_url        = self::get_site_logo_url();
+		$currency        = $transaction->currency;
+		$paid_amount     = (float) $transaction->amount;
 		$discount_amount = (float) ( $transaction->discount_amount ?? 0 );
-		$has_discount = $discount_amount > 0;
+		$has_discount    = $discount_amount > 0;
 		$original_amount = $paid_amount + $discount_amount;
-		$date       = date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $transaction->completed_at ) );
-		$gateway    = ucfirst( $transaction->gateway );
-		$receipt_id = $transaction->receipt_token;
+		$date            = date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $transaction->completed_at ) );
+		$gateway         = ucfirst( $transaction->gateway );
+		$receipt_id      = $transaction->receipt_token;
 
 		$is_invoice = 'invoice' === $type;
 		$title      = $is_invoice ? __( 'Invoice', 'gatewaykit' ) : __( 'Payment Receipt', 'gatewaykit' );
@@ -100,8 +100,8 @@ class GatewayKit_Receipt_PDF {
 		// Extract buyer name + email from the submitted form data and/or
 		// logged-in user data — the transaction table has no dedicated
 		// buyer_name/buyer_email columns.
-		$form_data  = $transaction->get( 'form_data' );
-		$user_data  = $transaction->get( 'user_data' );
+		$form_data   = $transaction->get( 'form_data' );
+		$user_data   = $transaction->get( 'user_data' );
 		$buyer_name  = '';
 		$buyer_email = '';
 
@@ -326,18 +326,26 @@ class GatewayKit_Receipt_PDF {
 				<?php endif; ?>
 
 				<div class="footer">
-					<p><?php printf(
+					<p>
+					<?php
+					printf(
 						/* translators: %1$s: document type (receipt/invoice), %2$s: site name */
 						esc_html__( 'Thank you for your payment. This %1$s is your official record from %2$s.', 'gatewaykit' ),
 						esc_html( strtolower( $type ) ),
 						esc_html( $site_name )
-					); ?></p>
-					<p><?php printf(
+					);
+					?>
+					</p>
+					<p>
+					<?php
+					printf(
 						/* translators: %1$s: generation timestamp, %2$s: site URL */
 						esc_html__( 'Generated on %1$s via %2$s', 'gatewaykit' ),
 						esc_html( current_time( 'Y-m-d H:i:s' ) ),
 						esc_html( $site_url )
-					); ?></p>
+					);
+					?>
+					</p>
 				</div>
 			</div>
 		</body>

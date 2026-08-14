@@ -41,17 +41,17 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 	 */
 	public function get_columns() {
 		return array(
-			'cb'           => '<input type="checkbox" />',
-			'id'           => __( 'Transaction', 'gatewaykit' ),
-			'receipt_code' => __( 'Receipt Code', 'gatewaykit' ),
-			'user'         => __( 'User', 'gatewaykit' ),
-			'gateway'      => __( 'Gateway', 'gatewaykit' ),
-			'amount'       => __( 'Amount', 'gatewaykit' ),
-			'description'  => __( 'Description', 'gatewaykit' ),
-			'status'       => __( 'Status', 'gatewaykit' ),
+			'cb'            => '<input type="checkbox" />',
+			'id'            => __( 'Transaction', 'gatewaykit' ),
+			'receipt_code'  => __( 'Receipt Code', 'gatewaykit' ),
+			'user'          => __( 'User', 'gatewaykit' ),
+			'gateway'       => __( 'Gateway', 'gatewaykit' ),
+			'amount'        => __( 'Amount', 'gatewaykit' ),
+			'description'   => __( 'Description', 'gatewaykit' ),
+			'status'        => __( 'Status', 'gatewaykit' ),
 			'error_details' => __( 'Error Info', 'gatewaykit' ),
-			'authority'    => __( 'Authority', 'gatewaykit' ),
-			'created_at'   => __( 'Date', 'gatewaykit' ),
+			'authority'     => __( 'Authority', 'gatewaykit' ),
+			'created_at'    => __( 'Date', 'gatewaykit' ),
 		);
 	}
 
@@ -84,7 +84,7 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 		}
 
 		$meta_key = 'manage' . $screen->id . 'columnshidden';
-		$saved   = get_user_option( $meta_key );
+		$saved    = get_user_option( $meta_key );
 
 		if ( ! is_array( $saved ) ) {
 			return array();
@@ -108,8 +108,8 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 
 		// Get data
 		// Get per-page from user meta (saved by WordPress's set_screen_options), fallback to 20.
-		$per_page     = 20;
-		$screen       = get_current_screen();
+		$per_page = 20;
+		$screen   = get_current_screen();
 		if ( $screen ) {
 			$saved = get_user_option( 'gatewaykit_transactions_per_page' );
 			if ( false !== $saved && (int) $saved > 0 ) {
@@ -207,7 +207,7 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 				'u.user_email LIKE %s',
 				'u.user_login LIKE %s',
 			);
-			$where_values = array_merge( $where_values, array_fill( 0, 6, $search_term ) );
+			$where_values      = array_merge( $where_values, array_fill( 0, 6, $search_term ) );
 
 			// Add JSON search conditions only for longer search terms.
 			if ( strlen( $search_raw ) > 2 ) {
@@ -221,17 +221,17 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 						'JSON_UNQUOTE(JSON_EXTRACT(t.form_data, "$.mobile")) LIKE %s',
 					)
 				);
-				$where_values = array_merge( $where_values, array_fill( 0, 5, $search_term ) );
+				$where_values      = array_merge( $where_values, array_fill( 0, 5, $search_term ) );
 			}
 
 			$where[] = '(' . implode( ' OR ', $search_conditions ) . ')';
 
 			// Add user table join for user searches
-			$joins[]      = "LEFT JOIN %i u ON t.user_id = u.ID";
+			$joins[]       = 'LEFT JOIN %i u ON t.user_id = u.ID';
 			$join_values[] = $wpdb->users;
 		} else {
 			// Only join users if we need to display user info
-			$joins[]      = "LEFT JOIN %i u ON t.user_id = u.ID";
+			$joins[]       = 'LEFT JOIN %i u ON t.user_id = u.ID';
 			$join_values[] = $wpdb->users;
 		}
 
@@ -267,7 +267,7 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 
 		// Use FORCE INDEX for better performance on large tables
 		$force_index = '';
-		$index_map    = array(
+		$index_map   = array(
 			'created_at' => 'idx_created_at',
 			'status'     => 'idx_status',
 			'amount'     => 'idx_amount_status',
@@ -393,12 +393,12 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 
 		$count = $wpdb->get_var( $sql ) ?: 0;
 		// phpcs:enable
-		
+
 		// Cache the count for 5 minutes (skip during search)
 		if ( $use_cache ) {
 			wp_cache_set( $cache_key, $count, 'gatewaykit_transactions', 300 );
 		}
-		
+
 		return $count;
 	}
 
@@ -448,8 +448,8 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 		$where_clause = $where ? 'WHERE ' . implode( ' AND ', $where ) : '';
 
 		// Cap export at 10 000 rows to prevent memory exhaustion.
-		$args[]    = 10000;
-		$all_args  = array_merge( array( $table_name ), $args );
+		$args[]   = 10000;
+		$all_args = array_merge( array( $table_name ), $args );
 
 		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- WHERE clause contains placeholders PHPCS can't count; table name internal
 		return $wpdb->get_col(
@@ -489,7 +489,13 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 		$transaction_ids = $this->get_filtered_transaction_ids( $filters );
 
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			GatewayKit_Logger::get_instance()->debug( 'Retrieved filtered transaction IDs', array( 'count' => count( $transaction_ids ), 'ids' => array_slice( $transaction_ids, 0, 5 ) ) );
+			GatewayKit_Logger::get_instance()->debug(
+				'Retrieved filtered transaction IDs',
+				array(
+					'count' => count( $transaction_ids ),
+					'ids'   => array_slice( $transaction_ids, 0, 5 ),
+				)
+			);
 		}
 		$this->export_transactions( $transaction_ids );
 	}
@@ -517,7 +523,13 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 		// Check if headers already sent
 		if ( headers_sent( $file, $line ) ) {
 			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-				GatewayKit_Logger::get_instance()->error( 'Headers already sent before export', array( 'file' => $file, 'line' => $line ) );
+				GatewayKit_Logger::get_instance()->error(
+					'Headers already sent before export',
+					array(
+						'file' => $file,
+						'line' => $line,
+					)
+				);
 			}
 			wp_die( esc_html__( 'Headers already sent.', 'gatewaykit' ) );
 		}
@@ -564,19 +576,19 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 
 		// Process transactions in batches to prevent memory issues
 		$batch_size = 100;
-		$total_ids = count( $transaction_ids );
+		$total_ids  = count( $transaction_ids );
 
 		// Pre-load gateway manager to avoid repeated instantiation
 		$gateway_manager = GatewayKit_Gateway_Manager::get_instance();
 
 		for ( $i = 0; $i < $total_ids; $i += $batch_size ) {
 			$batch_ids = array_slice( $transaction_ids, $i, $batch_size );
-			
+
 			// Get transactions in batch using optimized query
 			global $wpdb;
-			$table_name = $wpdb->prefix . 'gatewaykit_payment_transactions';
+			$table_name   = $wpdb->prefix . 'gatewaykit_payment_transactions';
 			$placeholders = implode( ',', array_fill( 0, count( $batch_ids ), '%d' ) );
-			
+
 			// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- values use %d placeholders
 			$batch_transactions = $wpdb->get_results(
 				$wpdb->prepare(
@@ -591,7 +603,7 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 			foreach ( $batch_transactions as $transaction_data ) {
 				try {
 					$transaction = new GatewayKit_Transaction_Model( $transaction_data );
-					
+
 					$user_name = '';
 					if ( ! empty( $transaction->user_id ) ) {
 						$user      = get_userdata( $transaction->user_id );
@@ -600,7 +612,7 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 
 					$receipt_code = ! empty( $transaction->receipt_token ) ? $transaction->receipt_token : '';
 
-					$gateway = $gateway_manager->get_gateway( $transaction->gateway );
+					$gateway      = $gateway_manager->get_gateway( $transaction->gateway );
 					$gateway_name = $gateway ? $gateway->get_gateway_name() : ucfirst( $transaction->gateway );
 
 					$row = array(
@@ -618,22 +630,31 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 					);
 
 					// Ensure all data is properly encoded in UTF-8 for Persian characters
-					$row = array_map( function( $value ) {
-						if ( is_string( $value ) ) {
-							return mb_convert_encoding( $value, 'UTF-8', mb_detect_encoding( $value, 'UTF-8, ISO-8859-1, Windows-1252', true ) ?: 'UTF-8' );
-						}
-						return $value;
-					}, $row );
+					$row = array_map(
+						function ( $value ) {
+							if ( is_string( $value ) ) {
+									return mb_convert_encoding( $value, 'UTF-8', mb_detect_encoding( $value, 'UTF-8, ISO-8859-1, Windows-1252', true ) ?: 'UTF-8' );
+							}
+							return $value;
+						},
+						$row
+					);
 
 					gatewaykit_fputcsv( $output, $row );
 
-			} catch ( Exception $e ) {
-				// Log error and continue with next transaction
-				if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-					GatewayKit_Logger::get_instance()->error( 'Error exporting transaction', array( 'transaction_id' => $transaction_data['id'], 'error' => $e->getMessage() ) );
+				} catch ( Exception $e ) {
+					// Log error and continue with next transaction
+					if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+						GatewayKit_Logger::get_instance()->error(
+							'Error exporting transaction',
+							array(
+								'transaction_id' => $transaction_data['id'],
+								'error'          => $e->getMessage(),
+							)
+						);
+					}
+					continue;
 				}
-				continue;
-			}
 			}
 
 			// Clear memory periodically
@@ -671,12 +692,12 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 
 		// Refund action — Pro only, completed transactions only.
 		if ( gatewaykit_is_pro_licensed() && 'completed' === $item['status'] ) {
-			$refund_url = wp_nonce_url(
+			$refund_url        = wp_nonce_url(
 				add_query_arg(
 					array(
-						'page'             => 'gatewaykit-transactions',
-						'action'           => 'refund',
-						'transaction_id'   => $item['id'],
+						'page'           => 'gatewaykit-transactions',
+						'action'         => 'refund',
+						'transaction_id' => $item['id'],
 					),
 					admin_url( 'admin.php' )
 				),
@@ -689,11 +710,15 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 					esc_attr( $item['id'] ),
 					esc_attr( $item['amount'] ),
 					esc_attr( $item['currency'] ),
-					esc_attr( wp_json_encode( sprintf(
-						/* translators: %s: refund amount */
-						__( 'Are you sure you want to refund %s? This action cannot be undone.', 'gatewaykit' ),
-						$item['amount'] . ' ' . $item['currency']
-					) ) ),
+					esc_attr(
+						wp_json_encode(
+							sprintf(
+							/* translators: %s: refund amount */
+								__( 'Are you sure you want to refund %s? This action cannot be undone.', 'gatewaykit' ),
+								$item['amount'] . ' ' . $item['currency']
+							)
+						)
+					),
 					esc_html__( 'Refund', 'gatewaykit' )
 				);
 		}
@@ -792,23 +817,23 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 	 */
 	private function get_status_badge( $status ) {
 		$status_labels = array(
-			'pending'             => __( 'Pending', 'gatewaykit' ),
-			'processing'          => __( 'Processing', 'gatewaykit' ),
-			'completed'           => __( 'Completed', 'gatewaykit' ),
-			'failed'              => __( 'Failed', 'gatewaykit' ),
-			'cancelled'           => __( 'Cancelled', 'gatewaykit' ),
-			'refunded'            => __( 'Refunded', 'gatewaykit' ),
-			'partially_refunded'  => __( 'Partial Refund', 'gatewaykit' ),
+			'pending'            => __( 'Pending', 'gatewaykit' ),
+			'processing'         => __( 'Processing', 'gatewaykit' ),
+			'completed'          => __( 'Completed', 'gatewaykit' ),
+			'failed'             => __( 'Failed', 'gatewaykit' ),
+			'cancelled'          => __( 'Cancelled', 'gatewaykit' ),
+			'refunded'           => __( 'Refunded', 'gatewaykit' ),
+			'partially_refunded' => __( 'Partial Refund', 'gatewaykit' ),
 		);
 
 		$status_classes = array(
-			'pending'             => 'gatewaykit-status-pending',
-			'processing'          => 'gatewaykit-status-processing',
-			'completed'           => 'gatewaykit-status-completed',
-			'failed'              => 'gatewaykit-status-failed',
-			'cancelled'           => 'gatewaykit-status-cancelled',
-			'refunded'            => 'gatewaykit-status-refunded',
-			'partially_refunded'  => 'gatewaykit-status-partial-refund',
+			'pending'            => 'gatewaykit-status-pending',
+			'processing'         => 'gatewaykit-status-processing',
+			'completed'          => 'gatewaykit-status-completed',
+			'failed'             => 'gatewaykit-status-failed',
+			'cancelled'          => 'gatewaykit-status-cancelled',
+			'refunded'           => 'gatewaykit-status-refunded',
+			'partially_refunded' => 'gatewaykit-status-partial-refund',
 		);
 
 		$label = isset( $status_labels[ $status ] ) ? $status_labels[ $status ] : ucfirst( $status );
@@ -818,8 +843,8 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 	}
 
 	/**
-		* Get error info display
-		*/
+	 * Get error info display
+	 */
 	private function get_error_info_display( $item ) {
 		// Only show error info for failed transactions
 		if ( $item['status'] !== 'failed' ) {
@@ -827,8 +852,8 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 		}
 
 		$error_message = ! empty( $item['error_message'] ) ? $item['error_message'] : '';
-		$error_type = ! empty( $item['error_type'] ) ? $item['error_type'] : '';
-		$error_code = ! empty( $item['error_code'] ) ? $item['error_code'] : '';
+		$error_type    = ! empty( $item['error_type'] ) ? $item['error_type'] : '';
+		$error_code    = ! empty( $item['error_code'] ) ? $item['error_code'] : '';
 
 		if ( empty( $error_message ) && empty( $error_type ) ) {
 			return '<span class="gatewaykit-error-unknown">' . esc_html__( 'Unknown error', 'gatewaykit' ) . '</span>';
@@ -841,15 +866,15 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 		}
 		if ( ! empty( $error_type ) ) {
 			$error_type_labels = array(
-				'license'     => __( 'License Error', 'gatewaykit' ),
-				'gateway'     => __( 'Gateway Error', 'gatewaykit' ),
+				'license'       => __( 'License Error', 'gatewaykit' ),
+				'gateway'       => __( 'Gateway Error', 'gatewaykit' ),
 				'configuration' => __( 'Configuration Error', 'gatewaykit' ),
-				'network'     => __( 'Network Error', 'gatewaykit' ),
-				'validation'  => __( 'Validation Error', 'gatewaykit' ),
-				'unknown'     => __( 'Unknown Error', 'gatewaykit' ),
+				'network'       => __( 'Network Error', 'gatewaykit' ),
+				'validation'    => __( 'Validation Error', 'gatewaykit' ),
+				'unknown'       => __( 'Unknown Error', 'gatewaykit' ),
 			);
-			$error_type_label = isset( $error_type_labels[ $error_type ] ) ? $error_type_labels[ $error_type ] : ucfirst( $error_type );
-			$tooltip_content .= '<strong>' . esc_html__( 'Type:', 'gatewaykit' ) . '</strong> ' . esc_html( $error_type_label ) . '<br>';
+			$error_type_label  = isset( $error_type_labels[ $error_type ] ) ? $error_type_labels[ $error_type ] : ucfirst( $error_type );
+			$tooltip_content  .= '<strong>' . esc_html__( 'Type:', 'gatewaykit' ) . '</strong> ' . esc_html( $error_type_label ) . '<br>';
 		}
 		if ( ! empty( $error_code ) ) {
 			$tooltip_content .= '<strong>' . esc_html__( 'Code:', 'gatewaykit' ) . '</strong> ' . esc_html( $error_code ) . '<br>';
@@ -867,14 +892,14 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 		}
 
 		return '<span class="gatewaykit-error-info ' . esc_attr( $severity_class ) . '" title="' . esc_attr( wp_strip_all_tags( $tooltip_content ) ) . '">' .
-			   '<span class="dashicons dashicons-warning" style="margin-top: 2px;"></span> ' .
-			   esc_html( $raw_text ) .
-			   '</span>';
+				'<span class="dashicons dashicons-warning" style="margin-top: 2px;"></span> ' .
+				esc_html( $raw_text ) .
+				'</span>';
 	}
 
 	/**
-		* Get error severity class
-		*/
+	 * Get error severity class
+	 */
 	private function get_error_severity_class( $error_type ) {
 		$severity_classes = array(
 			'license'       => 'gatewaykit-error-critical',
@@ -934,7 +959,7 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 
 		// Detect a bulk action from either the top or bottom selector.
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- nonce verified inside process_bulk_action()
-		$action  = isset( $_REQUEST['action'] ) ? sanitize_key( wp_unslash( $_REQUEST['action'] ) ) : '';
+		$action = isset( $_REQUEST['action'] ) ? sanitize_key( wp_unslash( $_REQUEST['action'] ) ) : '';
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- nonce verified inside process_bulk_action()
 		$action2 = isset( $_REQUEST['action2'] ) ? sanitize_key( wp_unslash( $_REQUEST['action2'] ) ) : '';
 
@@ -952,7 +977,13 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 	public function process_bulk_action() {
 		$current_action = $this->current_action();
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			GatewayKit_Logger::get_instance()->debug( 'process_bulk_action called', array( 'current_action' => $current_action, 'plural' => $this->_args['plural'] ) );
+			GatewayKit_Logger::get_instance()->debug(
+				'process_bulk_action called',
+				array(
+					'current_action' => $current_action,
+					'plural'         => $this->_args['plural'],
+				)
+			);
 		}
 
 		if ( $current_action === 'delete' ) {
@@ -999,13 +1030,15 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 				if ( ! $referer ) {
 					$referer = admin_url( 'admin.php?page=gatewaykit-transactions' );
 				}
-				wp_safe_redirect( add_query_arg(
-					array(
-						'gatewaykit_notice' => 'no_transactions_selected_for_export',
-						'gatewaykit_notice_type' => 'error',
-					),
-					$referer
-				) );
+				wp_safe_redirect(
+					add_query_arg(
+						array(
+							'gatewaykit_notice'      => 'no_transactions_selected_for_export',
+							'gatewaykit_notice_type' => 'error',
+						),
+						$referer
+					)
+				);
 				exit;
 			}
 			$this->bulk_export( $transaction_ids );

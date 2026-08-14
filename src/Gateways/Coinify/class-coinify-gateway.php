@@ -58,8 +58,22 @@ class GatewayKit_Coinify_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 	 */
 	public function get_supported_currencies() {
 		return array(
-			'USD', 'EUR', 'GBP', 'AUD', 'CAD', 'DKK', 'HKD', 'INR',
-			'JPY', 'MYR', 'MXN', 'NZD', 'NOK', 'SGD', 'SEK', 'CHF',
+			'USD',
+			'EUR',
+			'GBP',
+			'AUD',
+			'CAD',
+			'DKK',
+			'HKD',
+			'INR',
+			'JPY',
+			'MYR',
+			'MXN',
+			'NZD',
+			'NOK',
+			'SGD',
+			'SEK',
+			'CHF',
 		);
 	}
 
@@ -84,12 +98,12 @@ class GatewayKit_Coinify_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 				'label'       => __( 'Sandbox Mode', 'gatewaykit' ),
 				'description' => __( 'Use the Coinify sandbox environment for testing.', 'gatewaykit' ),
 			),
-			'api_key' => array(
+			'api_key'      => array(
 				'type'        => 'password',
 				'label'       => __( 'API Key', 'gatewaykit' ),
 				'description' => __( 'Your Coinify API key. Stored encrypted.', 'gatewaykit' ),
 			),
-			'api_secret' => array(
+			'api_secret'   => array(
 				'type'        => 'password',
 				'label'       => __( 'API Secret', 'gatewaykit' ),
 				'description' => __( 'Your Coinify API secret for webhook signature verification. Stored encrypted.', 'gatewaykit' ),
@@ -235,7 +249,15 @@ class GatewayKit_Coinify_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 			if ( is_array( $decoded ) && isset( $decoded['errors'] ) ) {
 				$message = wp_json_encode( $decoded['errors'] );
 			}
-			$this->log( 'error', 'Coinify API error', array( 'path' => $path, 'status' => $code, 'body' => $decoded ) );
+			$this->log(
+				'error',
+				'Coinify API error',
+				array(
+					'path'   => $path,
+					'status' => $code,
+					'body'   => $decoded,
+				)
+			);
 			return new WP_Error( 'coinify_api_error', $message );
 		}
 
@@ -273,10 +295,10 @@ class GatewayKit_Coinify_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 		$cancel_url = add_query_arg( $cancel_args, $callback_url );
 
 		$params = array(
-			'amount'     => $formatted,
-			'currency'   => $currency,
-			'external_id' => $ref,
-			'description' => $description ? mb_substr( (string) $description, 0, 200 ) : __( 'Payment', 'gatewaykit' ),
+			'amount'       => $formatted,
+			'currency'     => $currency,
+			'external_id'  => $ref,
+			'description'  => $description ? mb_substr( (string) $description, 0, 200 ) : __( 'Payment', 'gatewaykit' ),
 			'callback_url' => $this->get_webhook_url(),
 			'success_url'  => $success_url,
 			'cancel_url'   => $cancel_url,
@@ -315,7 +337,16 @@ class GatewayKit_Coinify_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 		set_transient( 'gatewaykit_cf_token_' . $intent_id, $intent_token, $ttl );
 		set_transient( 'gatewaykit_cf_redirect_' . $ref, $payment_url, DAY_IN_SECONDS );
 
-		$this->log( 'info', 'Coinify intent created', array( 'intent_id' => $intent_id, 'ref' => $ref, 'amount' => $formatted, 'currency' => $currency ) );
+		$this->log(
+			'info',
+			'Coinify intent created',
+			array(
+				'intent_id' => $intent_id,
+				'ref'       => $ref,
+				'amount'    => $formatted,
+				'currency'  => $currency,
+			)
+		);
 
 		return array(
 			'status'       => 'success',
@@ -367,7 +398,14 @@ class GatewayKit_Coinify_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 		$expected = $this->format_amount( $amount );
 		$paid     = isset( $intent['amount'] ) ? (float) $intent['amount'] : $expected;
 		if ( abs( $paid - $expected ) > 0.01 ) {
-			$this->log( 'error', 'Coinify amount mismatch', array( 'expected' => $expected, 'paid' => $paid ) );
+			$this->log(
+				'error',
+				'Coinify amount mismatch',
+				array(
+					'expected' => $expected,
+					'paid'     => $paid,
+				)
+			);
 			return array(
 				'status'        => 'failed',
 				'error_message' => __( 'Coinify payment amount does not match the intent amount.', 'gatewaykit' ),
@@ -401,7 +439,7 @@ class GatewayKit_Coinify_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 	 * the matching transaction.
 	 */
 	public function handle_webhook() {
-		$body = file_get_contents( 'php://input' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+		$body    = file_get_contents( 'php://input' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 		$payload = json_decode( $body, true );
 
 		if ( ! is_array( $payload ) ) {
@@ -444,7 +482,7 @@ class GatewayKit_Coinify_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 			$signature = sanitize_text_field( wp_unslash( $_SERVER['HTTP_X_COINIFY_SIGNATURE'] ) );
 		}
 		// phpcs:enable
-		$expected  = hash_hmac( 'sha256', $body, $secret );
+		$expected = hash_hmac( 'sha256', $body, $secret );
 		if ( '' === $signature || ! hash_equals( $expected, $signature ) ) {
 			GatewayKit_Logger::get_instance()->warning( 'Coinify webhook: signature mismatch', array( 'intent_id' => $intent_id ) );
 			status_header( 403 );
@@ -485,22 +523,29 @@ class GatewayKit_Coinify_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 				$expected_amount = (float) $transaction->amount;
 
 				if ( abs( $paid_amount - $expected_amount ) > 0.01 ) {
-					$this->log( 'error', sprintf(
-						'Webhook amount mismatch: expected %.2f, received %.2f — marking as failed',
-						$expected_amount, $paid_amount
-					), array(
-						'transaction_id' => $transaction->id,
-						'gateway'        => $this->get_gateway_id(),
-					) );
+					$this->log(
+						'error',
+						sprintf(
+							'Webhook amount mismatch: expected %.2f, received %.2f — marking as failed',
+							$expected_amount,
+							$paid_amount
+						),
+						array(
+							'transaction_id' => $transaction->id,
+							'gateway'        => $this->get_gateway_id(),
+						)
+					);
 					$transaction->update( array( 'status' => 'failed' ) );
 					return;
 				}
 
-				$transaction->update( array(
-					'status'       => 'completed',
-					'ref_id'       => $intent_id,
-					'completed_at' => current_time( 'mysql' ),
-				) );
+				$transaction->update(
+					array(
+						'status'       => 'completed',
+						'ref_id'       => $intent_id,
+						'completed_at' => current_time( 'mysql' ),
+					)
+				);
 				do_action( 'gatewaykit_payment_completed', $transaction );
 			} elseif ( in_array( $status, array( 'failed', 'expired', 'refunded' ), true ) ) {
 				$transaction->update( array( 'status' => 'failed' ) );

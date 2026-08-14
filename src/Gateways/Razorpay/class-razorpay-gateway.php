@@ -51,7 +51,16 @@ class GatewayKit_Razorpay_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 	 */
 	public function get_supported_currencies() {
 		return array(
-			'INR', 'USD', 'EUR', 'GBP', 'AED', 'SGD', 'MYR', 'AUD', 'CAD', 'JPY',
+			'INR',
+			'USD',
+			'EUR',
+			'GBP',
+			'AED',
+			'SGD',
+			'MYR',
+			'AUD',
+			'CAD',
+			'JPY',
 		);
 	}
 
@@ -71,17 +80,17 @@ class GatewayKit_Razorpay_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 	 */
 	public function get_settings_fields() {
 		return array(
-			'sandbox_mode' => array(
+			'sandbox_mode'   => array(
 				'type'        => 'checkbox',
 				'label'       => __( 'Test Mode', 'gatewaykit' ),
 				'description' => __( 'Use your Razorpay test (sandbox) API keys.', 'gatewaykit' ),
 			),
-			'key_id' => array(
+			'key_id'         => array(
 				'type'        => 'text',
 				'label'       => __( 'Key ID', 'gatewaykit' ),
 				'description' => __( 'Your Razorpay Key ID (starts with rzp_).', 'gatewaykit' ),
 			),
-			'key_secret' => array(
+			'key_secret'     => array(
 				'type'        => 'password',
 				'label'       => __( 'Key Secret', 'gatewaykit' ),
 				'description' => __( 'Your Razorpay Key Secret. Stored encrypted.', 'gatewaykit' ),
@@ -226,7 +235,15 @@ class GatewayKit_Razorpay_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 
 		if ( $code < 200 || $code >= 300 ) {
 			$message = isset( $decoded['error']['description'] ) ? $decoded['error']['description'] : __( 'Razorpay request failed.', 'gatewaykit' );
-			$this->log( 'error', 'Razorpay API error', array( 'path' => $path, 'status' => $code, 'body' => $decoded ) );
+			$this->log(
+				'error',
+				'Razorpay API error',
+				array(
+					'path'   => $path,
+					'status' => $code,
+					'body'   => $decoded,
+				)
+			);
 			return new WP_Error( 'razorpay_api_error', $message );
 		}
 
@@ -308,7 +325,16 @@ class GatewayKit_Razorpay_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 		set_transient( 'gatewaykit_razorpay_oid_' . $order_id, $ref, $ttl );
 		set_transient( 'gatewaykit_razorpay_redirect_' . $ref, $redirect_url, DAY_IN_SECONDS );
 
-		$this->log( 'info', 'Razorpay order created', array( 'order_id' => $order_id, 'ref' => $ref, 'amount' => $formatted, 'currency' => $currency ) );
+		$this->log(
+			'info',
+			'Razorpay order created',
+			array(
+				'order_id' => $order_id,
+				'ref'      => $ref,
+				'amount'   => $formatted,
+				'currency' => $currency,
+			)
+		);
 
 		return array(
 			'status'       => 'success',
@@ -360,7 +386,14 @@ class GatewayKit_Razorpay_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 		$expected = $this->format_amount( $amount );
 		$paid     = isset( $order['amount_paid'] ) ? (int) $order['amount_paid'] : $expected;
 		if ( $paid !== $expected ) {
-			$this->log( 'error', 'Razorpay amount mismatch', array( 'expected' => $expected, 'paid' => $paid ) );
+			$this->log(
+				'error',
+				'Razorpay amount mismatch',
+				array(
+					'expected' => $expected,
+					'paid'     => $paid,
+				)
+			);
 			return array(
 				'status'        => 'failed',
 				'error_message' => __( 'Razorpay payment amount does not match the order amount.', 'gatewaykit' ),
@@ -383,7 +416,14 @@ class GatewayKit_Razorpay_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 			$payment_id = $order_id;
 		}
 
-		$this->log( 'info', 'Razorpay payment verified', array( 'order_id' => $order_id, 'payment_id' => $payment_id ) );
+		$this->log(
+			'info',
+			'Razorpay payment verified',
+			array(
+				'order_id'   => $order_id,
+				'payment_id' => $payment_id,
+			)
+		);
 
 		return array(
 			'status' => 'success',
@@ -507,23 +547,30 @@ class GatewayKit_Razorpay_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 			$expected_amount = (float) $transaction->amount;
 
 			if ( abs( $paid_amount - $expected_amount ) > 0.01 ) {
-				$this->log( 'error', sprintf(
-					'Webhook amount mismatch: expected %.2f, received %.2f — marking as failed',
-					$expected_amount, $paid_amount
-				), array(
-					'transaction_id' => $transaction->id,
-					'gateway'        => $this->get_gateway_id(),
-				) );
+				$this->log(
+					'error',
+					sprintf(
+						'Webhook amount mismatch: expected %.2f, received %.2f — marking as failed',
+						$expected_amount,
+						$paid_amount
+					),
+					array(
+						'transaction_id' => $transaction->id,
+						'gateway'        => $this->get_gateway_id(),
+					)
+				);
 				$transaction->update( array( 'status' => 'failed' ) );
 				return;
 			}
 
 			$payment_id = isset( $payment['id'] ) ? sanitize_text_field( (string) $payment['id'] ) : $order_id;
-			$transaction->update( array(
-				'status'       => 'completed',
-				'ref_id'       => $payment_id,
-				'completed_at' => current_time( 'mysql' ),
-			) );
+			$transaction->update(
+				array(
+					'status'       => 'completed',
+					'ref_id'       => $payment_id,
+					'completed_at' => current_time( 'mysql' ),
+				)
+			);
 			do_action( 'gatewaykit_payment_completed', $transaction );
 		}
 

@@ -73,12 +73,12 @@ class GatewayKit_Paystack_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 				'label'       => __( 'Test Mode', 'gatewaykit' ),
 				'description' => __( 'Use your Paystack test keys (starts with sk_test_).', 'gatewaykit' ),
 			),
-			'secret_key' => array(
+			'secret_key'   => array(
 				'type'        => 'password',
 				'label'       => __( 'Secret Key', 'gatewaykit' ),
 				'description' => __( 'Your Paystack secret key (sk_live_... or sk_test_...). Stored encrypted.', 'gatewaykit' ),
 			),
-			'public_key' => array(
+			'public_key'   => array(
 				'type'        => 'text',
 				'label'       => __( 'Public Key', 'gatewaykit' ),
 				'description' => __( 'Your Paystack public key (pk_live_... or pk_test_...).', 'gatewaykit' ),
@@ -197,7 +197,15 @@ class GatewayKit_Paystack_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 
 		if ( $code < 200 || $code >= 300 ) {
 			$message = isset( $decoded['message'] ) ? $decoded['message'] : __( 'Paystack request failed.', 'gatewaykit' );
-			$this->log( 'error', 'Paystack API error', array( 'path' => $path, 'status' => $code, 'body' => $decoded ) );
+			$this->log(
+				'error',
+				'Paystack API error',
+				array(
+					'path'   => $path,
+					'status' => $code,
+					'body'   => $decoded,
+				)
+			);
 			return new WP_Error( 'paystack_api_error', $message );
 		}
 
@@ -257,9 +265,9 @@ class GatewayKit_Paystack_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 		if ( $description ) {
 			// Paystack does not have a description field per se, but accepts metadata.
 			$body['metadata'] = array(
-				'custom_fields' => array(
+				'custom_fields'  => array(
 					array(
-						'display_name' => __( 'Description', 'gatewaykit' ),
+						'display_name'  => __( 'Description', 'gatewaykit' ),
 						'variable_name' => 'description',
 						'value'         => mb_substr( (string) $description, 0, 255 ),
 					),
@@ -298,7 +306,16 @@ class GatewayKit_Paystack_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 		// Cache the reference -> authorization_url mapping for redirect resolution.
 		set_transient( 'gatewaykit_paystack_auth_' . $reference, $authorization_url, DAY_IN_SECONDS );
 
-		$this->log( 'info', 'Paystack transaction initialized', array( 'reference' => $reference, 'access_code' => $access_code, 'amount' => $formatted, 'currency' => $currency ) );
+		$this->log(
+			'info',
+			'Paystack transaction initialized',
+			array(
+				'reference'   => $reference,
+				'access_code' => $access_code,
+				'amount'      => $formatted,
+				'currency'    => $currency,
+			)
+		);
 
 		return array(
 			'status'       => 'success',
@@ -353,7 +370,14 @@ class GatewayKit_Paystack_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 		$paid     = isset( $data['amount'] ) ? (int) $data['amount'] : $expected;
 
 		if ( abs( $paid - $expected ) > 0 ) {
-			$this->log( 'error', 'Paystack amount mismatch', array( 'expected' => $expected, 'paid' => $paid ) );
+			$this->log(
+				'error',
+				'Paystack amount mismatch',
+				array(
+					'expected' => $expected,
+					'paid'     => $paid,
+				)
+			);
 			return array(
 				'status'        => 'failed',
 				'error_message' => __( 'Paystack payment amount does not match the order amount.', 'gatewaykit' ),
@@ -446,22 +470,29 @@ class GatewayKit_Paystack_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 			$expected_amount = (float) $transaction->amount;
 
 			if ( abs( $paid_amount - $expected_amount ) > 0.01 ) {
-				$this->log( 'error', sprintf(
-					'Webhook amount mismatch: expected %.2f, received %.2f — marking as failed',
-					$expected_amount, $paid_amount
-				), array(
-					'transaction_id' => $transaction->id,
-					'gateway'        => $this->get_gateway_id(),
-				) );
+				$this->log(
+					'error',
+					sprintf(
+						'Webhook amount mismatch: expected %.2f, received %.2f — marking as failed',
+						$expected_amount,
+						$paid_amount
+					),
+					array(
+						'transaction_id' => $transaction->id,
+						'gateway'        => $this->get_gateway_id(),
+					)
+				);
 				$transaction->update( array( 'status' => 'failed' ) );
 				return;
 			}
 
-			$transaction->update( array(
-				'status'       => 'completed',
-				'ref_id'       => $reference,
-				'completed_at' => current_time( 'mysql' ),
-			) );
+			$transaction->update(
+				array(
+					'status'       => 'completed',
+					'ref_id'       => $reference,
+					'completed_at' => current_time( 'mysql' ),
+				)
+			);
 			do_action( 'gatewaykit_payment_completed', $transaction );
 		}
 

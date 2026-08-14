@@ -151,10 +151,10 @@ class GatewayKit_IP_Helper {
 		}
 
 		list( $range_ip, $netmask ) = explode( '/', $range, 2 );
-		$netmask = (int) $netmask;
+		$netmask                    = (int) $netmask;
 
-		$is_ipv6      = false !== strpos( $range_ip, ':' );
-		$ip_is_ipv6   = false !== strpos( $ip, ':' );
+		$is_ipv6    = false !== strpos( $range_ip, ':' );
+		$ip_is_ipv6 = false !== strpos( $ip, ':' );
 
 		// IPv4 vs IPv6 mismatch — not a match.
 		if ( $is_ipv6 !== $ip_is_ipv6 ) {

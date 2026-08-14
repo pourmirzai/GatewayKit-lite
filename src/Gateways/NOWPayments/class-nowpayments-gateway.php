@@ -55,9 +55,32 @@ class GatewayKit_NOWPayments_Gateway extends GatewayKit_Abstract_Payment_Gateway
 	 */
 	public function get_supported_currencies() {
 		return array(
-			'USD', 'EUR', 'GBP', 'AUD', 'CAD', 'CHF', 'CNY', 'CZK', 'DKK',
-			'HKD', 'HUF', 'INR', 'JPY', 'KRW', 'MXN', 'MYR', 'NOK', 'NZD',
-			'PHP', 'PLN', 'RUB', 'SEK', 'SGD', 'THB', 'TRY', 'ZAR',
+			'USD',
+			'EUR',
+			'GBP',
+			'AUD',
+			'CAD',
+			'CHF',
+			'CNY',
+			'CZK',
+			'DKK',
+			'HKD',
+			'HUF',
+			'INR',
+			'JPY',
+			'KRW',
+			'MXN',
+			'MYR',
+			'NOK',
+			'NZD',
+			'PHP',
+			'PLN',
+			'RUB',
+			'SEK',
+			'SGD',
+			'THB',
+			'TRY',
+			'ZAR',
 		);
 	}
 
@@ -82,12 +105,12 @@ class GatewayKit_NOWPayments_Gateway extends GatewayKit_Abstract_Payment_Gateway
 				'label'       => __( 'Sandbox Mode', 'gatewaykit' ),
 				'description' => __( 'Use the NOWPayments sandbox environment for testing.', 'gatewaykit' ),
 			),
-			'api_key' => array(
+			'api_key'      => array(
 				'type'        => 'password',
 				'label'       => __( 'API Key', 'gatewaykit' ),
 				'description' => __( 'Your NOWPayments API key. Stored encrypted.', 'gatewaykit' ),
 			),
-			'ipn_secret' => array(
+			'ipn_secret'   => array(
 				'type'        => 'password',
 				'label'       => __( 'IPN Secret', 'gatewaykit' ),
 				'description' => __( 'Instant Payment Notification secret for webhook signature verification. Stored encrypted. If empty, IPN webhooks are rejected for security.', 'gatewaykit' ),
@@ -229,7 +252,15 @@ class GatewayKit_NOWPayments_Gateway extends GatewayKit_Abstract_Payment_Gateway
 
 		if ( $code < 200 || $code >= 300 ) {
 			$message = isset( $decoded['message'] ) ? $decoded['message'] : __( 'NOWPayments request failed.', 'gatewaykit' );
-			$this->log( 'error', 'NOWPayments API error', array( 'path' => $path, 'status' => $code, 'body' => $decoded ) );
+			$this->log(
+				'error',
+				'NOWPayments API error',
+				array(
+					'path'   => $path,
+					'status' => $code,
+					'body'   => $decoded,
+				)
+			);
 			return new WP_Error( 'nowpayments_api_error', $message );
 		}
 
@@ -269,13 +300,13 @@ class GatewayKit_NOWPayments_Gateway extends GatewayKit_Abstract_Payment_Gateway
 		$cancel_url = add_query_arg( $cancel_args, $callback_url );
 
 		$params = array(
-			'price_amount'     => $formatted,
-			'price_currency'   => $currency,
-			'order_id'         => $ref,
+			'price_amount'      => $formatted,
+			'price_currency'    => $currency,
+			'order_id'          => $ref,
 			'order_description' => $description ? mb_substr( (string) $description, 0, 200 ) : __( 'Payment', 'gatewaykit' ),
-			'success_url'      => $success_url,
-			'cancel_url'       => $cancel_url,
-			'ipn_callback_url' => $this->get_webhook_url(),
+			'success_url'       => $success_url,
+			'cancel_url'        => $cancel_url,
+			'ipn_callback_url'  => $this->get_webhook_url(),
 		);
 
 		$response = $this->api_request( '/invoice', $params, 'POST' );
@@ -304,7 +335,16 @@ class GatewayKit_NOWPayments_Gateway extends GatewayKit_Abstract_Payment_Gateway
 		set_transient( 'gatewaykit_np_redirect_' . $ref, $invoice_url, DAY_IN_SECONDS );
 		set_transient( 'gatewaykit_np_pid_' . $invoice_id, $ref, $ttl );
 
-		$this->log( 'info', 'NOWPayments invoice created', array( 'invoice_id' => $invoice_id, 'ref' => $ref, 'amount' => $formatted, 'currency' => $currency ) );
+		$this->log(
+			'info',
+			'NOWPayments invoice created',
+			array(
+				'invoice_id' => $invoice_id,
+				'ref'        => $ref,
+				'amount'     => $formatted,
+				'currency'   => $currency,
+			)
+		);
 
 		return array(
 			'status'       => 'success',
@@ -361,7 +401,14 @@ class GatewayKit_NOWPayments_Gateway extends GatewayKit_Abstract_Payment_Gateway
 		$expected = $this->format_amount( $amount );
 		$paid     = isset( $result['price_amount'] ) ? (float) $result['price_amount'] : $expected;
 		if ( abs( $paid - $expected ) > 0.01 ) {
-			$this->log( 'error', 'NOWPayments amount mismatch', array( 'expected' => $expected, 'paid' => $paid ) );
+			$this->log(
+				'error',
+				'NOWPayments amount mismatch',
+				array(
+					'expected' => $expected,
+					'paid'     => $paid,
+				)
+			);
 			return array(
 				'status'        => 'failed',
 				'error_message' => __( 'NOWPayments payment amount does not match the invoice amount.', 'gatewaykit' ),
@@ -447,7 +494,7 @@ class GatewayKit_NOWPayments_Gateway extends GatewayKit_Abstract_Payment_Gateway
 			exit;
 		}
 
-		$order_id      = isset( $decoded['order_id'] ) ? sanitize_text_field( $decoded['order_id'] ) : '';
+		$order_id       = isset( $decoded['order_id'] ) ? sanitize_text_field( $decoded['order_id'] ) : '';
 		$payment_status = isset( $decoded['payment_status'] ) ? sanitize_text_field( $decoded['payment_status'] ) : '';
 
 		if ( '' === $order_id ) {
@@ -485,22 +532,29 @@ class GatewayKit_NOWPayments_Gateway extends GatewayKit_Abstract_Payment_Gateway
 				$expected_amount = (float) $transaction->amount;
 
 				if ( abs( $paid_amount - $expected_amount ) > 0.01 ) {
-					$this->log( 'error', sprintf(
-						'Webhook amount mismatch: expected %.2f, received %.2f — marking as failed',
-						$expected_amount, $paid_amount
-					), array(
-						'transaction_id' => $transaction->id,
-						'gateway'        => $this->get_gateway_id(),
-					) );
+					$this->log(
+						'error',
+						sprintf(
+							'Webhook amount mismatch: expected %.2f, received %.2f — marking as failed',
+							$expected_amount,
+							$paid_amount
+						),
+						array(
+							'transaction_id' => $transaction->id,
+							'gateway'        => $this->get_gateway_id(),
+						)
+					);
 					$transaction->update( array( 'status' => 'failed' ) );
 					return;
 				}
 
-				$transaction->update( array(
-					'status'       => 'completed',
-					'ref_id'       => $order_id,
-					'completed_at' => current_time( 'mysql' ),
-				) );
+				$transaction->update(
+					array(
+						'status'       => 'completed',
+						'ref_id'       => $order_id,
+						'completed_at' => current_time( 'mysql' ),
+					)
+				);
 				do_action( 'gatewaykit_payment_completed', $transaction );
 			} elseif ( in_array( $payment_status, $failed_statuses, true ) ) {
 				$transaction->update( array( 'status' => 'failed' ) );

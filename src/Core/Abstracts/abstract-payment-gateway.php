@@ -148,7 +148,7 @@ abstract class GatewayKit_Abstract_Payment_Gateway implements GatewayKit_Payment
 
 		// Check required settings
 		$required_settings = $this->get_required_settings();
-		$errors = array();
+		$errors            = array();
 
 		foreach ( $required_settings as $setting ) {
 			if ( empty( $validated_settings[ $setting ] ) ) {

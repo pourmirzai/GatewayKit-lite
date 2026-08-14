@@ -33,8 +33,22 @@ class GatewayKit_Stripe_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 	 * @var array
 	 */
 	private static $zero_decimal = array(
-		'BIF', 'CLP', 'DJF', 'GNF', 'JPY', 'KMF', 'KRW', 'MGA', 'PYG', 'RWF',
-		'UGX', 'VND', 'VUV', 'XAF', 'XOF', 'XPF',
+		'BIF',
+		'CLP',
+		'DJF',
+		'GNF',
+		'JPY',
+		'KMF',
+		'KRW',
+		'MGA',
+		'PYG',
+		'RWF',
+		'UGX',
+		'VND',
+		'VUV',
+		'XAF',
+		'XOF',
+		'XPF',
 	);
 
 	/**
@@ -65,9 +79,29 @@ class GatewayKit_Stripe_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 	 */
 	public function get_supported_currencies() {
 		return array(
-			'USD', 'EUR', 'GBP', 'AUD', 'BRL', 'CAD', 'CNY', 'CZK', 'DKK',
-			'HKD', 'HUF', 'INR', 'JPY', 'MYR', 'MXN', 'NZD', 'NOK', 'PHP',
-			'PLN', 'SGD', 'SEK', 'CHF', 'THB',
+			'USD',
+			'EUR',
+			'GBP',
+			'AUD',
+			'BRL',
+			'CAD',
+			'CNY',
+			'CZK',
+			'DKK',
+			'HKD',
+			'HUF',
+			'INR',
+			'JPY',
+			'MYR',
+			'MXN',
+			'NZD',
+			'NOK',
+			'PHP',
+			'PLN',
+			'SGD',
+			'SEK',
+			'CHF',
+			'THB',
 		);
 	}
 
@@ -105,27 +139,27 @@ class GatewayKit_Stripe_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 	 */
 	public function get_settings_fields() {
 		$fields = array(
-			'sandbox_mode' => array(
+			'sandbox_mode'      => array(
 				'type'        => 'checkbox',
 				'label'       => __( 'Test Mode', 'gatewaykit' ),
 				'description' => __( 'Use Stripe sandbox (test) keys. Check this when using rk_test_ / sk_test_ keys.', 'gatewaykit' ),
 			),
-			'publishable_key' => array(
+			'publishable_key'   => array(
 				'type'        => 'text',
 				'label'       => __( 'Publishable Key (optional)', 'gatewaykit' ),
 				'description' => __( 'Optional. Not used by the hosted Checkout flow. Paste pk_live_... or pk_test_... only if you need it elsewhere.', 'gatewaykit' ),
 			),
-			'secret_key' => array(
+			'secret_key'        => array(
 				'type'        => 'password',
 				'label'       => __( 'Secret Key', 'gatewaykit' ),
 				'description' => __( 'Your server-side key: a restricted key (rk_live_... / rk_test_ — recommended) or a secret key (sk_live_... / sk_test_...). Stored encrypted.', 'gatewaykit' ),
 			),
-			'webhook_secret' => array(
+			'webhook_secret'    => array(
 				'type'        => 'password',
 				'label'       => __( 'Webhook Signing Secret', 'gatewaykit' ),
 				'description' => __( 'The signing secret for your Stripe webhook endpoint (whsec_...). Required to verify webhooks.', 'gatewaykit' ),
 			),
-			'checkout_mode' => array(
+			'checkout_mode'     => array(
 				'type'        => 'select',
 				'label'       => __( 'Checkout Display Mode', 'gatewaykit' ),
 				'options'     => array(
@@ -135,7 +169,7 @@ class GatewayKit_Stripe_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 				'default'     => 'hosted',
 				'description' => __( 'Embedded mode keeps customers on your site for a smoother experience. Requires Publishable Key. Hosted mode redirects to Stripe’s optimized checkout page.', 'gatewaykit' ),
 			),
-			'enable_apple_pay' => array(
+			'enable_apple_pay'  => array(
 				'type'        => 'checkbox',
 				'label'       => __( 'Apple Pay', 'gatewaykit' ),
 				'description' => __( 'Show Apple Pay button on checkout. Requires domain verification in Stripe Dashboard → Settings → Payment Methods → Apple Pay.', 'gatewaykit' ),
@@ -145,12 +179,12 @@ class GatewayKit_Stripe_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 				'label'       => __( 'Google Pay', 'gatewaykit' ),
 				'description' => __( 'Show Google Pay button on checkout. Requires domain verification in Stripe Dashboard.', 'gatewaykit' ),
 			),
-			'enable_klarna' => array(
+			'enable_klarna'     => array(
 				'type'        => 'checkbox',
 				'label'       => __( 'Klarna (Buy Now Pay Later)', 'gatewaykit' ),
 				'description' => __( 'Let customers pay in installments with Klarna. Availability depends on your Stripe account region.', 'gatewaykit' ),
 			),
-			'enable_afterpay' => array(
+			'enable_afterpay'   => array(
 				'type'        => 'checkbox',
 				'label'       => __( 'Afterpay / Clearpay (Buy Now Pay Later)', 'gatewaykit' ),
 				'description' => __( 'Let customers pay in 4 installments. Availability depends on your Stripe account region.', 'gatewaykit' ),
@@ -351,7 +385,14 @@ class GatewayKit_Stripe_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 		$etype  = isset( $decoded['error']['type'] ) ? $decoded['error']['type'] : '';
 
 		if ( 401 === $code || 'invalid_request_error' === $etype || false !== strpos( $detail, 'Invalid API Key' ) ) {
-			$this->log( 'error', 'Stripe test connection: invalid key', array( 'status' => $code, 'body' => $decoded ) );
+			$this->log(
+				'error',
+				'Stripe test connection: invalid key',
+				array(
+					'status' => $code,
+					'body'   => $decoded,
+				)
+			);
 			return array(
 				'success' => false,
 				'message' => __( 'Stripe rejected the key (unauthorized). The key is invalid, revoked, or the wrong type. Generate a new restricted key (rk_) or secret key (sk_) in the Stripe Dashboard.', 'gatewaykit' ),
@@ -360,14 +401,28 @@ class GatewayKit_Stripe_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 
 		if ( 403 === $code ) {
 			// Authentication succeeded; the key just lacks this permission.
-			$this->log( 'warning', 'Stripe test connection: permission denied', array( 'status' => $code, 'body' => $decoded ) );
+			$this->log(
+				'warning',
+				'Stripe test connection: permission denied',
+				array(
+					'status' => $code,
+					'body'   => $decoded,
+				)
+			);
 			return array(
 				'success' => true,
 				'message' => __( 'The key authenticated, but it lacks read access to Checkout Sessions. Grant Checkout Sessions permission to this restricted key in the Stripe Dashboard, or payments may fail.', 'gatewaykit' ),
 			);
 		}
 
-		$this->log( 'error', 'Stripe test connection: unexpected status', array( 'status' => $code, 'body' => $decoded ) );
+		$this->log(
+			'error',
+			'Stripe test connection: unexpected status',
+			array(
+				'status' => $code,
+				'body'   => $decoded,
+			)
+		);
 		/* translators: %d: HTTP status code */
 		$msg = $detail ? $detail : sprintf( __( 'Stripe returned an unexpected response (HTTP %d).', 'gatewaykit' ), $code );
 		return array(
@@ -410,12 +465,20 @@ class GatewayKit_Stripe_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 			return new WP_Error( 'stripe_request_failed', __( 'Could not connect to Stripe. Please try again later.', 'gatewaykit' ) );
 		}
 
-		$code     = wp_remote_retrieve_response_code( $response );
-		$decoded  = json_decode( wp_remote_retrieve_body( $response ), true );
+		$code    = wp_remote_retrieve_response_code( $response );
+		$decoded = json_decode( wp_remote_retrieve_body( $response ), true );
 
 		if ( $code < 200 || $code >= 300 ) {
 			$message = isset( $decoded['error']['message'] ) ? $decoded['error']['message'] : __( 'Stripe request failed.', 'gatewaykit' );
-			$this->log( 'error', 'Stripe API error', array( 'path' => $path, 'status' => $code, 'body' => $decoded ) );
+			$this->log(
+				'error',
+				'Stripe API error',
+				array(
+					'path'   => $path,
+					'status' => $code,
+					'body'   => $decoded,
+				)
+			);
 			return new WP_Error( 'stripe_api_error', $message );
 		}
 
@@ -471,7 +534,14 @@ class GatewayKit_Stripe_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 			return $response;
 		}
 
-		$this->log( 'info', 'Stripe payment link created', array( 'amount' => $formatted, 'currency' => $currency ) );
+		$this->log(
+			'info',
+			'Stripe payment link created',
+			array(
+				'amount'   => $formatted,
+				'currency' => $currency,
+			)
+		);
 
 		return $response;
 	}
@@ -496,9 +566,9 @@ class GatewayKit_Stripe_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 			);
 		}
 
-		$currency   = $this->get_currency();
+		$currency = $this->get_currency();
 		// Recompute formatted amount now that currency may have changed.
-		$formatted  = $this->format_amount( $amount );
+		$formatted = $this->format_amount( $amount );
 
 		// Embedded mode keeps the buyer on the site, so the {CHECKOUT_SESSION_ID}
 		// template is not supported. The frontend redirects via JS after the
@@ -523,14 +593,14 @@ class GatewayKit_Stripe_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 		// subscription Checkout Session instead of a one-time payment.
 		// Requires Pro license.
 		$subscription_price_id = isset( $user_data['subscription_price_id'] ) ? sanitize_text_field( $user_data['subscription_price_id'] ) : '';
-		$is_subscription      = $this->is_pro_licensed() && '' !== $subscription_price_id && preg_match( '/^price_[A-Za-z0-9]+$/', $subscription_price_id );
+		$is_subscription       = $this->is_pro_licensed() && '' !== $subscription_price_id && preg_match( '/^price_[A-Za-z0-9]+$/', $subscription_price_id );
 
 		if ( $is_subscription ) {
 			$params = array(
-				'mode'         => 'subscription',
-				'success_url'  => $success_url,
-				'cancel_url'   => $cancel_url,
-				'line_items'   => array(
+				'mode'        => 'subscription',
+				'success_url' => $success_url,
+				'cancel_url'  => $cancel_url,
+				'line_items'  => array(
 					array(
 						'price'    => $subscription_price_id,
 						'quantity' => 1,
@@ -543,10 +613,10 @@ class GatewayKit_Stripe_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 			}
 		} else {
 			$params = array(
-				'mode'         => 'payment',
-				'success_url'  => $success_url,
-				'cancel_url'   => $cancel_url,
-				'line_items'   => array(
+				'mode'        => 'payment',
+				'success_url' => $success_url,
+				'cancel_url'  => $cancel_url,
+				'line_items'  => array(
 					array(
 						'quantity'   => 1,
 						'price_data' => array(
@@ -651,12 +721,21 @@ class GatewayKit_Stripe_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 			set_transient( 'gatewaykit_stripe_sub_' . $session_id, true, WEEK_IN_SECONDS );
 		}
 
-		$this->log( 'info', 'Stripe checkout session created', array( 'session_id' => $session_id, 'amount' => $formatted, 'currency' => $currency, 'mode' => $is_embedded ? 'embedded' : 'hosted' ) );
+		$this->log(
+			'info',
+			'Stripe checkout session created',
+			array(
+				'session_id' => $session_id,
+				'amount'     => $formatted,
+				'currency'   => $currency,
+				'mode'       => $is_embedded ? 'embedded' : 'hosted',
+			)
+		);
 
 		return array(
-			'status'       => 'success',
-			'authority'    => $session_id,
-			'redirect_url' => $redirect_url,
+			'status'        => 'success',
+			'authority'     => $session_id,
+			'redirect_url'  => $redirect_url,
 			'client_secret' => $client_secret,
 		);
 	}
@@ -704,10 +783,14 @@ class GatewayKit_Stripe_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 
 		// Validate amount. Fail closed if the session omits amount_total.
 		if ( ! isset( $session['amount_total'] ) ) {
-			$this->log( 'error', 'Stripe Checkout session missing amount_total — rejecting payment', array(
-				'session_id' => isset( $session['id'] ) ? $session['id'] : 'unknown',
-				'authority'  => $authority,
-			) );
+			$this->log(
+				'error',
+				'Stripe Checkout session missing amount_total — rejecting payment',
+				array(
+					'session_id' => isset( $session['id'] ) ? $session['id'] : 'unknown',
+					'authority'  => $authority,
+				)
+			);
 			return array(
 				'status'        => 'failed',
 				'error_message' => __( 'Stripe payment amount could not be verified.', 'gatewaykit' ),
@@ -717,7 +800,14 @@ class GatewayKit_Stripe_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 		$expected   = $this->format_amount( $amount );
 		$paid_total = (int) $session['amount_total'];
 		if ( $paid_total > 0 && abs( $paid_total - $expected ) > 0 ) {
-			$this->log( 'error', 'Stripe amount mismatch', array( 'expected' => $expected, 'paid' => $paid_total ) );
+			$this->log(
+				'error',
+				'Stripe amount mismatch',
+				array(
+					'expected' => $expected,
+					'paid'     => $paid_total,
+				)
+			);
 			return array(
 				'status'        => 'failed',
 				'error_message' => __( 'Stripe payment amount does not match the order amount.', 'gatewaykit' ),
@@ -732,7 +822,14 @@ class GatewayKit_Stripe_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 			$ref_id = (string) $session['subscription'];
 		}
 
-		$this->log( 'info', 'Stripe payment verified', array( 'session_id' => $authority, 'ref_id' => $ref_id ) );
+		$this->log(
+			'info',
+			'Stripe payment verified',
+			array(
+				'session_id' => $authority,
+				'ref_id'     => $ref_id,
+			)
+		);
 
 		return array(
 			'status' => 'success',
@@ -803,7 +900,7 @@ class GatewayKit_Stripe_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 		// Handle subscription lifecycle events (invoice.paid, customer.subscription.deleted).
 		// Requires Pro license.
 		if ( $this->is_pro_licensed() && 'invoice.paid' === $type ) {
-			$billing_reason = isset( $object['billing_reason'] ) ? $object['billing_reason'] : '';
+			$billing_reason  = isset( $object['billing_reason'] ) ? $object['billing_reason'] : '';
 			$subscription_id = isset( $object['subscription'] ) ? (string) $object['subscription'] : '';
 
 			if ( 'subscription_cycle' === $billing_reason && '' !== $subscription_id ) {
@@ -853,11 +950,13 @@ class GatewayKit_Stripe_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 			$is_success = ( 'checkout.session.completed' === $type ) && isset( $object['payment_status'] ) && 'paid' === $object['payment_status'];
 
 			if ( $is_success ) {
-				$transaction->update( array(
-					'status'       => 'completed',
-					'ref_id'       => isset( $object['payment_intent'] ) ? (string) $object['payment_intent'] : '',
-					'completed_at' => current_time( 'mysql' ),
-				) );
+				$transaction->update(
+					array(
+						'status'       => 'completed',
+						'ref_id'       => isset( $object['payment_intent'] ) ? (string) $object['payment_intent'] : '',
+						'completed_at' => current_time( 'mysql' ),
+					)
+				);
 				do_action( 'gatewaykit_payment_completed', $transaction );
 			} else {
 				$transaction->update( array( 'status' => 'failed' ) );
@@ -924,8 +1023,8 @@ class GatewayKit_Stripe_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 			return false;
 		}
 
-		$signed    = $timestamp . '.' . $payload;
-		$expected  = hash_hmac( 'sha256', $signed, $secret );
+		$signed   = $timestamp . '.' . $payload;
+		$expected = hash_hmac( 'sha256', $signed, $secret );
 
 		return hash_equals( $expected, $parts['v1'] );
 	}

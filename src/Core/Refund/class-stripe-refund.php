@@ -53,10 +53,24 @@ class GatewayKit_Stripe_Refund {
 		}
 
 		// Format amount for Stripe (minor units).
-		$currency     = strtoupper( $transaction->currency );
-		$zero_decimal = array(
-			'BIF', 'CLP', 'DJF', 'GNF', 'JPY', 'KMF', 'KRW', 'MGA',
-			'PYG', 'RWF', 'UGX', 'VND', 'VUV', 'XAF', 'XOF', 'XPF',
+		$currency      = strtoupper( $transaction->currency );
+		$zero_decimal  = array(
+			'BIF',
+			'CLP',
+			'DJF',
+			'GNF',
+			'JPY',
+			'KMF',
+			'KRW',
+			'MGA',
+			'PYG',
+			'RWF',
+			'UGX',
+			'VND',
+			'VUV',
+			'XAF',
+			'XOF',
+			'XPF',
 		);
 		$stripe_amount = in_array( $currency, $zero_decimal, true )
 			? (int) round( $amount )
@@ -98,10 +112,10 @@ class GatewayKit_Stripe_Refund {
 		}
 
 		return array(
-			'refund_id'       => $body['id'],
-			'amount'          => $amount,
+			'refund_id'        => $body['id'],
+			'amount'           => $amount,
 			'gateway_response' => array(
-				'status' => isset( $body['status'] ) ? $body['status'] : '',
+				'status'              => isset( $body['status'] ) ? $body['status'] : '',
 				'balance_transaction' => isset( $body['balance_transaction'] ) ? $body['balance_transaction'] : '',
 			),
 		);

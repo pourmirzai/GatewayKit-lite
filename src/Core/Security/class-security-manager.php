@@ -114,7 +114,7 @@ class GatewayKit_Security_Manager {
 				'missing_nonce',
 				array(
 					'action' => $action,
-					'ip' => $this->get_client_ip(),
+					'ip'     => $this->get_client_ip(),
 				)
 			);
 			return false;
@@ -125,8 +125,8 @@ class GatewayKit_Security_Manager {
 				'invalid_nonce',
 				array(
 					'action' => $action,
-					'nonce' => substr( $nonce, 0, 10 ) . '...',
-					'ip' => $this->get_client_ip(),
+					'nonce'  => substr( $nonce, 0, 10 ) . '...',
+					'ip'     => $this->get_client_ip(),
 				)
 			);
 			return false;
@@ -152,7 +152,7 @@ class GatewayKit_Security_Manager {
 				'missing_ajax_nonce',
 				array(
 					'action' => $action,
-					'ip' => $this->get_client_ip(),
+					'ip'     => $this->get_client_ip(),
 				)
 			);
 			return false;
@@ -163,8 +163,8 @@ class GatewayKit_Security_Manager {
 				'invalid_ajax_nonce',
 				array(
 					'action' => $action,
-					'nonce' => substr( $nonce, 0, 10 ) . '...',
-					'ip' => $this->get_client_ip(),
+					'nonce'  => substr( $nonce, 0, 10 ) . '...',
+					'ip'     => $this->get_client_ip(),
 				)
 			);
 			return false;

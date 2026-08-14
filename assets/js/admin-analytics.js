@@ -53,18 +53,34 @@
 
 		$revenue.text(formatMoney(kpi.revenue, currency));
 		$count.text(parseInt(kpi.count, 10) || 0);
-		$avg.text(formatMoney(kpi.avg, currency));
+		$avg.text(formatMoney(kpi.avg_order, currency));
 		$rate.text((parseFloat(kpi.success_rate) || 0).toFixed(1) + '%');
 	}
 
 	function renderRevenueChart(chart, currency) {
 		var $container = $('#gk-revenue-chart');
-		if (!chart || !chart.length) {
+
+		var items;
+		if (chart && !Array.isArray(chart) && chart.labels && Array.isArray(chart.labels)) {
+			items = [];
+			for (var i = 0; i < chart.labels.length; i++) {
+				items.push({
+					date: chart.labels[i],
+					amount: chart.data ? chart.data[i] : 0,
+					count: chart.counts ? chart.counts[i] : 0
+				});
+			}
+			items = items.slice(0, 60);
+		} else if (Array.isArray(chart)) {
+			items = chart.slice(0, 60);
+		} else {
+			items = [];
+		}
+
+		if (!items || !items.length) {
 			showEmpty($container);
 			return;
 		}
-
-		var items = chart.slice(0, 60);
 
 		var maxAmount = 0;
 		for (var i = 0; i < items.length; i++) {
@@ -102,22 +118,38 @@
 
 	function renderGatewayChart(chart, currency) {
 		var $container = $('#gk-gateway-chart');
-		if (!chart || !chart.length) {
+
+		var items;
+		if (chart && !Array.isArray(chart) && chart.labels && Array.isArray(chart.labels)) {
+			items = [];
+			for (var i = 0; i < chart.labels.length; i++) {
+				items.push({
+					gateway: chart.labels[i],
+					revenue: chart.revenue ? chart.revenue[i] : 0
+				});
+			}
+		} else if (Array.isArray(chart)) {
+			items = chart.slice(0, 60);
+		} else {
+			items = [];
+		}
+
+		if (!items || !items.length) {
 			showEmpty($container);
 			return;
 		}
 
 		var totalRevenue = 0;
-		for (var i = 0; i < chart.length; i++) {
-			totalRevenue += parseFloat(chart[i].revenue) || 0;
+		for (var i2 = 0; i2 < items.length; i2++) {
+			totalRevenue += parseFloat(items[i2].revenue) || 0;
 		}
 
 		var colors = ['#00a32a', '#2271b1', '#dba617', '#d63638', '#826eb4', '#f3722b', '#787c82'];
 
 		var html = '<div class="gk-donut-list">';
 
-		for (var j = 0; j < chart.length; j++) {
-			var item = chart[j];
+		for (var j = 0; j < items.length; j++) {
+			var item = items[j];
 			var revenue = parseFloat(item.revenue) || 0;
 			var pct = totalRevenue > 0 ? (revenue / totalRevenue) * 100 : 0;
 			var color = colors[j % colors.length];
@@ -136,7 +168,17 @@
 
 	function renderStatusChart(chart) {
 		var $container = $('#gk-status-chart');
-		if (!chart || !chart.counts) {
+
+		var counts = {};
+		if (chart && chart.labels && Array.isArray(chart.labels) && chart.data && Array.isArray(chart.data)) {
+			for (var i = 0; i < chart.labels.length; i++) {
+				counts[String(chart.labels[i]).toLowerCase()] = parseInt(chart.data[i], 10) || 0;
+			}
+		} else if (chart && chart.counts) {
+			counts = chart.counts;
+		}
+
+		if (!counts || !Object.keys(counts).length) {
 			showEmpty($container);
 			return;
 		}
@@ -150,8 +192,8 @@
 		];
 
 		var totalCount = 0;
-		for (var i = 0; i < statuses.length; i++) {
-			totalCount += parseInt(chart.counts[statuses[i].key], 10) || 0;
+		for (var i2 = 0; i2 < statuses.length; i2++) {
+			totalCount += parseInt(counts[statuses[i2].key], 10) || 0;
 		}
 
 		if (totalCount === 0) {
@@ -163,7 +205,7 @@
 
 		for (var j = 0; j < statuses.length; j++) {
 			var status = statuses[j];
-			var count = parseInt(chart.counts[status.key], 10) || 0;
+			var count = parseInt(counts[status.key], 10) || 0;
 			var pct = totalCount > 0 ? (count / totalCount) * 100 : 0;
 
 			html += '<div class="gk-status-row">';
@@ -203,7 +245,7 @@
 			var pct = maxRevenue > 0 ? (revenue / maxRevenue) * 100 : 0;
 
 			html += '<div class="gk-top-forms-item">';
-			html += '<div class="gk-top-forms-name">' + escapeHtml(form.name || '') + '</div>';
+			html += '<div class="gk-top-forms-name">' + escapeHtml(form.label || form.name || '') + '</div>';
 			html += '<div class="gk-top-forms-bar-wrap">';
 			html += '<div class="gk-top-forms-bar" style="width: ' + pct + '%;"></div>';
 			html += '</div>';
@@ -229,13 +271,16 @@
 			gateway: gateway
 		})
 		.done(function(response) {
-			if (response && response.success) {
+			if (response && response.success && response.data && typeof response.data === 'object') {
 				var data = response.data;
-				renderKPIs(data.kpi, currency);
-				renderRevenueChart(data.revenue_chart, currency);
-				renderGatewayChart(data.gateway_chart, currency);
+				// Prefer the server-provided currency (reflects the real gateway
+				// currency setting) over the localized default.
+				var renderCurrency = data.currency || currency;
+				renderKPIs(data.kpi, renderCurrency);
+				renderRevenueChart(data.revenue_chart, renderCurrency);
+				renderGatewayChart(data.gateway_chart, renderCurrency);
 				renderStatusChart(data.status_chart);
-				renderTopForms(data.top_forms, currency);
+				renderTopForms(data.top_forms, renderCurrency);
 			} else {
 				showError($targets);
 			}

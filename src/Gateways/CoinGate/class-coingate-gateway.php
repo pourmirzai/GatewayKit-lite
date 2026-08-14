@@ -57,9 +57,27 @@ class GatewayKit_CoinGate_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 	 */
 	public function get_supported_currencies() {
 		return array(
-			'USD', 'EUR', 'GBP', 'AUD', 'CAD', 'CNY', 'CZK', 'DKK', 'HKD',
-			'HUF', 'INR', 'JPY', 'MYR', 'MXN', 'NZD', 'NOK', 'PLN', 'SGD',
-			'SEK', 'CHF', 'THB',
+			'USD',
+			'EUR',
+			'GBP',
+			'AUD',
+			'CAD',
+			'CNY',
+			'CZK',
+			'DKK',
+			'HKD',
+			'HUF',
+			'INR',
+			'JPY',
+			'MYR',
+			'MXN',
+			'NZD',
+			'NOK',
+			'PLN',
+			'SGD',
+			'SEK',
+			'CHF',
+			'THB',
 		);
 	}
 
@@ -84,7 +102,7 @@ class GatewayKit_CoinGate_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 				'label'       => __( 'Sandbox Mode', 'gatewaykit' ),
 				'description' => __( 'Use the CoinGate sandbox environment for testing.', 'gatewaykit' ),
 			),
-			'api_token' => array(
+			'api_token'    => array(
 				'type'        => 'password',
 				'label'       => __( 'API Token', 'gatewaykit' ),
 				'description' => __( 'Your CoinGate API token. Stored encrypted.', 'gatewaykit' ),
@@ -214,7 +232,15 @@ class GatewayKit_CoinGate_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 			if ( is_array( $decoded ) && isset( $decoded['errors'] ) ) {
 				$message = wp_json_encode( $decoded['errors'] );
 			}
-			$this->log( 'error', 'CoinGate API error', array( 'path' => $path, 'status' => $code, 'body' => $decoded ) );
+			$this->log(
+				'error',
+				'CoinGate API error',
+				array(
+					'path'   => $path,
+					'status' => $code,
+					'body'   => $decoded,
+				)
+			);
 			return new WP_Error( 'coingate_api_error', $message );
 		}
 
@@ -276,9 +302,9 @@ class GatewayKit_CoinGate_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 			);
 		}
 
-		$order_id     = isset( $response['id'] ) ? (string) $response['id'] : '';
-		$payment_url  = isset( $response['payment_url'] ) ? $response['payment_url'] : '';
-		$order_token  = isset( $response['token'] ) ? (string) $response['token'] : '';
+		$order_id    = isset( $response['id'] ) ? (string) $response['id'] : '';
+		$payment_url = isset( $response['payment_url'] ) ? $response['payment_url'] : '';
+		$order_token = isset( $response['token'] ) ? (string) $response['token'] : '';
 
 		if ( '' === $order_id || '' === $payment_url ) {
 			return array(
@@ -294,7 +320,16 @@ class GatewayKit_CoinGate_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 		set_transient( 'gatewaykit_cg_token_' . $order_id, $order_token, $ttl );
 		set_transient( 'gatewaykit_cg_redirect_' . $ref, $payment_url, DAY_IN_SECONDS );
 
-		$this->log( 'info', 'CoinGate order created', array( 'order_id' => $order_id, 'ref' => $ref, 'amount' => $formatted, 'currency' => $currency ) );
+		$this->log(
+			'info',
+			'CoinGate order created',
+			array(
+				'order_id' => $order_id,
+				'ref'      => $ref,
+				'amount'   => $formatted,
+				'currency' => $currency,
+			)
+		);
 
 		return array(
 			'status'       => 'success',
@@ -346,7 +381,14 @@ class GatewayKit_CoinGate_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 		$expected = $this->format_amount( $amount );
 		$paid     = isset( $order['price'] ) ? (float) $order['price'] : ( isset( $order['price_amount'] ) ? (float) $order['price_amount'] : $expected );
 		if ( abs( $paid - $expected ) > 0.01 ) {
-			$this->log( 'error', 'CoinGate amount mismatch', array( 'expected' => $expected, 'paid' => $paid ) );
+			$this->log(
+				'error',
+				'CoinGate amount mismatch',
+				array(
+					'expected' => $expected,
+					'paid'     => $paid,
+				)
+			);
 			return array(
 				'status'        => 'failed',
 				'error_message' => __( 'CoinGate payment amount does not match the order amount.', 'gatewaykit' ),
@@ -434,22 +476,29 @@ class GatewayKit_CoinGate_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 				$expected_amount = (float) $transaction->amount;
 
 				if ( abs( $paid_amount - $expected_amount ) > 0.01 ) {
-					$this->log( 'error', sprintf(
-						'Webhook amount mismatch: expected %.2f, received %.2f — marking as failed',
-						$expected_amount, $paid_amount
-					), array(
-						'transaction_id' => $transaction->id,
-						'gateway'        => $this->get_gateway_id(),
-					) );
+					$this->log(
+						'error',
+						sprintf(
+							'Webhook amount mismatch: expected %.2f, received %.2f — marking as failed',
+							$expected_amount,
+							$paid_amount
+						),
+						array(
+							'transaction_id' => $transaction->id,
+							'gateway'        => $this->get_gateway_id(),
+						)
+					);
 					$transaction->update( array( 'status' => 'failed' ) );
 					return;
 				}
 
-				$transaction->update( array(
-					'status'       => 'completed',
-					'ref_id'       => $order_id,
-					'completed_at' => current_time( 'mysql' ),
-				) );
+				$transaction->update(
+					array(
+						'status'       => 'completed',
+						'ref_id'       => $order_id,
+						'completed_at' => current_time( 'mysql' ),
+					)
+				);
 				do_action( 'gatewaykit_payment_completed', $transaction );
 			} elseif ( in_array( $status, array( 'invalid', 'expired', 'canceled', 'refunded' ), true ) ) {
 				$transaction->update( array( 'status' => 'failed' ) );

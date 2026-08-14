@@ -51,7 +51,14 @@ class GatewayKit_MercadoPago_Gateway extends GatewayKit_Abstract_Payment_Gateway
 	 */
 	public function get_supported_currencies() {
 		return array(
-			'BRL', 'MXN', 'ARS', 'COP', 'CLP', 'PEN', 'UYU', 'USD',
+			'BRL',
+			'MXN',
+			'ARS',
+			'COP',
+			'CLP',
+			'PEN',
+			'UYU',
+			'USD',
 		);
 	}
 
@@ -71,17 +78,17 @@ class GatewayKit_MercadoPago_Gateway extends GatewayKit_Abstract_Payment_Gateway
 	 */
 	public function get_settings_fields() {
 		return array(
-			'sandbox_mode'  => array(
+			'sandbox_mode'   => array(
 				'type'        => 'checkbox',
 				'label'       => __( 'Sandbox Mode', 'gatewaykit' ),
 				'description' => __( 'Use the sandbox init_point for test payments.', 'gatewaykit' ),
 			),
-			'access_token' => array(
+			'access_token'   => array(
 				'type'        => 'password',
 				'label'       => __( 'Access Token', 'gatewaykit' ),
 				'description' => __( 'Your Mercado Pago access token (live or test). Stored encrypted.', 'gatewaykit' ),
 			),
-			'public_key' => array(
+			'public_key'     => array(
 				'type'        => 'text',
 				'label'       => __( 'Public Key', 'gatewaykit' ),
 				'description' => __( 'Your Mercado Pago public key (optional, used for front-end integrations).', 'gatewaykit' ),
@@ -219,7 +226,15 @@ class GatewayKit_MercadoPago_Gateway extends GatewayKit_Abstract_Payment_Gateway
 			} elseif ( isset( $decoded['error'] ) ) {
 				$message = $decoded['error'];
 			}
-			$this->log( 'error', 'Mercado Pago API error', array( 'path' => $path, 'status' => $code, 'body' => $decoded ) );
+			$this->log(
+				'error',
+				'Mercado Pago API error',
+				array(
+					'path'   => $path,
+					'status' => $code,
+					'body'   => $decoded,
+				)
+			);
 			return new WP_Error( 'mercadopago_api_error', $message );
 		}
 
@@ -249,7 +264,7 @@ class GatewayKit_MercadoPago_Gateway extends GatewayKit_Abstract_Payment_Gateway
 		$currency = $this->get_currency();
 
 		$body = array(
-			'items' => array(
+			'items'            => array(
 				array(
 					'title'       => $description ? mb_substr( (string) $description, 0, 255 ) : __( 'Payment', 'gatewaykit' ),
 					'quantity'    => 1,
@@ -257,7 +272,7 @@ class GatewayKit_MercadoPago_Gateway extends GatewayKit_Abstract_Payment_Gateway
 					'currency_id' => $currency,
 				),
 			),
-			'back_urls' => array(
+			'back_urls'        => array(
 				'success' => $callback_url,
 				'failure' => $callback_url,
 				'pending' => $callback_url,
@@ -300,12 +315,16 @@ class GatewayKit_MercadoPago_Gateway extends GatewayKit_Abstract_Payment_Gateway
 		set_transient( 'gatewaykit_mercadopago_pref_' . $preference_id, $redirect_url, DAY_IN_SECONDS );
 		set_transient( 'gatewaykit_mercadopago_pid_' . $preference_id, $preference_id, $ttl );
 
-		$this->log( 'info', 'Mercado Pago preference created', array(
-			'preference_id' => $preference_id,
-			'amount'        => $formatted,
-			'currency'      => $currency,
-			'sandbox'       => $this->is_sandbox(),
-		) );
+		$this->log(
+			'info',
+			'Mercado Pago preference created',
+			array(
+				'preference_id' => $preference_id,
+				'amount'        => $formatted,
+				'currency'      => $currency,
+				'sandbox'       => $this->is_sandbox(),
+			)
+		);
 
 		return array(
 			'status'       => 'success',
@@ -354,7 +373,14 @@ class GatewayKit_MercadoPago_Gateway extends GatewayKit_Abstract_Payment_Gateway
 		$expected = $this->format_amount( $amount );
 		$paid     = isset( $payment['transaction_amount'] ) ? (float) $payment['transaction_amount'] : $expected;
 		if ( abs( $paid - $expected ) > 0.01 ) {
-			$this->log( 'error', 'Mercado Pago amount mismatch', array( 'expected' => $expected, 'paid' => $paid ) );
+			$this->log(
+				'error',
+				'Mercado Pago amount mismatch',
+				array(
+					'expected' => $expected,
+					'paid'     => $paid,
+				)
+			);
 			return array(
 				'status'        => 'failed',
 				'error_message' => __( 'Mercado Pago payment amount does not match the order amount.', 'gatewaykit' ),
@@ -393,8 +419,8 @@ class GatewayKit_MercadoPago_Gateway extends GatewayKit_Abstract_Payment_Gateway
 		// phpcs:disable WordPress.Security.NonceVerification.Missing, WordPress.Security.NonceVerification.Recommended -- external webhook callback from Mercado Pago; no WP user session exists, security via HMAC signature + re-fetching payment from Mercado Pago API below
 		$raw_body = file_get_contents( 'php://input' );
 		// Also allow URL params (Mercado Pago sometimes sends topic/id as query params for IPN).
-		$topic       = isset( $_GET['topic'] ) ? sanitize_text_field( wp_unslash( $_GET['topic'] ) ) : '';
-		$param_id    = isset( $_GET['id'] ) ? sanitize_text_field( wp_unslash( $_GET['id'] ) ) : '';
+		$topic         = isset( $_GET['topic'] ) ? sanitize_text_field( wp_unslash( $_GET['topic'] ) ) : '';
+		$param_id      = isset( $_GET['id'] ) ? sanitize_text_field( wp_unslash( $_GET['id'] ) ) : '';
 		$query_data_id = isset( $_GET['data.id'] ) ? sanitize_text_field( wp_unslash( $_GET['data.id'] ) ) : '';
 		// phpcs:enable WordPress.Security.NonceVerification.Missing, WordPress.Security.NonceVerification.Recommended
 
@@ -460,7 +486,7 @@ class GatewayKit_MercadoPago_Gateway extends GatewayKit_Abstract_Payment_Gateway
 			$preference_id = get_transient( 'gatewaykit_mercadopago_payid_' . $data_id ) ?: '';
 		}
 
-		$authority = '' !== $preference_id ? $preference_id : $data_id;
+		$authority   = '' !== $preference_id ? $preference_id : $data_id;
 		$transaction = GatewayKit_Transaction_Model::find_by_authority( $authority );
 
 		if ( ! $transaction ) {
@@ -479,22 +505,29 @@ class GatewayKit_MercadoPago_Gateway extends GatewayKit_Abstract_Payment_Gateway
 				$expected_amount = (float) $transaction->amount;
 
 				if ( abs( $paid_amount - $expected_amount ) > 0.01 ) {
-					$this->log( 'error', sprintf(
-						'Webhook amount mismatch: expected %.2f, received %.2f — marking as failed',
-						$expected_amount, $paid_amount
-					), array(
-						'transaction_id' => $transaction->id,
-						'gateway'        => $this->get_gateway_id(),
-					) );
+					$this->log(
+						'error',
+						sprintf(
+							'Webhook amount mismatch: expected %.2f, received %.2f — marking as failed',
+							$expected_amount,
+							$paid_amount
+						),
+						array(
+							'transaction_id' => $transaction->id,
+							'gateway'        => $this->get_gateway_id(),
+						)
+					);
 					$transaction->update( array( 'status' => 'failed' ) );
 					return;
 				}
 
-				$transaction->update( array(
-					'status'       => 'completed',
-					'ref_id'       => $payment_id,
-					'completed_at' => current_time( 'mysql' ),
-				) );
+				$transaction->update(
+					array(
+						'status'       => 'completed',
+						'ref_id'       => $payment_id,
+						'completed_at' => current_time( 'mysql' ),
+					)
+				);
 				do_action( 'gatewaykit_payment_completed', $transaction );
 			} elseif ( 'failed' === $status ) {
 				$transaction->update( array( 'status' => 'failed' ) );
@@ -528,7 +561,7 @@ class GatewayKit_MercadoPago_Gateway extends GatewayKit_Abstract_Payment_Gateway
 	private function verify_webhook_signature( $secret, $data_id ) {
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- public webhook endpoint; authenticity verified via HMAC, not nonce.
 		// phpcs:disable WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- opaque header tokens consumed as-is by the HMAC check; sanitizing would corrupt the signature.
-		$x_signature = isset( $_SERVER['HTTP_X_SIGNATURE'] ) ? wp_unslash( $_SERVER['HTTP_X_SIGNATURE'] ) : '';
+		$x_signature  = isset( $_SERVER['HTTP_X_SIGNATURE'] ) ? wp_unslash( $_SERVER['HTTP_X_SIGNATURE'] ) : '';
 		$x_request_id = isset( $_SERVER['HTTP_X_REQUEST_ID'] ) ? wp_unslash( $_SERVER['HTTP_X_REQUEST_ID'] ) : '';
 		// phpcs:enable
 

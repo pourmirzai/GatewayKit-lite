@@ -55,11 +55,11 @@ class GatewayKit_Transaction_Model {
 
 		// Generate a unique, uppercase alphanumeric receipt token in format XXXXXX-YYYYYY
 		// Optimized to prevent infinite loops with collision limit
-		$chars     = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-		$chars_len = strlen( $chars );
+		$chars        = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+		$chars_len    = strlen( $chars );
 		$max_attempts = 100; // Prevent infinite loops
-		$attempts = 0;
-		
+		$attempts     = 0;
+
 		do {
 			$raw = '';
 			for ( $i = 0; $i < 12; $i++ ) {
@@ -68,15 +68,15 @@ class GatewayKit_Transaction_Model {
 			$receipt_token = substr( $raw, 0, 6 ) . '-' . substr( $raw, 6, 6 );
 
 			// Check collision
-			$exists = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM %i WHERE receipt_token = %s LIMIT 1", $table_name, $receipt_token ) );
-			$attempts++;
-			
+			$exists = $wpdb->get_var( $wpdb->prepare( 'SELECT id FROM %i WHERE receipt_token = %s LIMIT 1', $table_name, $receipt_token ) );
+			++$attempts;
+
 			// Safety check to prevent infinite loops
-			if ($attempts >= $max_attempts) {
+			if ( $attempts >= $max_attempts ) {
 				GatewayKit_Logger::get_instance()->error(
 					'Receipt token generation failed - too many collisions',
 					array(
-						'attempts' => $attempts,
+						'attempts'     => $attempts,
 						'max_attempts' => $max_attempts,
 					)
 				);
@@ -85,8 +85,8 @@ class GatewayKit_Transaction_Model {
 		} while ( ! empty( $exists ) );
 
 		// Prepare data
-		$currency = isset( $data['currency'] ) ? sanitize_text_field( $data['currency'] ) : '';
-		$currency = $currency ? strtoupper( $currency ) : GatewayKit_Gateway_Manager::get_instance()->get_default_currency();
+		$currency    = isset( $data['currency'] ) ? sanitize_text_field( $data['currency'] ) : '';
+		$currency    = $currency ? strtoupper( $currency ) : GatewayKit_Gateway_Manager::get_instance()->get_default_currency();
 		$insert_data = array(
 			'user_id'                  => isset( $data['user_id'] ) ? intval( $data['user_id'] ) : null,
 			'form_id'                  => sanitize_key( $data['form_id'] ),
@@ -157,13 +157,13 @@ class GatewayKit_Transaction_Model {
 
 		// Create transaction object
 		$insert_data['id'] = $transaction_id;
-		
+
 		// Clear relevant caches
 		self::clear_cache();
-		
+
 		// Trigger action for other cache clearing
-		do_action('gatewaykit_transaction_created', $transaction_id);
-		
+		do_action( 'gatewaykit_transaction_created', $transaction_id );
+
 		return new self( $insert_data );
 	}
 
@@ -179,22 +179,22 @@ class GatewayKit_Transaction_Model {
 		// Check cache first
 		$cache_key = 'gatewaykit_transaction_' . $id;
 		$cache_ttl = 600; // 10 minutes cache
-		
-		$cached_transaction = get_transient($cache_key);
-		if ($cached_transaction !== false) {
-			return new self($cached_transaction);
+
+		$cached_transaction = get_transient( $cache_key );
+		if ( $cached_transaction !== false ) {
+			return new self( $cached_transaction );
 		}
 
 		$table_name = $wpdb->prefix . 'gatewaykit_payment_transactions';
 
 		$row = $wpdb->get_row(
-			$wpdb->prepare( "SELECT id, user_id, form_id, post_id, gateway, authority, ref_id, amount, discount_id, discount_amount, currency, description, status, gateway_response, form_data, user_data, callback_url, success_url, failure_url, receipt_token, receipt_token_created_at, ip_address, user_agent, created_at, updated_at, completed_at FROM %i WHERE id = %d", $table_name, $id ),
+			$wpdb->prepare( 'SELECT id, user_id, form_id, post_id, gateway, authority, ref_id, amount, discount_id, discount_amount, currency, description, status, gateway_response, form_data, user_data, callback_url, success_url, failure_url, receipt_token, receipt_token_created_at, ip_address, user_agent, created_at, updated_at, completed_at FROM %i WHERE id = %d', $table_name, $id ),
 			ARRAY_A
 		);
 
 		if ( $row ) {
 			// Cache the result
-			set_transient($cache_key, $row, $cache_ttl);
+			set_transient( $cache_key, $row, $cache_ttl );
 			return new self( $row );
 		}
 
@@ -211,24 +211,24 @@ class GatewayKit_Transaction_Model {
 		global $wpdb;
 
 		// Check cache first
-		$cache_key = 'gatewaykit_transaction_auth_' . md5($authority);
+		$cache_key = 'gatewaykit_transaction_auth_' . md5( $authority );
 		$cache_ttl = 600; // 10 minutes cache
-		
-		$cached_transaction = get_transient($cache_key);
-		if ($cached_transaction !== false) {
-			return new self($cached_transaction);
+
+		$cached_transaction = get_transient( $cache_key );
+		if ( $cached_transaction !== false ) {
+			return new self( $cached_transaction );
 		}
 
 		$table_name = $wpdb->prefix . 'gatewaykit_payment_transactions';
 
 		$row = $wpdb->get_row(
-			$wpdb->prepare( "SELECT id, user_id, form_id, post_id, gateway, authority, ref_id, amount, discount_id, discount_amount, currency, description, status, gateway_response, form_data, user_data, callback_url, success_url, failure_url, receipt_token, receipt_token_created_at, ip_address, user_agent, created_at, updated_at, completed_at FROM %i WHERE authority = %s", $table_name, $authority ),
+			$wpdb->prepare( 'SELECT id, user_id, form_id, post_id, gateway, authority, ref_id, amount, discount_id, discount_amount, currency, description, status, gateway_response, form_data, user_data, callback_url, success_url, failure_url, receipt_token, receipt_token_created_at, ip_address, user_agent, created_at, updated_at, completed_at FROM %i WHERE authority = %s', $table_name, $authority ),
 			ARRAY_A
 		);
 
 		if ( $row ) {
 			// Cache the result
-			set_transient($cache_key, $row, $cache_ttl);
+			set_transient( $cache_key, $row, $cache_ttl );
 			return new self( $row );
 		}
 
@@ -245,24 +245,24 @@ class GatewayKit_Transaction_Model {
 		global $wpdb;
 
 		// Check cache first
-		$cache_key = 'gatewaykit_transaction_receipt_' . md5($token);
+		$cache_key = 'gatewaykit_transaction_receipt_' . md5( $token );
 		$cache_ttl = 600; // 10 minutes cache
-		
-		$cached_transaction = get_transient($cache_key);
-		if ($cached_transaction !== false) {
-			return new self($cached_transaction);
+
+		$cached_transaction = get_transient( $cache_key );
+		if ( $cached_transaction !== false ) {
+			return new self( $cached_transaction );
 		}
 
 		$table_name = $wpdb->prefix . 'gatewaykit_payment_transactions';
 
 		$row = $wpdb->get_row(
-			$wpdb->prepare( "SELECT id, user_id, form_id, post_id, gateway, authority, ref_id, amount, discount_id, discount_amount, currency, description, status, gateway_response, form_data, user_data, callback_url, success_url, failure_url, receipt_token, receipt_token_created_at, ip_address, user_agent, created_at, updated_at, completed_at FROM %i WHERE receipt_token = %s", $table_name, $token ),
+			$wpdb->prepare( 'SELECT id, user_id, form_id, post_id, gateway, authority, ref_id, amount, discount_id, discount_amount, currency, description, status, gateway_response, form_data, user_data, callback_url, success_url, failure_url, receipt_token, receipt_token_created_at, ip_address, user_agent, created_at, updated_at, completed_at FROM %i WHERE receipt_token = %s', $table_name, $token ),
 			ARRAY_A
 		);
 
 		if ( $row ) {
 			// Cache the result
-			set_transient($cache_key, $row, $cache_ttl);
+			set_transient( $cache_key, $row, $cache_ttl );
 			return new self( $row );
 		}
 
@@ -282,12 +282,12 @@ class GatewayKit_Transaction_Model {
 		// Check cache first
 		$cache_key = 'gatewaykit_user_transactions_' . $user_id . '_' . $limit;
 		$cache_ttl = 300; // 5 minutes cache
-		
-		$cached_transactions = get_transient($cache_key);
-		if ($cached_transactions !== false) {
+
+		$cached_transactions = get_transient( $cache_key );
+		if ( $cached_transactions !== false ) {
 			$transactions = array();
-			foreach ($cached_transactions as $row) {
-				$transactions[] = new self($row);
+			foreach ( $cached_transactions as $row ) {
+				$transactions[] = new self( $row );
 			}
 			return $transactions;
 		}
@@ -296,7 +296,7 @@ class GatewayKit_Transaction_Model {
 
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT id, user_id, form_id, post_id, gateway, authority, ref_id, amount, discount_id, discount_amount, currency, description, status, gateway_response, form_data, user_data, callback_url, success_url, failure_url, receipt_token, receipt_token_created_at, ip_address, user_agent, created_at, updated_at, completed_at FROM %i WHERE user_id = %d ORDER BY created_at DESC LIMIT %d",
+				'SELECT id, user_id, form_id, post_id, gateway, authority, ref_id, amount, discount_id, discount_amount, currency, description, status, gateway_response, form_data, user_data, callback_url, success_url, failure_url, receipt_token, receipt_token_created_at, ip_address, user_agent, created_at, updated_at, completed_at FROM %i WHERE user_id = %d ORDER BY created_at DESC LIMIT %d',
 				$table_name,
 				$user_id,
 				$limit
@@ -310,7 +310,7 @@ class GatewayKit_Transaction_Model {
 		}
 
 		// Cache the result
-		set_transient($cache_key, $rows, $cache_ttl);
+		set_transient( $cache_key, $rows, $cache_ttl );
 
 		return $transactions;
 	}
@@ -381,7 +381,7 @@ class GatewayKit_Transaction_Model {
 
 		if ( isset( $data['error_timestamp'] ) ) {
 			$update_data['error_timestamp'] = $data['error_timestamp'];
-			$format[]                      = '%s';
+			$format[]                       = '%s';
 		}
 
 		if ( array_key_exists( 'discount_id', $data ) ) {
@@ -415,10 +415,10 @@ class GatewayKit_Transaction_Model {
 			$this->data = array_merge( $this->data, $update_data );
 
 			// Clear relevant caches
-			self::clear_cache($this->data['id']);
-			
+			self::clear_cache( $this->data['id'] );
+
 			// Trigger action for other cache clearing
-			do_action('gatewaykit_transaction_updated', $this->data['id']);
+			do_action( 'gatewaykit_transaction_updated', $this->data['id'] );
 
 			// Log update
 			GatewayKit_Logger::get_instance()->info(
@@ -451,8 +451,8 @@ class GatewayKit_Transaction_Model {
 	public function delete() {
 		global $wpdb;
 
-		$table_name = $wpdb->prefix . 'gatewaykit_payment_transactions';
-		$logs_table = $wpdb->prefix . 'gatewaykit_payment_logs';
+		$table_name  = $wpdb->prefix . 'gatewaykit_payment_transactions';
+		$logs_table  = $wpdb->prefix . 'gatewaykit_payment_logs';
 		$notes_table = $wpdb->prefix . 'gatewaykit_transaction_notes';
 
 		// Delete associated logs first (no FK cascade — app-level cleanup).
@@ -477,11 +477,11 @@ class GatewayKit_Transaction_Model {
 
 		if ( $result !== false ) {
 			// Clear relevant caches
-			self::clear_cache($this->data['id']);
-			
+			self::clear_cache( $this->data['id'] );
+
 			// Trigger action for other cache clearing
-			do_action('gatewaykit_transaction_deleted', $this->data['id']);
-			
+			do_action( 'gatewaykit_transaction_deleted', $this->data['id'] );
+
 			GatewayKit_Logger::get_instance()->info(
 				'Transaction deleted',
 				array(
@@ -626,7 +626,7 @@ class GatewayKit_Transaction_Model {
 	 */
 	public function set_error( $message, $code = '', $type = 'unknown', $details = null ) {
 		global $wpdb;
-		
+
 		$error_data = array(
 			'error_message'   => $message,
 			'error_code'      => $code,
@@ -642,7 +642,7 @@ class GatewayKit_Transaction_Model {
 		$wpdb->suppress_errors( true );
 		$result = $this->update( $error_data );
 		$wpdb->suppress_errors( false );
-		
+
 		return $result;
 	}
 
@@ -665,11 +665,11 @@ class GatewayKit_Transaction_Model {
 		global $wpdb;
 
 		// Create cache key based on filters
-		$cache_key = 'gatewaykit_transaction_stats_' . md5(serialize($filters));
+		$cache_key = 'gatewaykit_transaction_stats_' . md5( serialize( $filters ) );
 		$cache_ttl = 600; // 10 minutes cache
-		
-		$cached_stats = get_transient($cache_key);
-		if ($cached_stats !== false) {
+
+		$cached_stats = get_transient( $cache_key );
+		if ( $cached_stats !== false ) {
 			return $cached_stats;
 		}
 
@@ -711,14 +711,14 @@ class GatewayKit_Transaction_Model {
 
 		// Always prepare (at minimum for the %i table identifier).
 		$prepare_values = array_merge( array( $table_name ), $where_values );
-		$sql             = $wpdb->prepare( $sql, $prepare_values );
+		$sql            = $wpdb->prepare( $sql, $prepare_values );
 
 		$stats = $wpdb->get_row( $sql, ARRAY_A );
 
 		$result = $stats ?: array();
-		
+
 		// Cache the result
-		set_transient($cache_key, $result, $cache_ttl);
+		set_transient( $cache_key, $result, $cache_ttl );
 
 		return $result;
 	}
@@ -730,28 +730,28 @@ class GatewayKit_Transaction_Model {
 	 * @return void
 	 */
 	public static function clear_cache( $transaction_id = null ) {
-		if ($transaction_id) {
+		if ( $transaction_id ) {
 			// Clear specific transaction cache
-			delete_transient('gatewaykit_transaction_' . $transaction_id);
+			delete_transient( 'gatewaykit_transaction_' . $transaction_id );
 		}
-		
+
 		// Clear user transactions cache (clear all since we don't know which users are affected)
 		global $wpdb;
-		$cache_keys = $wpdb->get_col( $wpdb->prepare( "SELECT option_name FROM %i WHERE option_name LIKE %s", $wpdb->options, '_transient_gatewaykit_user_transactions_%' ) );
-		foreach ($cache_keys as $key) {
-			$transient_key = str_replace('_transient_', '', $key);
-			delete_transient($transient_key);
+		$cache_keys = $wpdb->get_col( $wpdb->prepare( 'SELECT option_name FROM %i WHERE option_name LIKE %s', $wpdb->options, '_transient_gatewaykit_user_transactions_%' ) );
+		foreach ( $cache_keys as $key ) {
+			$transient_key = str_replace( '_transient_', '', $key );
+			delete_transient( $transient_key );
 		}
-		
+
 		// Clear statistics cache
-		$stats_cache_keys = $wpdb->get_col( $wpdb->prepare( "SELECT option_name FROM %i WHERE option_name LIKE %s", $wpdb->options, '_transient_gatewaykit_transaction_stats_%' ) );
-		foreach ($stats_cache_keys as $key) {
-			$transient_key = str_replace('_transient_', '', $key);
-			delete_transient($transient_key);
+		$stats_cache_keys = $wpdb->get_col( $wpdb->prepare( 'SELECT option_name FROM %i WHERE option_name LIKE %s', $wpdb->options, '_transient_gatewaykit_transaction_stats_%' ) );
+		foreach ( $stats_cache_keys as $key ) {
+			$transient_key = str_replace( '_transient_', '', $key );
+			delete_transient( $transient_key );
 		}
-		
-		if (defined('WP_DEBUG') && WP_DEBUG) {
-			error_log('GatewayKit: Transaction cache cleared' . ($transaction_id ? ' for transaction ID ' . $transaction_id : ''));
+
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			error_log( 'GatewayKit: Transaction cache cleared' . ( $transaction_id ? ' for transaction ID ' . $transaction_id : '' ) );
 		}
 	}
 

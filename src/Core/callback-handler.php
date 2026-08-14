@@ -263,7 +263,10 @@ function gatewaykit_handle_webhook() {
 		if ( isset( $result['status'] ) && 'config_error' === $result['status'] ) {
 			GatewayKit_Logger::get_instance()->error(
 				'PayPal webhook rejected: configuration error',
-				array( 'error_code' => isset( $result['error_code'] ) ? $result['error_code'] : '', 'error_message' => isset( $result['error_message'] ) ? $result['error_message'] : '' )
+				array(
+					'error_code'    => isset( $result['error_code'] ) ? $result['error_code'] : '',
+					'error_message' => isset( $result['error_message'] ) ? $result['error_message'] : '',
+				)
 			);
 			status_header( 403 );
 			exit;
@@ -303,7 +306,10 @@ function gatewaykit_handle_webhook() {
 		// PayPal does not keep hammering us, but we log them.
 		GatewayKit_Logger::get_instance()->info(
 			'PayPal webhook not actioned',
-			array( 'result' => $result, 'event_type' => isset( $event['event_type'] ) ? sanitize_text_field( $event['event_type'] ) : '' )
+			array(
+				'result'     => $result,
+				'event_type' => isset( $event['event_type'] ) ? sanitize_text_field( $event['event_type'] ) : '',
+			)
 		);
 		status_header( 200 );
 		exit;
@@ -337,4 +343,3 @@ function gatewaykit_handle_webhook() {
 	exit;
 }
 add_action( 'init', 'gatewaykit_handle_webhook', 1 );
-
