@@ -867,7 +867,10 @@ class GatewayKit_Elementor_Action extends Action_Base {
 					GatewayKit_Discount_Model::decrement_usage( $discount_id );
 				}
 				if ( ! empty( $result['transaction_id'] ) ) {
-					GatewayKit_Transaction_Model::find( $result['transaction_id'] )?->update( array( 'status' => 'failed' ) );
+					$failed_transaction = GatewayKit_Transaction_Model::find( $result['transaction_id'] );
+					if ( $failed_transaction ) {
+						$failed_transaction->update( array( 'status' => 'failed' ) );
+					}
 				}
 				$ajax_handler->add_error_message( esc_html__( 'Payment gateway did not return a redirect URL. Please try again.', 'gatewaykit' ) );
 				return;

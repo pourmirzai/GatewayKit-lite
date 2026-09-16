@@ -1,9 +1,9 @@
 <?php
 /**
- * Plugin Name: GatewayKit – Payment Gateway for Elementor Forms
+ * Plugin Name: GatewayKit – Payment Gateway for Elementor Pro Forms
  * Plugin URI:  https://pourmirzai.com/gatewaykit
  * Description: Accept payments through Elementor Pro Forms with PayPal, Stripe, Mollie, CoinGate, Coinify, NOWPayments, Razorpay, Paystack, and Mercado Pago. Upgrade to GatewayKit Pro for discount codes, webhooks, white label, and more.
- * Version:     1.3.3
+ * Version:     1.3.4
  * Author:      Morteza Pourmirzai
  * Author URI:  https://pourmirzai.com
  * Text Domain: gatewaykit
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Lite build identity.
 if ( ! defined( 'GATEWAYKIT_LITE_VERSION' ) ) {
-	define( 'GATEWAYKIT_LITE_VERSION', '1.3.3' );
+	define( 'GATEWAYKIT_LITE_VERSION', '1.3.4' );
 }
 
 /*

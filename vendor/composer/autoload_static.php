@@ -4,50 +4,50 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitc42f8d0da163715df743a88f524b65d7
+class ComposerStaticInit4657f11c03d5b9f49c46c516cf46874b
 {
     public static $files = array (
         '8d50dc88e56bace65e1e72f6017983ed' => __DIR__ . '/..' . '/freemius/wordpress-sdk/start.php',
     );
 
     public static $prefixLengthsPsr4 = array (
-        'S' => 
+        'S' =>
         array (
             'Svg\\' => 4,
             'Sabberworm\\CSS\\' => 15,
         ),
-        'M' => 
+        'M' =>
         array (
             'Masterminds\\' => 12,
         ),
-        'F' => 
+        'F' =>
         array (
             'FontLib\\' => 8,
         ),
-        'D' => 
+        'D' =>
         array (
             'Dompdf\\' => 7,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'Svg\\' => 
+        'Svg\\' =>
         array (
             0 => __DIR__ . '/..' . '/phenx/php-svg-lib/src/Svg',
         ),
-        'Sabberworm\\CSS\\' => 
+        'Sabberworm\\CSS\\' =>
         array (
             0 => __DIR__ . '/..' . '/sabberworm/php-css-parser/src',
         ),
-        'Masterminds\\' => 
+        'Masterminds\\' =>
         array (
             0 => __DIR__ . '/..' . '/masterminds/html5/src',
         ),
-        'FontLib\\' => 
+        'FontLib\\' =>
         array (
             0 => __DIR__ . '/..' . '/phenx/php-font-lib/src/FontLib',
         ),
-        'Dompdf\\' => 
+        'Dompdf\\' =>
         array (
             0 => __DIR__ . '/..' . '/dompdf/dompdf/src',
         ),
@@ -61,9 +61,9 @@ class ComposerStaticInitc42f8d0da163715df743a88f524b65d7
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitc42f8d0da163715df743a88f524b65d7::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitc42f8d0da163715df743a88f524b65d7::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInitc42f8d0da163715df743a88f524b65d7::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit4657f11c03d5b9f49c46c516cf46874b::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit4657f11c03d5b9f49c46c516cf46874b::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit4657f11c03d5b9f49c46c516cf46874b::$classMap;
 
         }, null, ClassLoader::class);
     }

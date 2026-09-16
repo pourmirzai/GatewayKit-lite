@@ -1,26 +1,48 @@
-=== GatewayKit – Payment Gateway for Elementor Forms ===
+=== GatewayKit – Payment Gateway for Elementor Pro Forms ===
 Contributors: pourmirzai
-Tags: elementor, payment, paypal, stripe, mollie
+Tags: elementor, elementor pro, payment, paypal, stripe
 Requires at least: 6.2
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.3.3
+Stable tag: 1.3.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Accept payments through Elementor Pro Forms using PayPal, Stripe, Mollie, and more — without the bloat of WooCommerce or a shopping cart.
+Accept payments through Elementor Pro Forms with PayPal, Stripe, Mollie, and crypto. All 9 gateways free — no WooCommerce required.
 
 == Description ==
 
+### Turn any Elementor Pro Form into a payment form.
+
+If you sell a single product, collect donations, send invoices, or take bookings with a fee, you don't need a full online store — you just need a form that takes payment. **GatewayKit** is the Elementor payment form plugin that adds a **Payment Gateway** action to Elementor Pro Forms: build the form with your own fields, and customers complete payment at a secure hosted checkout. No shopping cart, no WooCommerce, no bloated e-commerce stack.
+
+Set up in minutes, right inside the form builder you already use. Every payment is recorded in a full dashboard, and PDF receipts and invoices are emailed to your customers automatically.
+
+**Who it's for:** freelancers, web designers, small businesses, nonprofits, course creators, and agencies building client sites on Elementor Pro.
+
+**Try the live demo:** See GatewayKit in action — [wp-test.pourmirzai.com](https://wp-test.pourmirzai.com/).
+
+**Translations:** Available in English, Spanish, French, German, Brazilian Portuguese, and Arabic.
+
 **Requirements:** Elementor Pro must be installed and active. The Elementor Forms widget (included with Elementor Pro) is required to create and accept payments through forms.
 
-GatewayKit turns any Elementor Pro Form into a payment form. Build custom forms with your own fields, and customers are redirected to a hosted checkout to complete payment — no shopping cart or WooCommerce required.
+### Why Elementor users choose GatewayKit
 
-If you sell a single product, collect donations, or invoice clients, you don't need a full store — you just need a form that takes payment. GatewayKit is designed for single-product sales, donations, invoices, event registrations, and simple payment flows where WooCommerce would be overkill.
+* **All 9 gateways included free** — PayPal, Stripe, Mollie, Razorpay, Paystack, Mercado Pago, CoinGate, Coinify, and NOWPayments. No per-gateway upsells and no premium tier just to unlock a processor.
+* **Payments your customers actually prefer** — UPI, PIX, mobile money, iDEAL, Bancontact, SOFORT, and 100+ cryptocurrencies, plus Apple Pay, Google Pay, Klarna, and Afterpay through Stripe Checkout.
+* **A real payment dashboard in WordPress** — search, filter, and review every transaction in one place instead of logging into five provider dashboards.
+* **PDF receipts and invoices, sent automatically** — professional, printable, and included free.
+* **Payment Links** — generate shareable Stripe checkout links without building a form at all.
+* **Security-first** — credentials encrypted at rest (AES-256-CBC), logs auto-redact sensitive data, nonce verification and rate limiting built in, and no tracking or call-home.
 
-**Try the live demo:** See GatewayKit in action on our demo site — [wp-test.pourmirzai.com](https://wp-test.pourmirzai.com/).
+### Popular use cases
 
-**Translations:** GatewayKit is available in English, Spanish, French, German, Brazilian Portuguese, and Arabic.
+* Sell a **single product or digital download** from a landing page — no storefront required
+* Collect **donations** and fundraising amounts (custom amounts supported; optional payment with Pro)
+* Send **invoices** and let clients pay any amount they owe
+* Take **event registrations** and booking fees right on the signup form
+* Charge **deposits** or run **recurring subscriptions** (Pro)
+* Accept **crypto** and **local payment methods** for customers worldwide
 
 **Payment Gateways Included Free**
 
@@ -36,14 +58,15 @@ If you sell a single product, collect donations, or invoice clients, you don't n
 
 **Core Features**
 
-* Fixed or dynamic payment amounts (pull price from a form field)
+* Fixed or dynamic payment amounts (pull the price from a form field)
 * Transaction dashboard with search, filters, and date-range filtering
-* Secure receipt tokens with printable payment result shortcode
+* Secure receipt tokens with a printable payment-result shortcode
 * PDF receipts emailed automatically to customers
 * PDF invoices downloadable from the receipt page
 * Transaction notes for internal order tracking
-* Structured logging with sensitive-data redaction
+* Shareable Payment Links (Stripe) — no form needed
 * Per-form failure redirect pages
+* Structured logging with sensitive-data redaction
 * Security: input sanitization, output escaping, nonce verification, rate limiting
 
 **GatewayKit Pro (Optional)**
@@ -63,7 +86,6 @@ Upgrade to GatewayKit Pro for advanced features:
 
 Visit the [GatewayKit website](https://gatewaykit.pourmirzai.com/) for full documentation and demos.
 
-
 == Installation ==
 
 1. Install and activate **Elementor** and **Elementor Pro** (the Forms module is required).
@@ -80,13 +102,25 @@ Visit the [GatewayKit website](https://gatewaykit.pourmirzai.com/) for full docu
 
 Yes. The Elementor Pro Forms module is required because GatewayKit is an "Actions After Submit" handler for Elementor forms.
 
+= Does GatewayKit require WooCommerce? =
+
+No. GatewayKit is a standalone payment solution for Elementor Pro Forms — no WooCommerce, no shopping cart, no e-commerce plugin needed.
+
+= Elementor Pro already includes Stripe. Why do I need GatewayKit? =
+
+Elementor's built-in form action supports Stripe only and gives you no payment dashboard, no PDF receipts, and no choice of provider. GatewayKit is a superset: all 9 gateways (PayPal, Stripe, Mollie, crypto, and more), a full transaction dashboard, PDF receipts and invoices, Payment Links, and the Pro extras — included free.
+
 = Which payment methods are included in Lite? =
 
 All nine payment gateways are included in the free plugin: PayPal, Stripe, Mollie, CoinGate, Coinify, NOWPayments, Razorpay, Paystack, and Mercado Pago. GatewayKit Pro adds advanced features like discount codes, refunds, analytics, CSV export, and more.
 
-= Are payment credentials stored securely? =
+= Can customers pay a custom amount? =
 
-Yes. All API keys and secrets are encrypted at rest (AES-256-CBC) and decrypted only in memory when a payment is processed. Logs automatically redact sensitive data. GatewayKit itself does not track your visitors, and your data is never sold or shared — payment details are sent only to the payment providers you configure, and license/update checks run through Freemius's SDK (which you can opt out of).
+Yes. Set the amount type to "From Form Field" and map it to a number field — perfect for invoices and donations.
+
+= Is this plugin secure? Can I trust it with payments? =
+
+Yes. GatewayKit was built security-first: all API keys and secrets are encrypted at rest (AES-256-CBC) and decrypted only in memory when a payment is processed. Logs automatically redact sensitive data. Every form submission is protected by nonce verification, input sanitization, output escaping, and rate limiting. GatewayKit itself does not track your visitors, and your data is never sold or shared — payment details are sent only to the payment providers you configure, and license/update checks run through Freemius's SDK (which you can opt out of).
 
 = The activation link in my opt-in email returns a 403 error. What should I do? =
 
@@ -113,6 +147,16 @@ The same guidance applies if license-key activation fails for the same reason.
 9. Receipt page when opened directly via transaction query.
 
 == Changelog ==
+
+= 1.3.4 =
+
+**Critical fix**
+
+* Fixed a PHP 7.4 compatibility issue that could prevent the plugin from loading on some sites
+
+**Compatibility**
+
+* Verified with WordPress 7.1 — "Tested up to" updated to 7.1
 
 = 1.3.3 =
 
@@ -202,6 +246,29 @@ The same guidance applies if license-key activation fails for the same reason.
 * PayPal payments through Elementor Pro Forms
 * Optional GatewayKit Pro add-on with Stripe, Mollie, and CoinGate gateways
 
+== Upgrade Notice ==
+
+= 1.3.4 =
+Fixes a PHP 7.4 compatibility issue that could prevent the plugin from loading, and is verified with WordPress 7.1.
+
+= 1.3.3 =
+Critical White Label fix: magic links no longer break on save. If you are locked out, use `?gatewaykit_wl=GatewayKit_WL_emergency_key` after updating.
+
+= 1.3.2 =
+Manage your Stripe subscriptions from a dedicated overview page in the admin.
+
+= 1.3.0 =
+Three new regional gateways (Razorpay, Paystack, Mercado Pago), Apple Pay, Google Pay, Klarna, Afterpay, embedded checkout, and shareable Payment Links.
+
+= 1.2.0 =
+Crypto payments via NOWPayments, date filters, customer email receipts, and transaction notes.
+
+= 1.1.0 =
+Security and performance release. PayPal webhooks are now verified via PayPal's official signature endpoint — open PayPal settings and paste your Webhook ID to enable full protection. PayPal access tokens are now cached across requests.
+
+= 1.0.0 =
+First release. Accept PayPal payments through Elementor Pro Forms. Upgrade to GatewayKit Pro for Stripe, Mollie, and CoinGate.
+
 == External Services ==
 
 This plugin connects to payment provider APIs to process payments.
@@ -272,23 +339,3 @@ When a user submits a payment form, the plugin sends the payment amount, currenc
 * API Endpoint (Test): https://api.mercadopago.com (sandbox tokens)
 * Terms of Service: https://www.mercadopago.com/terms-and-conditions
 * Privacy Policy: https://www.mercadopago.com/privacy-experience
-
-== Upgrade Notice ==
-
-= 1.3.3 =
-Critical White Label fix: magic links no longer break on save. If you are locked out, use `?gatewaykit_wl=GatewayKit_WL_emergency_key` after updating.
-
-= 1.3.2 =
-Manage your Stripe subscriptions from a dedicated overview page in the admin.
-
-= 1.3.0 =
-Three new regional gateways (Razorpay, Paystack, Mercado Pago), Apple Pay, Google Pay, Klarna, Afterpay, embedded checkout, and shareable Payment Links.
-
-= 1.2.0 =
-Crypto payments via NOWPayments, date filters, customer email receipts, and transaction notes.
-
-= 1.1.0 =
-Security and performance release. PayPal webhooks are now verified via PayPal's official signature endpoint — open PayPal settings and paste your Webhook ID to enable full protection. PayPal access tokens are now cached across requests.
-
-= 1.0.0 =
-First release. Accept PayPal payments through Elementor Pro Forms. Upgrade to GatewayKit Pro for Stripe, Mollie, and CoinGate.

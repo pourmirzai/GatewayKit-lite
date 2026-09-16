@@ -1,5 +1,15 @@
 # GatewayKit Changelog
 
+## 1.3.4
+
+**Critical fix**
+
+- Fixed a PHP 7.4 compatibility issue that could prevent the plugin from loading on some sites
+
+**Compatibility**
+
+- Verified with WordPress 7.1 — "Tested up to" updated to 7.1
+
 ## 1.3.3
 
 **Critical fixes**
