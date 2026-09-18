@@ -58,11 +58,26 @@ function gatewaykit_handle_payment_callback() {
 
 			do_action( 'gatewaykit_payment_failed', $transaction, array( 'reason' => 'cancelled_by_user' ) );
 
-			// Route to the failure URL; fall back to success URL, then a notice.
+			// Route to the failure URL; fall back to success URL, receipt page, or home.
 			$redirect_url = $transaction->failure_url ? $transaction->failure_url : $transaction->success_url;
 
+			if ( ! $redirect_url ) {
+				$receipt_page_id = (int) get_option( 'gatewaykit_receipt_page_id', 0 );
+				if ( $receipt_page_id > 0 && get_permalink( $receipt_page_id ) ) {
+					$redirect_url = get_permalink( $receipt_page_id );
+				} else {
+					$redirect_url = home_url( '/' );
+				}
+			}
+
 			if ( $redirect_url ) {
-				$redirect_url = add_query_arg( 'gatewaykit_receipt', $transaction->receipt_token, $redirect_url );
+				$redirect_url = add_query_arg(
+					array(
+						'gatewaykit_receipt' => $transaction->receipt_token,
+						'gatewaykit_notice'  => 'cancelled',
+					),
+					$redirect_url
+				);
 				wp_safe_redirect( $redirect_url );
 				exit;
 			}
@@ -70,9 +85,11 @@ function gatewaykit_handle_payment_callback() {
 			wp_die( esc_html__( 'Payment cancelled. No redirect URL is configured for this form.', 'gatewaykit' ) );
 		}
 
-		// No matching transaction; show a clean cancellation notice instead of
-		// the misleading "Invalid callback parameters." error.
-		wp_die( esc_html__( 'Payment cancelled.', 'gatewaykit' ) );
+		// No matching transaction; redirect to receipt page or home with cancellation notice.
+		$receipt_page_id = (int) get_option( 'gatewaykit_receipt_page_id', 0 );
+		$fallback_url    = ( $receipt_page_id > 0 && get_permalink( $receipt_page_id ) ) ? get_permalink( $receipt_page_id ) : home_url( '/' );
+		wp_safe_redirect( add_query_arg( 'gatewaykit_notice', 'cancelled', $fallback_url ) );
+		exit;
 	}
 
 	// Validate the callback token parameter. Redirect-based gateways pass the
@@ -113,8 +130,24 @@ function gatewaykit_handle_payment_callback() {
 			? $transaction->success_url
 			: ( $transaction->failure_url ? $transaction->failure_url : $transaction->success_url );
 
+		if ( ! $redirect_url ) {
+			$receipt_page_id = (int) get_option( 'gatewaykit_receipt_page_id', 0 );
+			if ( $receipt_page_id > 0 && get_permalink( $receipt_page_id ) ) {
+				$redirect_url = get_permalink( $receipt_page_id );
+			} else {
+				$redirect_url = home_url( '/' );
+			}
+		}
+
 		if ( $redirect_url ) {
-			$redirect_url = add_query_arg( 'gatewaykit_receipt', $transaction->receipt_token, $redirect_url );
+			$notice_status = ( 'completed' === $transaction->status ) ? 'completed' : ( 'cancelled' === $transaction->status ? 'cancelled' : 'failed' );
+			$redirect_url  = add_query_arg(
+				array(
+					'gatewaykit_receipt' => $transaction->receipt_token,
+					'gatewaykit_notice'  => $notice_status,
+				),
+				$redirect_url
+			);
 			wp_safe_redirect( $redirect_url );
 			exit;
 		}
@@ -156,25 +189,31 @@ function gatewaykit_handle_payment_callback() {
 		// Trigger failure action
 		do_action( 'gatewaykit_payment_failed', $transaction, $result );
 
-		// Redirect to redirect URL specified in form settings
-		$redirect_url = $transaction->failure_url;
-		if ( $redirect_url ) {
-			// Add receipt token to URL for shortcode
-			$redirect_url = add_query_arg( 'gatewaykit_receipt', $transaction->receipt_token, $redirect_url );
-			wp_safe_redirect( $redirect_url );
-			exit;
-		} else {
-			// Use success URL as fallback for failure
-			$redirect_url = $transaction->success_url;
-			if ( $redirect_url ) {
-				$redirect_url = add_query_arg( 'gatewaykit_receipt', $transaction->receipt_token, $redirect_url );
-				wp_safe_redirect( $redirect_url );
-				exit;
+		// Redirect to failure URL, success URL, receipt page, or home.
+		$redirect_url = $transaction->failure_url ? $transaction->failure_url : $transaction->success_url;
+
+		if ( ! $redirect_url ) {
+			$receipt_page_id = (int) get_option( 'gatewaykit_receipt_page_id', 0 );
+			if ( $receipt_page_id > 0 && get_permalink( $receipt_page_id ) ) {
+				$redirect_url = get_permalink( $receipt_page_id );
 			} else {
-				// Fallback to default if no custom URL is set
-				wp_die( esc_html__( 'Redirect URL not configured.', 'gatewaykit' ) );
+				$redirect_url = home_url( '/' );
 			}
 		}
+
+		if ( $redirect_url ) {
+			$redirect_url = add_query_arg(
+				array(
+					'gatewaykit_receipt' => $transaction->receipt_token,
+					'gatewaykit_notice'  => 'failed',
+				),
+				$redirect_url
+			);
+			wp_safe_redirect( $redirect_url );
+			exit;
+		}
+
+		wp_die( esc_html__( 'Redirect URL not configured.', 'gatewaykit' ) );
 	}
 	// phpcs:enable
 }

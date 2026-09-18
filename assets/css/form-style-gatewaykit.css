@@ -1,0 +1,311 @@
+/**
+ * GatewayKit Brand Style Preset (Midnight Dark & Electric Lime)
+ * Inspired by GatewayKit / Sentry Design Language.
+ *
+ * @package GatewayKit
+ */
+
+/* Form Wrapper Card — Deep Midnight Navy Canvas */
+.gatewaykit-form-wrap.gk-style-gatewaykit {
+	background: #150f23;
+	border: 1px solid #362d59;
+	border-radius: 16px;
+	padding: 32px;
+	box-shadow: 0 16px 48px rgba(10, 6, 22, 0.45);
+	color: #f1f5f9;
+}
+
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-form-header {
+	border-bottom: 1px solid #362d59;
+	margin-bottom: 24px;
+	padding-bottom: 16px;
+}
+
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-form-title {
+	color: #ffffff;
+	font-weight: 700;
+}
+
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-form-description {
+	color: #bdb8c0;
+}
+
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-field-label {
+	color: #f1f5f9;
+	font-weight: 600;
+	font-size: 14px;
+}
+
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-required {
+	color: #fa7faa; /* Hot Pink accent */
+}
+
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-section-heading {
+	color: #ffffff;
+	font-weight: 700;
+}
+
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-helper-text,
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-help-text {
+	color: #bdb8c0;
+}
+
+/* Fixed Amount Card — Ink Deep Surface with Electric Lime */
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-fixed-amount-card {
+	background: #1f1633;
+	border: 1px solid #362d59;
+	border-radius: 12px;
+	padding: 18px 24px;
+	box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05), 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-fixed-amount-card .gk-amount-label {
+	color: #bdb8c0;
+	text-transform: uppercase;
+	font-size: 12px;
+	font-weight: 600;
+	letter-spacing: 0.5px;
+}
+
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-fixed-amount-card .gk-amount-value {
+	color: #c2ef4e; /* Electric Lime */
+	font-family: Monaco, Menlo, Consolas, monospace;
+	font-size: 22px;
+	font-weight: 700;
+}
+
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-amount-original {
+	color: #79628c;
+	text-decoration: line-through;
+	opacity: 0.8;
+	font-size: 0.8em;
+	margin-right: 6px;
+	font-weight: 500;
+}
+
+@keyframes gkAmountPulseGlow {
+	0% {
+		transform: scale(1);
+		text-shadow: none;
+	}
+	35% {
+		transform: scale(1.14);
+		text-shadow: 0 0 16px rgba(194, 239, 78, 0.85);
+		color: #e2ff8d;
+	}
+	70% {
+		transform: scale(0.98);
+	}
+	100% {
+		transform: scale(1);
+		text-shadow: none;
+		color: #c2ef4e;
+	}
+}
+
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-fixed-amount-card .gk-amount-value.gk-amount-pulse {
+	animation: gkAmountPulseGlow 0.55s ease-out;
+	display: inline-block;
+}
+
+/* Text Inputs, Selects & Textareas — Dark Form Inputs */
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-text-input,
+.gatewaykit-form-wrap.gk-style-gatewaykit select,
+.gatewaykit-form-wrap.gk-style-gatewaykit textarea {
+	border-radius: 8px;
+	border: 1.5px solid #362d59;
+	background: #1f1633;
+	color: #ffffff;
+	font-size: 14px;
+	transition: all 0.2s ease;
+}
+
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-text-input::placeholder,
+.gatewaykit-form-wrap.gk-style-gatewaykit textarea::placeholder {
+	color: #79628c;
+}
+
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-text-input:focus,
+.gatewaykit-form-wrap.gk-style-gatewaykit select:focus,
+.gatewaykit-form-wrap.gk-style-gatewaykit textarea:focus {
+	border-color: #c2ef4e;
+	box-shadow: 0 0 0 3px rgba(194, 239, 78, 0.25);
+	outline: none;
+	background: #251b3d;
+}
+
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-input-group {
+	border: 1.5px solid #362d59;
+	background: #1f1633;
+	border-radius: 8px;
+}
+
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-input-group:focus-within {
+	border-color: #c2ef4e;
+	box-shadow: 0 0 0 3px rgba(194, 239, 78, 0.25);
+	background: #251b3d;
+}
+
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-input-prefix {
+	background: #171026;
+	border-right: 1px solid #362d59;
+	color: #bdb8c0;
+}
+
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-custom-amount-input {
+	color: #ffffff;
+	background: transparent;
+}
+
+/* Preset Amount / Tier Pills */
+.gatewaykit-form-wrap.gk-style-gatewaykit button.gk-preset-pill,
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-preset-pill {
+	background: #1f1633 !important;
+	border: 1.5px solid #362d59 !important;
+	color: #e2e8f0 !important;
+	border-radius: 8px;
+	padding: 9px 18px;
+	font-weight: 600;
+	font-size: 14px;
+	cursor: pointer;
+	box-shadow: none;
+	text-decoration: none;
+	transition: all 0.15s ease;
+	outline: none;
+}
+
+.gatewaykit-form-wrap.gk-style-gatewaykit button.gk-preset-pill:hover,
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-preset-pill:hover {
+	background: #251b3d !important;
+	border-color: #c2ef4e !important;
+	color: #c2ef4e !important;
+}
+
+.gatewaykit-form-wrap.gk-style-gatewaykit button.gk-preset-pill.is-selected,
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-preset-pill.is-selected {
+	background: #c2ef4e !important;
+	border-color: #c2ef4e !important;
+	color: #150f23 !important;
+	font-weight: 700;
+	box-shadow: 0 4px 14px rgba(194, 239, 78, 0.35);
+}
+
+/* Gateway Selection Cards */
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-gateway-card {
+	border-radius: 10px;
+	border: 1.5px solid #362d59;
+	background: #1f1633;
+	padding: 13px 16px;
+	transition: all 0.15s ease;
+}
+
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-gateway-card:hover {
+	border-color: #79628c;
+	background: #251b3d;
+}
+
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-gateway-card.is-selected {
+	border-color: #c2ef4e;
+	background: #251b3d;
+	box-shadow: 0 0 0 1.5px #c2ef4e;
+}
+
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-gw-title {
+	color: #ffffff;
+	font-weight: 600;
+}
+
+/* Options & Terms */
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-choice-option {
+	color: #e2e8f0;
+}
+
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-terms-label {
+	color: #bdb8c0;
+}
+
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-divider {
+	border-top: 1px solid #362d59;
+}
+
+/* Discount Code Apply Button & Feedback */
+.gatewaykit-form-wrap.gk-style-gatewaykit button.gk-discount-apply-btn,
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-discount-apply-btn {
+	background: #c2ef4e !important;
+	color: #150f23 !important;
+	border: 1.5px solid #c2ef4e !important;
+	border-radius: 8px;
+	padding: 0 20px;
+	font-weight: 700;
+	font-size: 13px;
+	text-transform: uppercase;
+	letter-spacing: 0.2px;
+	box-shadow: none;
+	cursor: pointer;
+	transition: all 0.15s ease;
+}
+
+.gatewaykit-form-wrap.gk-style-gatewaykit button.gk-discount-apply-btn:hover:not(:disabled),
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-discount-apply-btn:hover:not(:disabled) {
+	background: #d4ff68 !important;
+	border-color: #d4ff68 !important;
+	box-shadow: 0 0 12px rgba(194, 239, 78, 0.4);
+}
+
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-discount-feedback.is-success {
+	background: rgba(194, 239, 78, 0.12);
+	color: #c2ef4e;
+	border: 1px solid rgba(194, 239, 78, 0.35);
+}
+
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-discount-feedback.is-error {
+	background: rgba(250, 127, 170, 0.12);
+	color: #fa7faa;
+	border: 1px solid rgba(250, 127, 170, 0.35);
+}
+
+/* Submit Button — Electric Lime Hero CTA */
+.gatewaykit-form-wrap.gk-style-gatewaykit button.gk-submit-btn,
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-submit-btn {
+	background: #c2ef4e !important;
+	color: #150f23 !important;
+	border: none !important;
+	border-radius: 8px;
+	padding: 15px 24px;
+	font-weight: 700;
+	font-size: 15px;
+	text-transform: uppercase;
+	letter-spacing: 0.2px;
+	box-shadow: 0 4px 18px rgba(194, 239, 78, 0.3);
+	cursor: pointer;
+	transition: all 0.15s ease;
+}
+
+.gatewaykit-form-wrap.gk-style-gatewaykit button.gk-submit-btn:hover:not(:disabled),
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-submit-btn:hover:not(:disabled) {
+	background: #d4ff68 !important;
+	box-shadow: 0 6px 24px rgba(194, 239, 78, 0.45);
+	transform: translateY(-1px);
+}
+
+.gatewaykit-form-wrap.gk-style-gatewaykit button.gk-submit-btn:disabled,
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-submit-btn:disabled {
+	opacity: 0.45;
+	cursor: not-allowed;
+	transform: none;
+	box-shadow: none;
+}
+
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-spinner {
+	border: 2px solid rgba(21, 15, 35, 0.25);
+	border-top-color: #150f23;
+}
+
+/* Footer Attribution (Midnight) */
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-form-footer-badge a {
+	color: #94a3b8;
+}
+
+.gatewaykit-form-wrap.gk-style-gatewaykit .gk-form-footer-badge a:hover {
+	color: #c2ef4e;
+}

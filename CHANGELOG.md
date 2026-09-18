@@ -1,5 +1,23 @@
 # GatewayKit Changelog
 
+## 1.5.1
+
+**Security & Attribution**
+
+- Server-side amount validation matches the selected priced option exactly (closes lower-tier-price-with-higher-tier-selection mismatch)
+- "Powered by GatewayKit" footer badge on free forms (hidden with a Pro license)
+
+## 1.5.0
+
+**Features**
+
+- Native WordPress Gutenberg Block (`gatewaykit/payment-form`) with real-time preview and customization
+- 3-Step Setup Wizard for quick onboarding (currency, gateways, starter forms)
+- Labeled pricing presets (e.g. `Early Bird: 25, VIP Pass: 100`) and tiered ticket pricing
+- Dynamic option pricing (`Option | Price`) for select and radio choice fields
+- New Event Registration & Tickets starter template
+- Resilient theme style isolation for Modern Clean and Elevated Card presets
+
 ## 1.3.4
 
 **Critical fix**

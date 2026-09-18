@@ -192,37 +192,6 @@ class GatewayKit_PayPal_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 	/**
 	 * Zero-decimal currencies per PayPal REST API v2 spec.
 	 *
-	 * PayPal rejects fractional values for these ("Fraction digits are not
-	 * allowed with this currency"), so they must be sent as whole numbers.
-	 *
-	 * Source: PayPal Developer Docs, "Currency codes" — currencies that use
-	 * the zero-decimal format. NOTE: HUF and TWD are NOT in this list — they
-	 * are 2-decimal in REST API v2 (they were zero-decimal only in the legacy
-	 * NVP/SOAP API).
-	 *
-	 * @link https://developer.paypal.com/api/rest/reference/currency-codes/
-	 *
-	 * @var string[]
-	 */
-	private static $zero_decimal = array(
-		'BIF',
-		'CLP',
-		'DJF',
-		'GNF',
-		'JPY',
-		'KMF',
-		'KRW',
-		'MGA',
-		'PYG',
-		'RWF',
-		'UGX',
-		'VND',
-		'VUV',
-		'XAF',
-		'XOF',
-		'XPF',
-	);
-
 	/**
 	 * Render the amount as the value string PayPal expects for the active
 	 * currency: integer for zero-decimal currencies, 2-decimal string
@@ -233,7 +202,7 @@ class GatewayKit_PayPal_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 	 */
 	private function format_value( $amount ) {
 		$currency = $this->get_currency();
-		if ( in_array( $currency, self::$zero_decimal, true ) ) {
+		if ( $this->is_zero_decimal_currency( $currency ) ) {
 			return (string) (int) round( (float) $amount );
 		}
 		return number_format( (float) $amount, 2, '.', '' );

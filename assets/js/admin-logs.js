@@ -12,6 +12,7 @@
 
 			$body.on( 'click', '.gatewaykit-logs-copy', this.copySelected );
 			$body.on( 'click', '.gatewaykit-logs-export', this.exportSelected );
+			$body.on( 'click', '.gatewaykit-logs-clear', this.clearAllLogs );
 
 			// Intercept the WP "Apply" bulk-action button when action is copy/export.
 			$( '#gatewaykit-logs-table-form' ).on( 'submit', this.handleBulkSubmit );
@@ -44,6 +45,55 @@
 			GatewayKitLogs._noticeTimer = window.setTimeout( function() {
 				$notice.text( '' );
 			}, 6000 );
+		},
+
+		/**
+		 * Clear all payment logs via AJAX.
+		 */
+		clearAllLogs: function( e ) {
+			if ( e ) {
+				e.preventDefault();
+			}
+
+			var confirmMsg = ( typeof gatewaykit_logs_vars !== 'undefined' && gatewaykit_logs_vars.confirm_clear )
+				? gatewaykit_logs_vars.confirm_clear
+				: 'Are you sure you want to delete ALL logs? This cannot be undone.';
+
+			if ( ! window.confirm( confirmMsg ) ) {
+				return;
+			}
+
+			var $btn = $( '.gatewaykit-logs-clear' ).first();
+			$btn.prop( 'disabled', true );
+
+			$.ajax( {
+				url: gatewaykit_ajax.ajax_url,
+				method: 'POST',
+				dataType: 'json',
+				data: {
+					action: 'gatewaykit_clear_logs',
+					nonce: gatewaykit_ajax.nonce
+				}
+			} ).done( function( response ) {
+				if ( response && response.success ) {
+					var successMsg = ( response.data && response.data.message )
+						? response.data.message
+						: ( ( typeof gatewaykit_logs_vars !== 'undefined' && gatewaykit_logs_vars.cleared ) ? gatewaykit_logs_vars.cleared : 'All logs cleared.' );
+					GatewayKitLogs.notice( successMsg, 'success' );
+					window.setTimeout( function() {
+						window.location.reload();
+					}, 1000 );
+				} else {
+					var failMsg = ( response && response.data )
+						? response.data
+						: ( ( typeof gatewaykit_logs_vars !== 'undefined' && gatewaykit_logs_vars.clear_failed ) ? gatewaykit_logs_vars.clear_failed : 'Failed to clear logs.' );
+					GatewayKitLogs.notice( failMsg, 'error' );
+				}
+			} ).fail( function() {
+				GatewayKitLogs.notice( ( typeof gatewaykit_logs_vars !== 'undefined' && gatewaykit_logs_vars.ajax_error ) ? gatewaykit_logs_vars.ajax_error : 'Error.', 'error' );
+			} ).always( function() {
+				$btn.prop( 'disabled', false );
+			} );
 		},
 
 		/**

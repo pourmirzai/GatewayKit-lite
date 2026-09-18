@@ -81,6 +81,17 @@ abstract class GatewayKit_Abstract_Payment_Gateway implements GatewayKit_Payment
 	}
 
 	/**
+	 * Get gateway title/name.
+	 *
+	 * Alias for get_gateway_name() for backwards compatibility.
+	 *
+	 * @return string Gateway title
+	 */
+	public function get_title() {
+		return $this->get_gateway_name();
+	}
+
+	/**
 	 * Check if gateway is available
 	 *
 	 * @return bool True if available
@@ -227,6 +238,45 @@ abstract class GatewayKit_Abstract_Payment_Gateway implements GatewayKit_Payment
 	 */
 	protected function format_amount( $amount ) {
 		return intval( $amount );
+	}
+
+	/**
+	 * Get the list of zero-decimal currencies (ISO 4217).
+	 *
+	 * Zero-decimal currencies have no minor units (e.g. JPY, KRW). Gateways
+	 * can override this method if their supported zero-decimal currencies differ.
+	 *
+	 * @return string[] Array of uppercase currency codes.
+	 */
+	public function get_zero_decimal_currencies() {
+		return array(
+			'BIF',
+			'CLP',
+			'DJF',
+			'GNF',
+			'JPY',
+			'KMF',
+			'KRW',
+			'MGA',
+			'PYG',
+			'RWF',
+			'UGX',
+			'VND',
+			'VUV',
+			'XAF',
+			'XOF',
+			'XPF',
+		);
+	}
+
+	/**
+	 * Check if a currency is a zero-decimal currency for this gateway.
+	 *
+	 * @param string $currency ISO 4217 currency code.
+	 * @return bool True if zero-decimal currency.
+	 */
+	public function is_zero_decimal_currency( $currency ) {
+		return in_array( strtoupper( (string) $currency ), $this->get_zero_decimal_currencies(), true );
 	}
 
 	/**

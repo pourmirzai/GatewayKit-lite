@@ -285,10 +285,10 @@
                     console.log('GatewayKit Test Webhook response:', response);
                     if (response.success) {
                         var msg = (response.data && response.data.message) ? response.data.message : response.data;
-                        resultDiv.html('<span style="color:#46b450;">&#10004; ' + msg + '</span>').show();
+                        resultDiv.html('<span style="color:#46b450;">&#10004; ' + self.escapeHtml(msg) + '</span>').show();
                     } else {
                         var msg = (response.data && response.data.message) ? response.data.message : (typeof response.data === 'string' ? response.data : (gatewaykit_admin_vars.test_failed || 'Test failed'));
-                        resultDiv.html('<span style="color:#dc3232;">&#10008; ' + msg + '</span>').show();
+                        resultDiv.html('<span style="color:#dc3232;">&#10008; ' + self.escapeHtml(msg) + '</span>').show();
                     }
                 },
                 error: function(xhr, status, error) {
@@ -358,88 +358,58 @@
         },
 
         initGatewayToggles: function() {
-            var self = this;
-            
-            // Handle clicks on toggle track
-            $('.gatewaykit-toggle-track').on('click', function() {
-                var toggleTrack = $(this);
-                var gatewayToggle = toggleTrack.closest('.gatewaykit-gateway-toggle');
-                var statusInput = gatewayToggle.find('.gatewaykit-gateway-status-input');
-                var gatewayCard = gatewayToggle.closest('.gatewaykit-gateway-card');
-                var cardContent = gatewayCard.find('.gatewaykit-gateway-card-content');
-                var toggleLabel = gatewayToggle.find('.gatewaykit-toggle-label');
+            $(document).off('click.gkToggle', '.gatewaykit-gateway-toggle').on('click.gkToggle', '.gatewaykit-gateway-toggle', function(e) {
+                e.preventDefault();
+                var toggle = $(this);
+                var input = toggle.find('.gatewaykit-gateway-status-input');
+                var track = toggle.find('.gatewaykit-toggle-track');
+                var label = toggle.find('.gatewaykit-toggle-label');
+                var card = toggle.closest('.gatewaykit-gateway-card');
+                var content = card.find('.gatewaykit-gateway-card-content');
+                var currentVal = input.val();
+                var newVal = currentVal === '1' ? '0' : '1';
 
-                // Toggle status
-                var currentStatus = statusInput.val();
-                var newStatus = currentStatus === '1' ? '0' : '1';
+                input.val(newVal);
 
-                // Update hidden input
-                statusInput.val(newStatus);
-
-                // Update visual state
-                if (newStatus === '1') {
-                    // Enable gateway
-                    toggleTrack.removeClass('disabled').addClass('enabled');
-                    toggleLabel.removeClass('active').addClass('active');
-                    toggleLabel.text('\u0641\u0639\u0627\u0644');
-                    gatewayCard.removeClass('disabled').addClass('enabled');
-
-                    // Animate content appearance
-                    setTimeout(function() {
-                        cardContent.removeClass('hidden').addClass('visible');
-                        cardContent.css({
-                            'max-height': '1000px',
-                            'opacity': '1'
-                        });
-                    }, 50);
-
+                if (newVal === '1') {
+                    track.removeClass('disabled').addClass('enabled');
+                    label.removeClass('active').addClass('active');
+                    label.text((typeof gatewaykit_admin_vars !== 'undefined' && gatewaykit_admin_vars.enabled) ? gatewaykit_admin_vars.enabled : 'Enabled');
+                    card.removeClass('disabled').addClass('enabled');
+                    content.removeClass('hidden').addClass('visible');
+                    content.css({ 'max-height': '1000px', 'opacity': '1' });
                 } else {
-                    // Disable gateway
-                    toggleTrack.removeClass('enabled').addClass('disabled');
-                    toggleLabel.removeClass('active');
-                    toggleLabel.text('\u063a\u064a\u0631\u0641\u0639\u0627\u0644');
-                    gatewayCard.removeClass('enabled').addClass('disabled');
-
-                    // Animate content disappearance
-                    cardContent.removeClass('visible').addClass('hidden');
-                    cardContent.css({
-                        'max-height': '0',
-                        'opacity': '0'
-                    });
+                    track.removeClass('enabled').addClass('disabled');
+                    label.removeClass('active');
+                    label.text((typeof gatewaykit_admin_vars !== 'undefined' && gatewaykit_admin_vars.disabled) ? gatewaykit_admin_vars.disabled : 'Disabled');
+                    card.removeClass('enabled').addClass('disabled');
+                    content.removeClass('visible').addClass('hidden');
+                    content.css({ 'max-height': '0', 'opacity': '0' });
                 }
             });
 
-            // Set initial state for all toggles
             $('.gatewaykit-gateway-toggle').each(function() {
-                var gatewayToggle = $(this);
-                var statusInput = gatewayToggle.find('.gatewaykit-gateway-status-input');
-                var toggleTrack = gatewayToggle.find('.gatewaykit-toggle-track');
-                var toggleLabel = gatewayToggle.find('.gatewaykit-toggle-label');
-                var gatewayCard = gatewayToggle.closest('.gatewaykit-gateway-card');
-                var cardContent = gatewayCard.find('.gatewaykit-gateway-card-content');
+                var toggle = $(this);
+                var input = toggle.find('.gatewaykit-gateway-status-input');
+                var track = toggle.find('.gatewaykit-toggle-track');
+                var label = toggle.find('.gatewaykit-toggle-label');
+                var card = toggle.closest('.gatewaykit-gateway-card');
+                var content = card.find('.gatewaykit-gateway-card-content');
 
-                var currentStatus = statusInput.val();
-
-                if (currentStatus === '1') {
-                    toggleTrack.removeClass('disabled').addClass('enabled');
-                    toggleLabel.removeClass('active').addClass('active');
-                    toggleLabel.text('\u0641\u0639\u0627\u0644');
-                    gatewayCard.removeClass('disabled').addClass('enabled');
-                    cardContent.removeClass('hidden').addClass('visible');
-                    cardContent.css({
-                        'max-height': '1000px',
-                        'opacity': '1'
-                    });
+                if (input.val() === '1') {
+                    track.removeClass('disabled').addClass('enabled');
+                    label.removeClass('active').addClass('active');
+                    label.text((typeof gatewaykit_admin_vars !== 'undefined' && gatewaykit_admin_vars.enabled) ? gatewaykit_admin_vars.enabled : 'Enabled');
+                    card.removeClass('disabled').addClass('enabled');
+                    content.removeClass('hidden').addClass('visible');
+                    content.css({ 'max-height': '1000px', 'opacity': '1' });
                 } else {
-                    toggleTrack.removeClass('enabled').addClass('disabled');
-                    toggleLabel.removeClass('active');
-                    toggleLabel.text('\u063a\u064a\u0631\u0641\u0639\u0627\u0644');
-                    gatewayCard.removeClass('enabled').addClass('disabled');
-                    cardContent.removeClass('visible').addClass('hidden');
-                    cardContent.css({
-                        'max-height': '0',
-                        'opacity': '0'
-                    });
+                    track.removeClass('enabled').addClass('disabled');
+                    label.removeClass('active');
+                    label.text((typeof gatewaykit_admin_vars !== 'undefined' && gatewaykit_admin_vars.disabled) ? gatewaykit_admin_vars.disabled : 'Disabled');
+                    card.removeClass('enabled').addClass('disabled');
+                    content.removeClass('visible').addClass('hidden');
+                    content.css({ 'max-height': '0', 'opacity': '0' });
                 }
             });
         },
@@ -482,7 +452,7 @@
 
                 if (isNaN(elementorLimit) || elementorLimit < 1 || elementorLimit > 100) {
                     isValid = false;
-                    $('input[name="gatewaykit_admin_ajax_rate_limit"]').addClass('gatewaykit-field-error');
+                    $('input[name="gatewaykit_elementor_action_rate_limit"]').addClass('gatewaykit-field-error');
                     validationErrors.push('Elementor rate limit must be between 1 and 100');
                 }
 
@@ -667,28 +637,28 @@
                                 }
 
                                 html += '<tr>';
-                                html += '<td><strong>' + fieldName + '</strong></td>';
-                                html += '<td>' + fieldValue + '</td>';
+                                html += '<td><strong>' + self.escapeHtml(fieldName) + '</strong></td>';
+                                html += '<td>' + self.escapeHtml(fieldValue) + '</td>';
                                 html += '</tr>';
                             });
 
                             html += '</tbody></table>';
                             html += '</div>';
                         } else {
-                            html += '<p>' + gatewaykit_admin_vars.no_form_data + '</p>';
+                            html += '<p>' + self.escapeHtml(gatewaykit_admin_vars.no_form_data) + '</p>';
                         }
 
                         // User data
                         if (data.user_data && Object.keys(data.user_data).length > 0) {
                             html += '<div class="gatewaykit-user-data">';
-                            html += '<h3>' + gatewaykit_admin_vars.user_data + '</h3>';
+                            html += '<h3>' + self.escapeHtml(gatewaykit_admin_vars.user_data) + '</h3>';
                             html += '<table class="wp-list-table widefat fixed striped">';
-                            html += '<thead><tr><th>' + gatewaykit_admin_vars.field + '</th><th>' + gatewaykit_admin_vars.value + '</th></tr></thead><tbody>';
+                            html += '<thead><tr><th>' + self.escapeHtml(gatewaykit_admin_vars.field) + '</th><th>' + self.escapeHtml(gatewaykit_admin_vars.value) + '</th></tr></thead><tbody>';
 
                             $.each(data.user_data, function(key, value) {
                                 html += '<tr>';
-                                html += '<td><strong>' + key + '</strong></td>';
-                                html += '<td>' + (value || '-') + '</td>';
+                                html += '<td><strong>' + self.escapeHtml(key) + '</strong></td>';
+                                html += '<td>' + self.escapeHtml(value || '-') + '</td>';
                                 html += '</tr>';
                             });
 
@@ -699,7 +669,7 @@
                         html += '</div>';
                         content.html(html);
                     } else {
-                        content.html('<p>' + gatewaykit_admin_vars.error + ': ' + (response.data || gatewaykit_admin_vars.unknown_error) + '</p>');
+                        content.html('<p>' + self.escapeHtml(gatewaykit_admin_vars.error) + ': ' + self.escapeHtml(response.data || gatewaykit_admin_vars.unknown_error) + '</p>');
                     }
                 },
                 error: function() {
@@ -760,10 +730,10 @@
                     var note = notes[i];
                     html += '<div class="gatewaykit-note-item">';
                     html += '<div class="gatewaykit-note-meta">';
-                    html += '<strong>' + (note.author_name || gatewaykit_admin_vars.unknown_user) + '</strong>';
-                    html += ' <span class="gatewaykit-note-date">' + note.created_at + '</span>';
+                    html += '<strong>' + self.escapeHtml(note.author_name || gatewaykit_admin_vars.unknown_user) + '</strong>';
+                    html += ' <span class="gatewaykit-note-date">' + self.escapeHtml(note.created_at) + '</span>';
                     html += '</div>';
-                    html += '<div class="gatewaykit-note-text">' + note.note + '</div>';
+                    html += '<div class="gatewaykit-note-text">' + self.escapeHtml(note.note) + '</div>';
                     html += '</div>';
                 }
                 html += '</div>';

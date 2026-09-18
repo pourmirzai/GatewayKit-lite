@@ -1,9 +1,9 @@
 <?php
 /**
- * Plugin Name: GatewayKit – Payment Gateway for Elementor Pro Forms
+ * Plugin Name: GatewayKit – Simple Payment Form, Donation & Checkout
  * Plugin URI:  https://pourmirzai.com/gatewaykit
- * Description: Accept payments through Elementor Pro Forms with PayPal, Stripe, Mollie, CoinGate, Coinify, NOWPayments, Razorpay, Paystack, and Mercado Pago. Upgrade to GatewayKit Pro for discount codes, webhooks, white label, and more.
- * Version:     1.3.4
+ * Description: Accept payments and donations with 9 free gateways (Stripe, PayPal, Crypto). Fast checkout forms with zero platform fees and no WooCommerce bloat.
+ * Version:     1.5.2
  * Author:      Morteza Pourmirzai
  * Author URI:  https://pourmirzai.com
  * Text Domain: gatewaykit
@@ -12,7 +12,6 @@
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Requires at least: 6.2
  * Requires PHP: 7.4
- * Requires Plugins: elementor
  * Plugin Slug: gatewaykit
  */
 
@@ -23,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Lite build identity.
 if ( ! defined( 'GATEWAYKIT_LITE_VERSION' ) ) {
-	define( 'GATEWAYKIT_LITE_VERSION', '1.3.4' );
+	define( 'GATEWAYKIT_LITE_VERSION', '1.5.2' );
 }
 
 /*
@@ -137,6 +136,18 @@ if ( ! function_exists( 'gatewaykit_lite_uninstall_cleanup' ) ) {
 
 		foreach ( $gatewaykit_tables as $gatewaykit_table ) {
 			$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $gatewaykit_table ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.DirectDatabaseQuery.NoTruncation, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		}
+
+		// 1b. Delete sample forms and receipt page if created.
+		$receipt_page_id = (int) get_option( 'gatewaykit_receipt_page_id', 0 );
+		if ( $receipt_page_id ) {
+			wp_delete_post( $receipt_page_id, true );
+		}
+		$default_form_ids = (array) get_option( 'gatewaykit_default_form_ids', array() );
+		foreach ( $default_form_ids as $form_id ) {
+			if ( $form_id ) {
+				wp_delete_post( (int) $form_id, true );
+			}
 		}
 
 		// 2. Delete all gatewaykit_* options.

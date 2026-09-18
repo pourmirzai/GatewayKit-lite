@@ -244,14 +244,32 @@ class GatewayKit_NOWPayments_Gateway extends GatewayKit_Abstract_Payment_Gateway
 
 		if ( is_wp_error( $response ) ) {
 			$this->log( 'error', 'NOWPayments request failed: ' . $response->get_error_message(), array( 'path' => $path ) );
-			return new WP_Error( 'nowpayments_request_failed', __( 'Could not connect to NOWPayments. Please try again later.', 'gatewaykit' ) );
+			return new WP_Error(
+				'nowpayments_request_failed',
+				sprintf(
+					/* translators: %s: connection error message */
+					__( 'Could not connect to NOWPayments: %s', 'gatewaykit' ),
+					$response->get_error_message()
+				)
+			);
 		}
 
 		$code    = wp_remote_retrieve_response_code( $response );
 		$decoded = json_decode( wp_remote_retrieve_body( $response ), true );
 
 		if ( $code < 200 || $code >= 300 ) {
-			$message = isset( $decoded['message'] ) ? $decoded['message'] : __( 'NOWPayments request failed.', 'gatewaykit' );
+			$message = '';
+			if ( is_array( $decoded ) && ! empty( $decoded['message'] ) ) {
+				$message = is_array( $decoded['message'] ) ? implode( '; ', $decoded['message'] ) : (string) $decoded['message'];
+			} elseif ( is_array( $decoded ) && ! empty( $decoded['error'] ) ) {
+				$message = is_array( $decoded['error'] ) ? implode( '; ', $decoded['error'] ) : (string) $decoded['error'];
+			} elseif ( is_array( $decoded ) && ! empty( $decoded['description'] ) ) {
+				$message = (string) $decoded['description'];
+			} else {
+				$raw_body = wp_remote_retrieve_body( $response );
+				$message  = ! empty( $raw_body ) ? substr( wp_strip_all_tags( $raw_body ), 0, 200 ) : __( 'NOWPayments request failed.', 'gatewaykit' );
+			}
+
 			$this->log(
 				'error',
 				'NOWPayments API error',
@@ -289,6 +307,18 @@ class GatewayKit_NOWPayments_Gateway extends GatewayKit_Abstract_Payment_Gateway
 
 		$currency = $this->get_currency();
 
+		if ( ! in_array( strtoupper( $currency ), $this->get_supported_currencies(), true ) ) {
+			return array(
+				'status'        => 'error',
+				'error_type'    => 'validation',
+				'error_message' => sprintf(
+					/* translators: %s: currency code */
+					__( 'NOWPayments does not support currency "%s". Please select a supported currency in settings.', 'gatewaykit' ),
+					$currency
+				),
+			);
+		}
+
 		// NOWPayments does not echo its invoice id on redirect, so we use a
 		// local reference token (same pattern as CoinGate).
 		$ref         = 'np_' . wp_generate_password( 16, false );
@@ -301,7 +331,7 @@ class GatewayKit_NOWPayments_Gateway extends GatewayKit_Abstract_Payment_Gateway
 
 		$params = array(
 			'price_amount'      => $formatted,
-			'price_currency'    => $currency,
+			'price_currency'    => strtolower( $currency ),
 			'order_id'          => $ref,
 			'order_description' => $description ? mb_substr( (string) $description, 0, 200 ) : __( 'Payment', 'gatewaykit' ),
 			'success_url'       => $success_url,

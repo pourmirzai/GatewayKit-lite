@@ -28,30 +28,6 @@ class GatewayKit_Stripe_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 	const LIVE_BASE = 'https://api.stripe.com/v1';
 
 	/**
-	 * Zero-decimal currencies (no minor units) per Stripe's spec.
-	 *
-	 * @var array
-	 */
-	private static $zero_decimal = array(
-		'BIF',
-		'CLP',
-		'DJF',
-		'GNF',
-		'JPY',
-		'KMF',
-		'KRW',
-		'MGA',
-		'PYG',
-		'RWF',
-		'UGX',
-		'VND',
-		'VUV',
-		'XAF',
-		'XOF',
-		'XPF',
-	);
-
-	/**
 	 * Get gateway ID.
 	 *
 	 * @return string
@@ -267,7 +243,7 @@ class GatewayKit_Stripe_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 		}
 		$currency = strtoupper( $currency );
 
-		if ( in_array( $currency, self::$zero_decimal, true ) ) {
+		if ( $this->is_zero_decimal_currency( $currency ) ) {
 			return (int) round( (float) $amount );
 		}
 

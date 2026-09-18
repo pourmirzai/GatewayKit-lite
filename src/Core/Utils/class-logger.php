@@ -27,7 +27,7 @@ class GatewayKit_Logger {
 	 * sink when the DB insert itself fails, the other writes to the WordPress
 	 * debug log (the logger's documented WP_DEBUG output).
 	 */
-	// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.PHP.DevelopmentFunctions.error_log_error_log
+	// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQLPlaceholders.UnsupportedIdentifierPlaceholder, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.PHP.DevelopmentFunctions.error_log_error_log
 
 	/**
 	 * Single instance
@@ -482,6 +482,29 @@ class GatewayKit_Logger {
 				$days
 			)
 		);
+	}
+
+	/**
+	 * Clear all logs (truncate or delete all rows).
+	 *
+	 * @return int|bool Number of deleted rows or false on failure.
+	 */
+	public function clear_all_logs() {
+		global $wpdb;
+
+		$table_name = $wpdb->prefix . 'gatewaykit_payment_logs';
+
+		$result = $wpdb->query(
+			$wpdb->prepare( 'TRUNCATE TABLE %i', $table_name )
+		);
+
+		if ( false === $result ) {
+			$result = $wpdb->query(
+				$wpdb->prepare( 'DELETE FROM %i', $table_name )
+			);
+		}
+
+		return $result;
 	}
 
 	/**

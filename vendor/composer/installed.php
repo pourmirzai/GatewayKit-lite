@@ -3,7 +3,7 @@
         'name' => 'pourmirzai/gatewaykit',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'b0c0161025050ac62ff2a6cecfc538a2e4eb08af',
+        'reference' => '429f20b6a0aab2015a583a3b6bc92183d76b9213',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -58,7 +58,7 @@
         'pourmirzai/gatewaykit' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'b0c0161025050ac62ff2a6cecfc538a2e4eb08af',
+            'reference' => '429f20b6a0aab2015a583a3b6bc92183d76b9213',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

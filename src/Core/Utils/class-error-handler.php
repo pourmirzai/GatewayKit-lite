@@ -222,20 +222,24 @@ class GatewayKit_Error_Handler {
 		$error_type    = isset( $gateway_error['error_type'] ) ? $gateway_error['error_type'] : 'unknown';
 		$error_code    = isset( $gateway_error['error_code'] ) ? $gateway_error['error_code'] : 'payment_failed';
 		$error_details = isset( $gateway_error['error_details'] ) ? $gateway_error['error_details'] : array();
-		$message       = isset( $gateway_error['message'] ) ? $gateway_error['message'] : '';
+		$message       = ! empty( $gateway_error['error_message'] ) ? $gateway_error['error_message'] : ( ! empty( $gateway_error['message'] ) ? $gateway_error['message'] : '' );
 
-		// Get appropriate error message
-		$error_message = $this->get_error_message( $error_type, $error_code, $is_admin, $error_details );
-
-		// If gateway provided a specific message, use it as the primary message
-		if ( ! empty( $message ) ) {
-			$error_message = $message . ' ' . $error_message;
+		if ( ! $is_admin && function_exists( 'current_user_can' ) && current_user_can( 'manage_options' ) ) {
+			$is_admin = true;
 		}
 
-		// Create WP_Error with additional data
+		// Get appropriate error message.
+		$error_message = $this->get_error_message( $error_type, $error_code, $is_admin, $error_details );
+
+		// If gateway provided a specific message, prioritize it.
+		if ( ! empty( $message ) ) {
+			$error_message = $message;
+		}
+
+		// Create WP_Error with additional data.
 		$wp_error = new WP_Error( $error_code, $error_message );
 
-		// Add error details to WP_Error data
+		// Add error details to WP_Error data.
 		$wp_error->add_data(
 			array(
 				'error_type'       => $error_type,

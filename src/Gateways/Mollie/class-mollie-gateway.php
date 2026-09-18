@@ -157,31 +157,16 @@ class GatewayKit_Mollie_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 	 *
 	 * Mollie requires the value to match the currency's precision: integer for
 	 * these (e.g. JPY "100"), 2-decimal string otherwise. Sending "100.00" for
-	 * JPY is rejected. Only JPY appears in Mollie's supported list above; the
-	 * others are listed for correctness/future-proofing.
+	/**
+	 * Get the list of zero-decimal currencies for Mollie.
 	 *
-	 * @var string[]
+	 * Extends the default zero-decimal currencies with ISK and LAK.
+	 *
+	 * @return string[]
 	 */
-	private static $zero_decimal = array(
-		'BIF',
-		'CLP',
-		'DJF',
-		'GNF',
-		'ISK',
-		'JPY',
-		'KMF',
-		'KRW',
-		'LAK',
-		'MGA',
-		'PYG',
-		'RWF',
-		'UGX',
-		'VND',
-		'VUV',
-		'XAF',
-		'XOF',
-		'XPF',
-	);
+	public function get_zero_decimal_currencies() {
+		return array_merge( parent::get_zero_decimal_currencies(), array( 'ISK', 'LAK' ) );
+	}
 
 	/**
 	 * Render the amount as the value string Mollie expects for the active
@@ -193,7 +178,7 @@ class GatewayKit_Mollie_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 	 */
 	private function format_value( $amount ) {
 		$currency = $this->get_currency();
-		if ( in_array( $currency, self::$zero_decimal, true ) ) {
+		if ( $this->is_zero_decimal_currency( $currency ) ) {
 			return (string) (int) round( (float) $amount );
 		}
 		return number_format( (float) $amount, 2, '.', '' );

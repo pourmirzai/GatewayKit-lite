@@ -1,152 +1,194 @@
-=== GatewayKit – Payment Gateway for Elementor Pro Forms ===
+=== GatewayKit – Simple Payment Form, Donation & Checkout ===
 Contributors: pourmirzai
-Tags: elementor, elementor pro, payment, paypal, stripe
+Tags: payment-form, donation, stripe-checkout, crypto-payment, elementor
 Requires at least: 6.2
-Tested up to: 7.1
+Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.3.4
+Stable tag: 1.5.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Accept payments through Elementor Pro Forms with PayPal, Stripe, Mollie, and crypto. All 9 gateways free — no WooCommerce required.
+Accept payments and donations with 9 free gateways (Stripe, PayPal, Crypto). Fast checkout forms with zero platform fees and no WooCommerce bloat.
 
 == Description ==
 
-### Turn any Elementor Pro Form into a payment form.
+### Turn any WordPress page into a high-converting payment or donation form in 2 minutes.
 
-If you sell a single product, collect donations, send invoices, or take bookings with a fee, you don't need a full online store — you just need a form that takes payment. **GatewayKit** is the Elementor payment form plugin that adds a **Payment Gateway** action to Elementor Pro Forms: build the form with your own fields, and customers complete payment at a secure hosted checkout. No shopping cart, no WooCommerce, no bloated e-commerce stack.
+If you sell a single product, accept donations, send client invoices, or charge event booking fees, you don't need a heavy online store. You just need a fast, dependable payment form.
 
-Set up in minutes, right inside the form builder you already use. Every payment is recorded in a full dashboard, and PDF receipts and invoices are emailed to your customers automatically.
+**GatewayKit** is the payment form and donation builder for WordPress: create custom checkout forms, accept donations, or connect Elementor forms to secure payment processors. **No WooCommerce, no shopping cart, no 2%–3% platform fees, and no e-commerce bloat.**
 
-**Who it's for:** freelancers, web designers, small businesses, nonprofits, course creators, and agencies building client sites on Elementor Pro.
+Set up in minutes using our visual drag-and-drop form builder, native Gutenberg block, or shortcodes. Every payment is tracked in a centralized WordPress dashboard, and professional PDF receipts and tax invoices are emailed to your customers automatically.
+
+**Who it's for:** Freelancers, consultants, small businesses, nonprofits, course creators, event organizers, and web agencies building client sites.
 
 **Try the live demo:** See GatewayKit in action — [wp-test.pourmirzai.com](https://wp-test.pourmirzai.com/).
 
 **Translations:** Available in English, Spanish, French, German, Brazilian Portuguese, and Arabic.
 
-**Requirements:** Elementor Pro must be installed and active. The Elementor Forms widget (included with Elementor Pro) is required to create and accept payments through forms.
+**Requirements:** WordPress 6.2+, PHP 7.4+. Works with any WordPress theme. Gutenberg and Elementor compatible. No WooCommerce required.
 
-### Why Elementor users choose GatewayKit
+### Why WordPress creators choose GatewayKit
 
-* **All 9 gateways included free** — PayPal, Stripe, Mollie, Razorpay, Paystack, Mercado Pago, CoinGate, Coinify, and NOWPayments. No per-gateway upsells and no premium tier just to unlock a processor.
-* **Payments your customers actually prefer** — UPI, PIX, mobile money, iDEAL, Bancontact, SOFORT, and 100+ cryptocurrencies, plus Apple Pay, Google Pay, Klarna, and Afterpay through Stripe Checkout.
-* **A real payment dashboard in WordPress** — search, filter, and review every transaction in one place instead of logging into five provider dashboards.
-* **PDF receipts and invoices, sent automatically** — professional, printable, and included free.
-* **Payment Links** — generate shareable Stripe checkout links without building a form at all.
-* **Security-first** — credentials encrypted at rest (AES-256-CBC), logs auto-redact sensitive data, nonce verification and rate limiting built in, and no tracking or call-home.
+* **All 9 gateways included 100% free** — PayPal, Stripe, Mollie, Razorpay, Paystack, Mercado Pago, CoinGate, Coinify, and NOWPayments. No per-gateway fees and no premium tier just to unlock a processor.
+* **0% platform fees** — We never skim 2% or 3% off your sales or donations like competing plugins. What you earn is 100% yours.
+* **Works anywhere in WordPress** — Use our standalone visual Form Builder, native Gutenberg block, clean shortcode `[gatewaykit_form id="..."]`, or optional Elementor Free/Pro widget and action.
+* **Instant starter templates** — Launch in seconds with pre-built templates for Simple Product Checkout, Tiered Donations, Service Invoicing, and Event Ticket Registration.
+* **Dynamic amounts & preset tiers** — Offer fixed pricing, customer-entered donation amounts, or preset tier buttons (e.g. $10, $25, $50, $100) with dynamic price calculation.
+* **Automated PDF receipts and tax invoices** — Beautiful, compliant, printable PDF documents generated and emailed automatically upon payment.
+* **Payments your customers actually prefer** — Apple Pay, Google Pay, cards, UPI, PIX, mobile money, iDEAL, Bancontact, SOFORT, plus Bitcoin, Ethereum, and 100+ cryptocurrencies.
+* **Centralized transaction dashboard** — Search, filter, inspect, and manage every transaction right inside WordPress without jumping across 5 separate merchant portals.
+* **Bank-grade security** — API secrets encrypted at rest with AES-256-CBC, auto-redacted log files, nonce protection, rate limiting, and zero telemetry or tracking.
 
 ### Popular use cases
 
-* Sell a **single product or digital download** from a landing page — no storefront required
-* Collect **donations** and fundraising amounts (custom amounts supported; optional payment with Pro)
-* Send **invoices** and let clients pay any amount they owe
-* Take **event registrations** and booking fees right on the signup form
-* Charge **deposits** or run **recurring subscriptions** (Pro)
-* Accept **crypto** and **local payment methods** for customers worldwide
+* **Digital Products & Downloads** — Sell an ebook, design template, or digital asset directly from a landing page without a cart.
+* **Donations & Nonprofits** — Collect charitable contributions with preset tier buttons, custom amounts, and instant tax receipts.
+* **Client Invoicing & Retainers** — Let clients pay invoices or project deposits online with automated PDF confirmations.
+* **Event Tickets & Registrations** — Take attendee signups and ticket fees with dynamic tiered pricing (Early Bird, VIP).
+* **Global & Crypto Checkout** — Accept international payment methods (UPI in India, PIX in Brazil, Paystack in Africa) and cryptocurrencies alongside standard credit cards.
 
-**Payment Gateways Included Free**
+### Payment Gateways Included Free
 
-* **PayPal** — Modern hosted checkout with sandbox mode and webhook verification
-* **Stripe** — Stripe Checkout with automatic 3D Secure, Apple Pay, Google Pay, Klarna, Afterpay, and embedded checkout option
-* **Mollie** — iDEAL, credit cards, Bancontact, SOFORT, and more
-* **Razorpay** — UPI, cards, net banking, and wallets for Indian merchants
-* **Paystack** — Cards, bank transfers, and mobile money for African markets
-* **Mercado Pago** — Cards, PIX, and local payment methods for Latin America
-* **CoinGate** — Bitcoin, Ethereum, and 50+ cryptocurrencies
-* **Coinify** — Bitcoin, Ethereum, and popular cryptocurrencies
-* **NOWPayments** — Bitcoin, Ethereum, and 100+ altcoins
+* **PayPal** — Modern hosted PayPal Checkout with sandbox testing and IPN/webhook verification.
+* **Stripe** — Stripe Checkout with Apple Pay, Google Pay, cards, Klarna, Afterpay, and embedded checkout.
+* **Mollie** — Popular European payment methods including iDEAL, Bancontact, cards, and SOFORT.
+* **Razorpay** — UPI, cards, net banking, and wallets for India.
+* **Paystack** — Cards, bank transfers, and mobile money for Nigeria, Ghana, South Africa, and Kenya.
+* **Mercado Pago** — Cards, PIX, and local payment methods for Latin America.
+* **CoinGate** — Bitcoin, Ethereum, and 50+ cryptocurrencies.
+* **Coinify** — Bitcoin, Ethereum, and popular cryptocurrencies.
+* **NOWPayments** — Bitcoin, Ethereum, and 100+ altcoins.
 
-**Core Features**
 
-* Fixed or dynamic payment amounts (pull the price from a form field)
-* Transaction dashboard with search, filters, and date-range filtering
-* Secure receipt tokens with a printable payment-result shortcode
-* PDF receipts emailed automatically to customers
-* PDF invoices downloadable from the receipt page
-* Transaction notes for internal order tracking
-* Shareable Payment Links (Stripe) — no form needed
-* Per-form failure redirect pages
-* Structured logging with sensitive-data redaction
-* Security: input sanitization, output escaping, nonce verification, rate limiting
+### GatewayKit Pro (Optional)
 
-**GatewayKit Pro (Optional)**
+Looking for advanced automation and marketing tools? Upgrade to GatewayKit Pro:
 
-Upgrade to GatewayKit Pro for advanced features:
+* **Discount & Coupon Codes** — Fixed or percentage-based coupons with usage limits and expiration dates.
+* **Partial (Deposit) Payments** — Collect an upfront deposit and charge the balance later.
+* **One-Click Refunds** — Issue refunds directly from your WordPress dashboard for Stripe and PayPal.
+* **Recurring Subscriptions** — Bill weekly, monthly, or annually via Stripe.
+* **Analytics & Reports** — Track revenue trends, gateway performance, and top-converting forms.
+* **CSV Transaction Export** — Filter and export full financial logs for accounting and CRM import.
+* **Outgoing Webhooks** — Trigger real-time automations in Zapier, Make, and n8n with HMAC security.
+* **White-Label Branding** — Rebrand the plugin interface for agency client installations.
 
-* Discount (coupon) codes with usage limits, per-user caps, and expiry dates
-* Partial (deposit) payments — charge a percentage now, the rest later
-* One-click refunds from the dashboard (Stripe + PayPal) — no separate logins
-* Analytics dashboard with revenue trends and your best-performing forms
-* CSV export for your accountant or CRM (all / selected / filtered)
-* Recurring subscriptions powered by Stripe
-* Optional (donation-style) payment forms
-* Outgoing webhooks to trigger automations in Zapier, Make, and n8n
-* White-label mode for agencies and client sites
-* Payment Summary field showing customers a clear breakdown before they pay
-
-Visit the [GatewayKit website](https://gatewaykit.pourmirzai.com/) for full documentation and demos.
+Visit the [GatewayKit website](https://gatewaykit.pourmirzai.com/) for documentation, guides, and live demos.
 
 == Installation ==
 
-1. Install and activate **Elementor** and **Elementor Pro** (the Forms module is required).
-2. Upload the `gatewaykit` plugin folder to `/wp-content/plugins/` or install it via Plugins → Add New → Upload Plugin.
-3. Activate **GatewayKit** through the Plugins screen.
-4. Go to **GatewayKit → Settings** and enable the gateways you want, then enter your credentials.
-5. Create an Elementor Pro Form, then under **Actions After Submit** add the **Payment Gateway** action.
-6. Configure the gateway, amount, and success/failure redirect pages.
-7. Create a result page and add the shortcode `[gatewaykit_receipt]`.
+### 1. Install & Activate
+Search for **GatewayKit** in your WordPress dashboard under **Plugins → Add New**, click **Install Now**, and **Activate**.
+
+### 2. Quick Setup Wizard
+Follow the 2-minute onboarding wizard to select your currency, enable your preferred payment gateways (Stripe, PayPal, etc.), and enter your API keys.
+
+### 3. Create & Embed Your Form
+Go to **GatewayKit → Payment Forms** and pick a starter template (Donation, Product, Ticket, or Blank). Embed it anywhere using:
+* **Gutenberg:** Add the **Payment Form** block and select your form.
+* **Shortcode:** Paste `[gatewaykit_form id="123"]` into any page builder or widget.
+* **Elementor:** Use the native GatewayKit widget or add the Payment Gateway action in Elementor Pro Forms.
 
 == Frequently Asked Questions ==
 
-= Does this require Elementor Pro? =
-
-Yes. The Elementor Pro Forms module is required because GatewayKit is an "Actions After Submit" handler for Elementor forms.
-
 = Does GatewayKit require WooCommerce? =
 
-No. GatewayKit is a standalone payment solution for Elementor Pro Forms — no WooCommerce, no shopping cart, no e-commerce plugin needed.
+No. GatewayKit is built specifically to eliminate WooCommerce overhead for single-product sales, service invoices, event tickets, and donations. There is no shopping cart, no shop page, and no database bloat.
 
-= Elementor Pro already includes Stripe. Why do I need GatewayKit? =
+= Does GatewayKit require Elementor or Elementor Pro? =
 
-Elementor's built-in form action supports Stripe only and gives you no payment dashboard, no PDF receipts, and no choice of provider. GatewayKit is a superset: all 9 gateways (PayPal, Stripe, Mollie, crypto, and more), a full transaction dashboard, PDF receipts and invoices, Payment Links, and the Pro extras — included free.
+No. GatewayKit includes its own visual drag-and-drop form builder, native Gutenberg block, and universal shortcode `[gatewaykit_form id="..."]`. It works seamlessly on any WordPress theme. If you happen to use Elementor, GatewayKit provides both a dedicated widget for Elementor Free and an "Actions After Submit" integration for Elementor Pro Forms.
 
-= Which payment methods are included in Lite? =
+= Are all 9 payment gateways really free? Does GatewayKit take a transaction fee? =
 
-All nine payment gateways are included in the free plugin: PayPal, Stripe, Mollie, CoinGate, Coinify, NOWPayments, Razorpay, Paystack, and Mercado Pago. GatewayKit Pro adds advanced features like discount codes, refunds, analytics, CSV export, and more.
+Yes, all 9 gateways (PayPal, Stripe, Mollie, Razorpay, Paystack, Mercado Pago, CoinGate, Coinify, NOWPayments) are 100% free in GatewayKit Lite. GatewayKit charges **0% platform fees**. You only pay standard processing fees directly to your payment processor (e.g. Stripe or PayPal).
 
-= Can customers pay a custom amount? =
+= Can customers pay custom amounts or donate? =
 
-Yes. Set the amount type to "From Form Field" and map it to a number field — perfect for invoices and donations.
+Yes. GatewayKit supports fixed prices, custom user-entered amounts, and preset donation tier buttons (such as $10, $25, $50, $100). All amounts are validated server-side to prevent client tampering.
 
-= Is this plugin secure? Can I trust it with payments? =
+= How do automated PDF receipts and invoices work? =
 
-Yes. GatewayKit was built security-first: all API keys and secrets are encrypted at rest (AES-256-CBC) and decrypted only in memory when a payment is processed. Logs automatically redact sensitive data. Every form submission is protected by nonce verification, input sanitization, output escaping, and rate limiting. GatewayKit itself does not track your visitors, and your data is never sold or shared — payment details are sent only to the payment providers you configure, and license/update checks run through Freemius's SDK (which you can opt out of).
+Immediately after a successful payment, GatewayKit generates a professional, printable PDF receipt/tax invoice and emails it to the customer. Customers can also download it from their secure payment confirmation page.
+
+= Is GatewayKit secure? =
+
+Security is our top engineering priority:
+1. All secret API keys are encrypted at rest using AES-256-CBC with your site's WordPress security salts (`SECURE_AUTH_KEY`).
+2. Log files automatically redact all sensitive credentials, card data, and tokens.
+3. Every request is protected by WordPress nonces, strict capability checks, and rate limiting.
+4. GatewayKit collects zero tracking data and never calls home.
 
 = The activation link in my opt-in email returns a 403 error. What should I do? =
 
-This is a known issue documented by Freemius in [Known License Activation Issues → Security Layer Blockage](https://freemius.com/help/documentation/wordpress-sdk/license-activation-issues/). The activation URL contains random security keys with punctuation characters (`%`, `^`, `;`, `)`, `*`, `!`, `>`, `$`) that some security plugins and firewall modules (ModSecurity, Cloudflare WAF, Wordfence, Solid Security, etc.) flag as suspicious and block.
-
-Per Freemius's official guidance, temporarily disable your security plugins/layers/modules just for the activation process:
-
-1. Temporarily disable ModSecurity (cPanel → ModSecurity → Off), Cloudflare WAF (WAF → Off), and/or any WordPress security plugin (Wordfence, Solid Security, etc.).
-2. Open the activation email again and click the activation link.
-3. Once activation completes, re-enable all the security components you disabled.
-
-The same guidance applies if license-key activation fails for the same reason.
+This is an occasional security firewall false-positive documented in [Freemius License Activation Issues](https://freemius.com/help/documentation/wordpress-sdk/license-activation-issues/). The activation URL contains random cryptographic characters that some WAFs (ModSecurity, Cloudflare, Wordfence) flag. Temporarily pause your security firewall rule during initial email activation, then re-enable it immediately.
 
 == Screenshots ==
 
-1. GatewayKit dashboard with payment overview.
-2. Dashboard widget showing recent payments.
-3. Dashboard widget with transaction summary.
-4. Settings page with gateway configuration.
-5. Gateway settings configured inside Elementor.
-6. Selecting a form action to trigger the payment gateway.
-7. Transaction management list with filters.
-8. Payment receipt generated after a successful transaction.
-9. Receipt page when opened directly via transaction query.
+1. Visual drag-and-drop payment form builder with live settings.
+2. Native Gutenberg block for embedding payment and donation forms with live preview.
+3. Clean frontend donation form with preset amount buttons and custom amount option.
+4. Centralized transaction dashboard with search, filters, and transaction details.
+5. Automated professional PDF receipt sent to customers after payment.
+6. Multi-gateway settings with encrypted credential storage (Stripe, PayPal, Crypto, etc.).
+7. Optional Elementor form integration with Actions After Submit.
+8. Pro features: Discount coupon management, analytics overview, and CSV export.
 
 == Changelog ==
+
+= 1.5.1 =
+
+**Security & Attribution**
+
+* Server-side amount validation now requires the submitted amount to exactly match the price of the selected priced option (dropdown/radio tiers) — a lower-tier price can no longer be submitted together with a higher-tier selection.
+* Free forms now display a small "Powered by GatewayKit" footer badge (automatically hidden with an active GatewayKit Pro license).
+
+= 1.5.0 =
+
+**Gutenberg Block, Setup Wizard & Tiered Pricing**
+
+* Native Gutenberg Block — add and configure payment forms directly in the WordPress Block Editor with live preview and custom styling.
+* 3-Step Setup Wizard — onboard new installations in under two minutes with currency setup, gateway activation, and instant starter forms.
+* Labeled Pricing Presets — define named pricing tiers (e.g. `Early Bird: 25, General Admission: 50, VIP Pass: 100`) for tickets, registrations, and campaigns.
+* Dynamic Option-Based Pricing — attach prices to dropdown and radio choice options (`VIP Pass | 100`) with live frontend calculation.
+* Event Registration & Tickets Starter Template — pre-built ticket checkout template with tier options and attendee fields.
+* Modern Clean & Elevated Card Presets — hardened style isolation preventing theme button style leakage.
+* Style presets split by edition: theme inherit and Modern stay free; Elevated Card, custom CSS, and the new branded GatewayKit style are part of GatewayKit Pro.
+* Form Builder Polish — added customizable Section/Tier label and optimized layout.
+
+= 1.4.2 =
+
+**Form UX Polish, Style Presets & Spam Protection**
+
+* Cancelled payments now redirect back gracefully (form page or receipt page with a friendly notice) instead of showing a blank error page.
+* New "Amount section position" option — show the price/donation block before or after the form fields (after fields is the new default).
+* Style presets per form: inherit your theme's styling or use the built-in Modern design (Elevated Card and custom CSS presets available with GatewayKit Pro).
+* New Discount Code field for the payment form builder (GatewayKit Pro) with live validation and atomic usage tracking.
+* Built-in honeypot spam protection on all standalone payment forms.
+
+= 1.4.1 =
+
+**Major Update: Drag & Drop Form Builder**
+
+* New drag-and-drop form builder on the Payment Forms screen — add, reorder, duplicate, and configure fields visually (keyboard-friendly move buttons included).
+* 13 field types: text, email, phone, number, textarea, dropdown, radio buttons, single checkbox, checkbox group, date, hidden field, section heading, and divider.
+* Per-field settings: label, placeholder, required toggle, help text, half/full width, options editor, and default value. Email stays required so PDF receipts keep working.
+* Starter templates — Blank, Donation, Product/Service, and Invoice — plus one-click Duplicate on the forms list.
+* Fixed a fatal error (`get_title() on string`) on the form editor screen and in frontend form rendering when payment gateways are registered.
+* Existing 1.4.0 forms are automatically migrated to the new field structure — no action needed.
+
+= 1.4.0 =
+
+**Major Release: Standalone Payment Forms & Elementor Free Support**
+
+* Added standalone Payment Forms builder (`gatewaykit_form`) with support for fixed pricing, customer-entered amounts, and donation preset buttons.
+* Added native Elementor widget for Elementor Free — embed and style payment forms without Elementor Pro.
+* Added universal shortcode `[gatewaykit_form id="..."]` to embed payment forms in Gutenberg, block editor, or any page builder.
+* Automatic onboarding: automatically generates a Payment Receipt page and pre-configured sample forms on activation.
+* Removed hard dependency on Elementor Pro — GatewayKit can now run standalone or with Elementor Free.
+* Enhanced server-side validation for currencies and enabled gateways per form.
+* Updated security architecture with isolated nonce faucets and cookie-bind verification across mixed-form environments.
 
 = 1.3.4 =
 

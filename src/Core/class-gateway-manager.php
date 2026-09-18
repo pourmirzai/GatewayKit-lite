@@ -97,18 +97,6 @@ class GatewayKit_Gateway_Manager {
 		}
 
 		$this->gateways[ $gateway_id ] = $class_name;
-
-		// Only log during initial registration in debug mode
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			$this->logger->debug(
-				'Gateway registered',
-				array(
-					'gateway_id' => $gateway_id,
-					'class_name' => $class_name,
-				)
-			);
-		}
-
 		return true;
 	}
 
@@ -166,9 +154,6 @@ class GatewayKit_Gateway_Manager {
 
 		$cached_gateways = get_transient( $cache_key );
 		if ( $cached_gateways !== false ) {
-			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-				$this->logger->debug( 'Available gateways loaded from cache' );
-			}
 			return $cached_gateways;
 		}
 
@@ -190,10 +175,6 @@ class GatewayKit_Gateway_Manager {
 
 		// Cache the result
 		set_transient( $cache_key, $available, $cache_ttl );
-
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			$this->logger->debug( 'Available gateways cached for 5 minutes' );
-		}
 
 		return $available;
 	}
@@ -420,9 +401,6 @@ class GatewayKit_Gateway_Manager {
 
 		$cached_stats = get_transient( $cache_key );
 		if ( $cached_stats !== false ) {
-			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-				$this->logger->debug( 'Gateway stats loaded from cache' );
-			}
 			return $cached_stats;
 		}
 
@@ -436,10 +414,6 @@ class GatewayKit_Gateway_Manager {
 
 		// Cache the result
 		set_transient( $cache_key, $stats, $cache_ttl );
-
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			$this->logger->debug( 'Gateway stats cached for 10 minutes' );
-		}
 
 		return $stats;
 	}
