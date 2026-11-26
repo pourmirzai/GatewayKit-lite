@@ -410,8 +410,9 @@ class GatewayKit_CoinGate_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 	 * @return string
 	 */
 	public function get_redirect_url( $authority ) {
-		$authority = sanitize_text_field( (string) $authority );
-		return get_transient( 'gatewaykit_cg_redirect_' . $authority ) ?: '';
+		$authority    = sanitize_text_field( (string) $authority );
+		$redirect_url = get_transient( 'gatewaykit_cg_redirect_' . $authority );
+		return $redirect_url ? $redirect_url : '';
 	}
 
 	/**

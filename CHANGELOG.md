@@ -1,5 +1,14 @@
 # GatewayKit Changelog
 
+## 1.5.3
+
+- Tested with WordPress 7.2.
+- Improved payment form connection errors and discount management reliability.
+
+## 1.5.2
+
+- Improved the discount field upgrade prompt in the form builder.
+
 ## 1.5.1
 
 **Security & Attribution**

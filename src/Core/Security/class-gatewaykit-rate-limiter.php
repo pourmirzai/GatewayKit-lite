@@ -7,7 +7,7 @@
  * @package GatewayKit
  */
 
-// Prevent direct access
+// Prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -39,7 +39,7 @@ class GatewayKit_Rate_Limiter {
 	 */
 	public static function get_instance() {
 		static $instance = null;
-		if ( $instance === null ) {
+		if ( null === $instance ) {
 			$instance = new self();
 		}
 		return $instance;
@@ -66,7 +66,7 @@ class GatewayKit_Rate_Limiter {
 	/**
 	 * Get rate limit threshold for an endpoint
 	 *
-	 * @param string $endpoint Endpoint identifier
+	 * @param string $endpoint Endpoint identifier.
 	 * @return int Max requests allowed
 	 */
 	private function get_threshold( $endpoint ) {
@@ -86,8 +86,8 @@ class GatewayKit_Rate_Limiter {
 	/**
 	 * Get transient key for IP and endpoint
 	 *
-	 * @param string $ip Client IP
-	 * @param string $endpoint Endpoint identifier
+	 * @param string $ip Client IP.
+	 * @param string $endpoint Endpoint identifier.
 	 * @return string Transient key
 	 */
 	private function get_transient_key( $ip, $endpoint ) {
@@ -97,7 +97,7 @@ class GatewayKit_Rate_Limiter {
 	/**
 	 * Check if request exceeds rate limit
 	 *
-	 * @param string $endpoint Endpoint identifier ('elementor_action', 'admin_ajax', 'callback')
+	 * @param string $endpoint Endpoint identifier ('elementor_action', 'admin_ajax', 'callback').
 	 * @return bool|WP_Error True if allowed, WP_Error if rate limited
 	 */
 	public function check_rate_limit( $endpoint ) {
@@ -113,13 +113,13 @@ class GatewayKit_Rate_Limiter {
 		$threshold     = $this->get_threshold( $endpoint );
 		$transient_key = $this->get_transient_key( $ip, $endpoint );
 
-		// Get current request count
+		// Get current request count.
 		$current_count = get_transient( $transient_key );
-		if ( $current_count === false ) {
+		if ( false === $current_count ) {
 			$current_count = 0;
 		}
 
-		// Check if threshold exceeded
+		// Check if threshold exceeded.
 		if ( $current_count >= $threshold ) {
 			GatewayKit_Logger::get_instance()->warning(
 				'Rate limit exceeded',
@@ -137,7 +137,7 @@ class GatewayKit_Rate_Limiter {
 			);
 		}
 
-		// Increment and update transient
+		// Increment and update transient.
 		$new_count = $current_count + 1;
 		set_transient( $transient_key, $new_count, self::DEFAULT_TIME_WINDOW );
 
@@ -157,7 +157,7 @@ class GatewayKit_Rate_Limiter {
 	/**
 	 * Get current rate limit status for debugging
 	 *
-	 * @param string $endpoint Endpoint identifier
+	 * @param string $endpoint Endpoint identifier.
 	 * @return array Status information
 	 */
 	public function get_status( $endpoint ) {
@@ -168,7 +168,7 @@ class GatewayKit_Rate_Limiter {
 		return array(
 			'ip'            => $ip,
 			'endpoint'      => $endpoint,
-			'current_count' => $current_count ?: 0,
+			'current_count' => $current_count ? $current_count : 0,
 			'threshold'     => $this->get_threshold( $endpoint ),
 			'time_window'   => self::DEFAULT_TIME_WINDOW,
 			'enabled'       => 'process_payment' === $endpoint ? true : $this->is_enabled(),

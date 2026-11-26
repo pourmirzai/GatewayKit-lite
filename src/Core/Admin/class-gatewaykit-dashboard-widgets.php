@@ -7,7 +7,7 @@
  * @package GatewayKit
  */
 
-// Prevent direct access
+// Prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -24,7 +24,7 @@ class GatewayKit_Dashboard_Widgets {
 		add_action( 'wp_dashboard_setup', array( $this, 'add_dashboard_widgets' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_dashboard_styles' ) );
 
-		// Clear cache when transactions are modified
+		// Clear cache when transactions are modified.
 		add_action( 'gatewaykit_transaction_created', array( $this, 'clear_dashboard_cache' ) );
 		add_action( 'gatewaykit_transaction_updated', array( $this, 'clear_dashboard_cache' ) );
 		add_action( 'gatewaykit_transaction_deleted', array( $this, 'clear_dashboard_cache' ) );
@@ -32,10 +32,12 @@ class GatewayKit_Dashboard_Widgets {
 
 	/**
 	 * Enqueue dashboard styles
+	 *
+	 * @param string $hook Current admin page hook.
 	 */
 	public function enqueue_dashboard_styles( string $hook ) {
-		// Only load on dashboard page
-		if ( $hook !== 'index.php' ) {
+		// Only load on dashboard page.
+		if ( 'index.php' !== $hook ) {
 			return;
 		}
 
@@ -87,12 +89,12 @@ class GatewayKit_Dashboard_Widgets {
 	public function payment_overview_widget() {
 		global $wpdb;
 
-		// Check cache first
+		// Check cache first.
 		$cache_key = 'gatewaykit_dashboard_stats';
 		$cache_ttl = 300; // 5 minutes cache
 
 		$cached_stats = get_transient( $cache_key );
-		if ( $cached_stats !== false ) {
+		if ( false !== $cached_stats ) {
 			$stats = $cached_stats;
 		} else {
 			$table_name = $wpdb->prefix . 'gatewaykit_payment_transactions';
@@ -124,7 +126,7 @@ class GatewayKit_Dashboard_Widgets {
 				);
 			}
 
-			// Cache the result
+			// Cache the result.
 			set_transient( $cache_key, $stats, $cache_ttl );
 		}
 
@@ -186,12 +188,12 @@ class GatewayKit_Dashboard_Widgets {
 	public function recent_transactions_widget() {
 		global $wpdb;
 
-		// Check cache first
+		// Check cache first.
 		$cache_key = 'gatewaykit_recent_transactions';
 		$cache_ttl = 180; // 3 minutes cache
 
 		$cached_transactions = get_transient( $cache_key );
-		if ( $cached_transactions !== false ) {
+		if ( false !== $cached_transactions ) {
 			$recent_transactions = $cached_transactions;
 		} else {
 			$table_name = $wpdb->prefix . 'gatewaykit_payment_transactions';
@@ -209,7 +211,7 @@ class GatewayKit_Dashboard_Widgets {
 			);
 		// phpcs:enable
 
-			// Cache the result
+			// Cache the result.
 			set_transient( $cache_key, $recent_transactions, $cache_ttl );
 		}
 

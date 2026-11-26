@@ -8,7 +8,7 @@
  * @package GatewayKit
  */
 
-// Prevent direct access
+// Prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -20,11 +20,15 @@ class GatewayKit_Error_Handler {
 
 	/**
 	 * Singleton instance
+	 *
+	 * @var GatewayKit_Error_Handler|null
 	 */
 	private static $instance = null;
 
 	/**
 	 * Error type mappings
+	 *
+	 * @var array
 	 */
 	private $error_mappings = array();
 
@@ -41,7 +45,7 @@ class GatewayKit_Error_Handler {
 	 * @return GatewayKit_Error_Handler
 	 */
 	public static function get_instance() {
-		if ( self::$instance === null ) {
+		if ( null === self::$instance ) {
 			self::$instance = new self();
 		}
 		return self::$instance;
@@ -114,31 +118,31 @@ class GatewayKit_Error_Handler {
 	/**
 	 * Get error message based on error type and context
 	 *
-	 * @param string $error_type Error type (configuration, gateway, network, etc.)
-	 * @param string $error_code Specific error code
-	 * @param bool   $is_admin Whether this is for admin context
-	 * @param array  $error_details Additional error details
+	 * @param string $error_type Error type (configuration, gateway, network, etc.).
+	 * @param string $error_code Specific error code.
+	 * @param bool   $is_admin Whether this is for admin context.
+	 * @param array  $error_details Additional error details.
 	 * @return string Formatted error message
 	 */
 	public function get_error_message( $error_type, $error_code = '', $is_admin = false, $error_details = array() ) {
-		// Default to unknown error type if not found
+		// Default to unknown error type if not found.
 		if ( ! isset( $this->error_mappings[ $error_type ] ) ) {
 			$error_type = 'unknown';
 		}
 
 		$mapping = $this->error_mappings[ $error_type ];
 
-		// Get base message based on context
+		// Get base message based on context.
 		$message = $is_admin && isset( $mapping['admin_message'] )
 			? $mapping['admin_message']
 			: $mapping['user_message'];
 
-		// Add specific error code message if available
+		// Add specific error code message if available.
 		if ( ! empty( $error_code ) && isset( $mapping['error_codes'][ $error_code ] ) ) {
 			$message .= ' ' . $mapping['error_codes'][ $error_code ];
 		}
 
-		// Add additional details for admin context
+		// Add additional details for admin context.
 		if ( $is_admin && ! empty( $error_details ) ) {
 			$message .= $this->format_error_details( $error_details );
 		}
@@ -149,13 +153,13 @@ class GatewayKit_Error_Handler {
 	/**
 	 * Format error details for admin display
 	 *
-	 * @param array $error_details Error details array
+	 * @param array $error_details Error details array.
 	 * @return string Formatted error details
 	 */
 	private function format_error_details( $error_details ) {
 		$details = '';
 
-		// Filter out sensitive information with comprehensive patterns
+		// Filter out sensitive information with comprehensive patterns.
 		$sensitive_patterns = array(
 			'password',
 			'token',
@@ -184,7 +188,7 @@ class GatewayKit_Error_Handler {
 			$key_lower    = strtolower( $key );
 			$is_sensitive = false;
 
-			// Check for sensitive patterns
+			// Check for sensitive patterns.
 			foreach ( $sensitive_patterns as $pattern ) {
 				if ( strpos( $key_lower, $pattern ) !== false ) {
 					$is_sensitive = true;
@@ -193,19 +197,16 @@ class GatewayKit_Error_Handler {
 			}
 
 			if ( ! $is_sensitive ) {
-				$safe_details[ $key ] = is_scalar( $value ) ? $value : json_encode( $value );
+				$safe_details[ $key ] = is_scalar( $value ) ? $value : wp_json_encode( $value );
+			} elseif ( is_string( $value ) && strlen( $value ) > 8 ) {
+				$safe_details[ $key ] = substr( $value, 0, 4 ) . '[REDACTED]' . substr( $value, -4 );
 			} else {
-				// Partial redaction for debugging
-				if ( is_string( $value ) && strlen( $value ) > 8 ) {
-					$safe_details[ $key ] = substr( $value, 0, 4 ) . '[REDACTED]' . substr( $value, -4 );
-				} else {
-					$safe_details[ $key ] = '[REDACTED]';
-				}
+				$safe_details[ $key ] = '[REDACTED]';
 			}
 		}
 
 		if ( ! empty( $safe_details ) ) {
-			$details = ' ' . __( 'Details:', 'gatewaykit' ) . ' ' . json_encode( $safe_details, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE );
+			$details = ' ' . __( 'Details:', 'gatewaykit' ) . ' ' . wp_json_encode( $safe_details, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE );
 		}
 
 		return $details;
@@ -214,8 +215,8 @@ class GatewayKit_Error_Handler {
 	/**
 	 * Create WP_Error from gateway error response
 	 *
-	 * @param array $gateway_error Gateway error response
-	 * @param bool  $is_admin Whether this is for admin context
+	 * @param array $gateway_error Gateway error response.
+	 * @param bool  $is_admin Whether this is for admin context.
 	 * @return WP_Error Formatted WP_Error object
 	 */
 	public function create_wp_error_from_gateway( $gateway_error, $is_admin = false ) {
@@ -255,10 +256,10 @@ class GatewayKit_Error_Handler {
 	/**
 	 * Log error with appropriate context
 	 *
-	 * @param string $error_type Error type
-	 * @param string $error_code Error code
-	 * @param array  $error_details Error details
-	 * @param string $context Additional context
+	 * @param string $error_type Error type.
+	 * @param string $error_code Error code.
+	 * @param array  $error_details Error details.
+	 * @param string $context Additional context.
 	 */
 	public function log_error( $error_type, $error_code, $error_details = array(), $context = '' ) {
 		$logger = GatewayKit_Logger::get_instance();
@@ -288,7 +289,7 @@ class GatewayKit_Error_Handler {
 	/**
 	 * Get error codes for a specific error type
 	 *
-	 * @param string $error_type Error type
+	 * @param string $error_type Error type.
 	 * @return array Error codes for the type
 	 */
 	public function get_error_codes( $error_type ) {
@@ -301,15 +302,15 @@ class GatewayKit_Error_Handler {
 	/**
 	 * Handle error recovery attempts
 	 *
-	 * @param string $error_type Error type
-	 * @param string $error_code Error code
-	 * @param array  $context Recovery context
+	 * @param string $error_type Error type.
+	 * @param string $error_code Error code.
+	 * @param array  $context Recovery context.
 	 * @return bool True if recovery was attempted
 	 */
 	public function attempt_error_recovery( $error_type, $error_code, $context = array() ) {
 		$logger = GatewayKit_Logger::get_instance();
 
-		// Log recovery attempt
+		// Log recovery attempt.
 		$logger->info(
 			'Attempting error recovery',
 			array(
@@ -352,19 +353,19 @@ class GatewayKit_Error_Handler {
 	/**
 	 * Handle configuration error recovery
 	 *
-	 * @param string $error_code Error code
-	 * @param array  $context Recovery context
+	 * @param string $error_code Error code.
+	 * @param array  $context Recovery context.
 	 * @return bool True if recovery was attempted
 	 */
 	private function handle_configuration_recovery( $error_code, $context ) {
 		switch ( $error_code ) {
 			case 'gateway_disabled':
-				// Attempt to re-enable gateway if safe
+				// Attempt to re-enable gateway if safe.
 				if ( isset( $context['gateway_id'] ) ) {
 					$gateway_manager = GatewayKit_Gateway_Manager::get_instance();
 					$gateway         = $gateway_manager->get_gateway( $context['gateway_id'] );
 					if ( $gateway && $gateway->is_available() ) {
-						// Gateway is actually available, update cache
+						// Gateway is actually available, update cache.
 						$gateway_manager->clear_all_caches();
 						return true;
 					}
@@ -377,17 +378,17 @@ class GatewayKit_Error_Handler {
 	/**
 	 * Handle network error recovery
 	 *
-	 * @param string $error_code Error code
-	 * @param array  $context Recovery context
+	 * @param string $error_code Error code.
+	 * @param array  $context Recovery context.
 	 * @return bool True if recovery was attempted
 	 */
 	private function handle_network_recovery( $error_code, $context ) {
 		switch ( $error_code ) {
 			case 'exception':
 			case 'verification_exception':
-				// Implement exponential backoff for retry
+				// Implement exponential backoff for retry.
 				if ( isset( $context['retry_count'] ) && $context['retry_count'] < 3 ) {
-					$delay = min( 30, pow( 2, $context['retry_count'] ) ); // Max 30 seconds
+					$delay = min( 30, pow( 2, $context['retry_count'] ) ); // Max 30 seconds.
 					sleep( $delay );
 					return true;
 				}
@@ -399,14 +400,14 @@ class GatewayKit_Error_Handler {
 	/**
 	 * Handle gateway error recovery
 	 *
-	 * @param string $error_code Error code
-	 * @param array  $context Recovery context
+	 * @param string $error_code Error code.
+	 * @param array  $context Recovery context.
 	 * @return bool True if recovery was attempted
 	 */
 	private function handle_gateway_recovery( $error_code, $context ) {
 		switch ( $error_code ) {
 			case 'api_request_failed':
-				// Clear gateway cache and retry
+				// Clear gateway cache and retry.
 				if ( isset( $context['gateway_id'] ) ) {
 					$gateway_manager = GatewayKit_Gateway_Manager::get_instance();
 					$gateway_manager->clear_all_caches();
@@ -415,7 +416,7 @@ class GatewayKit_Error_Handler {
 				break;
 
 			case 'verification_failed':
-				// Schedule retry verification
+				// Schedule retry verification.
 				if ( isset( $context['transaction_id'] ) ) {
 					wp_schedule_single_event(
 						time() + 300,
@@ -434,16 +435,16 @@ class GatewayKit_Error_Handler {
 	/**
 	 * Create structured error response for API
 	 *
-	 * @param string $error_type Error type
-	 * @param string $error_code Error code
-	 * @param array  $context Error context
-	 * @param bool   $is_admin Whether this is for admin context
+	 * @param string $error_type Error type.
+	 * @param string $error_code Error code.
+	 * @param array  $context Error context.
+	 * @param bool   $is_admin Whether this is for admin context.
 	 * @return array Structured error response
 	 */
 	public function create_structured_error_response( $error_type, $error_code, $context = array(), $is_admin = false ) {
 		$logger = GatewayKit_Logger::get_instance();
 
-		// Log the error
+		// Log the error.
 		$logger->error(
 			'Structured error created',
 			array(
@@ -454,7 +455,7 @@ class GatewayKit_Error_Handler {
 			)
 		);
 
-		// Attempt recovery
+		// Attempt recovery.
 		$recovery_attempted = $this->attempt_error_recovery( $error_type, $error_code, $context );
 
 		return array(

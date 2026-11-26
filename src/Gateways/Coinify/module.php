@@ -1,11 +1,15 @@
 <?php
-// src/Gateways/Coinify/module.php — Coinify crypto gateway module (Pro).
+/**
+ * Coinify crypto gateway module.
+ *
+ * @package GatewayKit
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-require_once __DIR__ . '/class-coinify-gateway.php';
+require_once __DIR__ . '/class-gatewaykit-coinify-gateway.php';
 
 // F5: warn the merchant when Coinify is enabled without its API secret,
 // because inbound webhooks are rejected (HTTP 403) in that case.

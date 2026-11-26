@@ -948,17 +948,17 @@ class GatewayKit_Stripe_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 	 * Extract the session id for the relevant webhook event types.
 	 *
 	 * @param string $type   Event type.
-	 * @param array  $object Event data object.
+	 * @param array  $event_object Event data object.
 	 * @return string Session id or empty string when unsupported.
 	 */
-	private function extract_session( $type, $object ) {
+	private function extract_session( $type, $event_object ) {
 		if ( 'checkout.session.completed' === $type ) {
-			return isset( $object['id'] ) ? (string) $object['id'] : '';
+			return isset( $event_object['id'] ) ? (string) $event_object['id'] : '';
 		}
 
 		// payment_intent.payment_failed -> resolve the session that owns it.
 		if ( 'payment_intent.payment_failed' === $type ) {
-			$pi = isset( $object['id'] ) ? (string) $object['id'] : '';
+			$pi = isset( $event_object['id'] ) ? (string) $event_object['id'] : '';
 			if ( '' === $pi ) {
 				return '';
 			}

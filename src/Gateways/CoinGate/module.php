@@ -1,11 +1,15 @@
 <?php
-// src/Gateways/CoinGate/module.php — CoinGate crypto gateway module (Pro).
+/**
+ * CoinGate crypto gateway module.
+ *
+ * @package GatewayKit
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-require_once __DIR__ . '/class-coingate-gateway.php';
+require_once __DIR__ . '/class-gatewaykit-coingate-gateway.php';
 
 return array(
 	'id'    => 'coingate',

@@ -323,7 +323,7 @@
 					});
 				})
 				.fail(function () {
-					showNotice($notices, GatewayKitFormConfig.i18n.security_error || 'Security check failed. Please reload the page.', 'error');
+					showNotice($notices, GatewayKitFormConfig.i18n.network_error || 'Could not connect. Check your connection and try again.', 'error');
 					setLoading(false);
 				});
 			});

@@ -115,6 +115,7 @@ class GatewayKit_Receipt_Email {
 				$upload_dir = wp_upload_dir();
 				$temp_file  = $upload_dir['basedir'] . '/gatewaykit-temp-' . $filename;
 
+				// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- A local temporary PDF attachment is required by wp_mail.
 				if ( file_put_contents( $temp_file, $pdf_content ) !== false ) {
 					$attachments[] = $temp_file;
 				}
@@ -156,7 +157,7 @@ class GatewayKit_Receipt_Email {
 	 */
 	private function generate_pdf( $transaction ) {
 		if ( ! class_exists( 'GatewayKit_Receipt_PDF' ) ) {
-			$pdf_path = GATEWAYKIT_PLUGIN_DIR . 'src/Core/Email/class-receipt-pdf.php';
+			$pdf_path = GATEWAYKIT_PLUGIN_DIR . 'src/Core/Email/class-gatewaykit-receipt-pdf.php';
 			if ( file_exists( $pdf_path ) ) {
 				require_once $pdf_path;
 			}

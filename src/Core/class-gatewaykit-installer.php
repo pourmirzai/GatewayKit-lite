@@ -25,7 +25,7 @@ class GatewayKit_Installer {
 	public static function activate() {
 		try {
 			// Load required dependencies for activation.
-			require_once GATEWAYKIT_PLUGIN_DIR . 'src/Core/class-autoloader.php';
+			require_once GATEWAYKIT_PLUGIN_DIR . 'src/Core/class-gatewaykit-autoloader.php';
 
 			// Initialize autoloader explicitly for activation context.
 			GatewayKit_Autoloader::get_instance();

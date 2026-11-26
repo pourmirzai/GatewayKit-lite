@@ -460,8 +460,9 @@ class GatewayKit_NOWPayments_Gateway extends GatewayKit_Abstract_Payment_Gateway
 	 * @return string
 	 */
 	public function get_redirect_url( $authority ) {
-		$authority = sanitize_text_field( (string) $authority );
-		return get_transient( 'gatewaykit_np_redirect_' . $authority ) ?: '';
+		$authority    = sanitize_text_field( (string) $authority );
+		$redirect_url = get_transient( 'gatewaykit_np_redirect_' . $authority );
+		return $redirect_url ? $redirect_url : '';
 	}
 
 	/**
@@ -621,18 +622,18 @@ class GatewayKit_NOWPayments_Gateway extends GatewayKit_Abstract_Payment_Gateway
 	 * result is identical to a top-level ksort (the official reference
 	 * implementation).
 	 *
-	 * @param array $array Array to sort (passed by reference).
+	 * @param array $values Array to sort (passed by reference).
 	 */
-	private function recursive_ksort( &$array ) {
-		if ( ! is_array( $array ) ) {
+	private function recursive_ksort( &$values ) {
+		if ( ! is_array( $values ) ) {
 			return;
 		}
-		foreach ( $array as &$value ) {
+		foreach ( $values as &$value ) {
 			if ( is_array( $value ) ) {
 				$this->recursive_ksort( $value );
 			}
 		}
 		unset( $value );
-		ksort( $array );
+		ksort( $values );
 	}
 }

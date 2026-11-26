@@ -7,7 +7,7 @@
  * @package GatewayKit
  */
 
-// Prevent direct access
+// Prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -20,19 +20,19 @@ function gatewaykit_handle_payment_callback() {
 	// nonce: callbacks are matched by transaction receipt tokens and protected
 	// by rate limiting.
 	// phpcs:disable WordPress.Security.NonceVerification.Recommended
-	// Check if this is a payment callback
+	// Check if this is a payment callback.
 	if ( ! isset( $_GET['gatewaykit_callback'] ) || sanitize_text_field( wp_unslash( $_GET['gatewaykit_callback'] ) ) !== '1' ) {
 		return;
 	}
 
-	// Rate limiting check
+	// Rate limiting check.
 	$rate_limiter = GatewayKit_Rate_Limiter::get_instance();
 	$rate_check   = $rate_limiter->check_rate_limit( 'callback' );
 	if ( is_wp_error( $rate_check ) ) {
 		wp_die( esc_html( $rate_check->get_error_message() ) );
 	}
 
-	// Validate gateway ID using centralized validator
+	// Validate gateway ID using centralized validator.
 	$validator  = GatewayKit_Input_Validator::get_instance();
 	$gateway_id = isset( $_GET['gateway'] ) ? $validator->validate_gateway( wp_unslash( $_GET['gateway'] ) ) : null; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitized by GatewayKit_Input_Validator::validate_gateway()
 	if ( is_wp_error( $gateway_id ) ) {
@@ -104,14 +104,14 @@ function gatewaykit_handle_payment_callback() {
 		wp_die( esc_html__( 'Invalid callback parameters.', 'gatewaykit' ) );
 	}
 
-	// Get transaction
+	// Get transaction.
 	$transaction = GatewayKit_Transaction_Model::find_by_authority( $authority );
 
 	if ( ! $transaction ) {
 		wp_die( esc_html__( 'Transaction not found.', 'gatewaykit' ) );
 	}
 
-	// Get gateway
+	// Get gateway.
 	$gateway_manager = GatewayKit_Gateway_Manager::get_instance();
 	$gateway         = $gateway_manager->get_gateway( $gateway_id );
 
@@ -155,11 +155,11 @@ function gatewaykit_handle_payment_callback() {
 		wp_die( esc_html__( 'This payment has already been processed.', 'gatewaykit' ) );
 	}
 
-	// Verify payment
+	// Verify payment.
 	$result = $gateway->verify_payment( $authority, $transaction->amount );
 
-	if ( $result['status'] === 'success' ) {
-		// Update transaction
+	if ( 'success' === $result['status'] ) {
+		// Update transaction.
 		$transaction->update(
 			array(
 				'status'       => 'completed',
@@ -168,25 +168,25 @@ function gatewaykit_handle_payment_callback() {
 			)
 		);
 
-		// Trigger success action
+		// Trigger success action.
 		do_action( 'gatewaykit_payment_completed', $transaction );
 
-		// Redirect to redirect URL specified in form settings
+		// Redirect to redirect URL specified in form settings.
 		$redirect_url = $transaction->success_url;
 		if ( $redirect_url ) {
-			// Add receipt token to URL for shortcode
+			// Add receipt token to URL for shortcode.
 			$redirect_url = add_query_arg( 'gatewaykit_receipt', $transaction->receipt_token, $redirect_url );
 			wp_safe_redirect( $redirect_url );
 			exit;
 		} else {
-			// Fallback to default if no custom URL is set
+			// Fallback to default if no custom URL is set.
 			wp_die( esc_html__( 'Redirect URL not configured for success.', 'gatewaykit' ) );
 		}
 	} else {
-		// Update transaction
+		// Update transaction.
 		$transaction->update( array( 'status' => 'failed' ) );
 
-		// Trigger failure action
+		// Trigger failure action.
 		do_action( 'gatewaykit_payment_failed', $transaction, $result );
 
 		// Redirect to failure URL, success URL, receipt page, or home.
@@ -218,7 +218,7 @@ function gatewaykit_handle_payment_callback() {
 	// phpcs:enable
 }
 
-// Initialize callback handling
+// Initialize callback handling.
 add_action( 'template_redirect', 'gatewaykit_handle_payment_callback', 1 );
 
 /**

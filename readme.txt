@@ -1,10 +1,10 @@
-=== GatewayKit – Simple Payment Form, Donation & Checkout ===
+=== GatewayKit – Advanced All-in-One Form Builder & Payment Solution ===
 Contributors: pourmirzai
 Tags: payment-form, donation, stripe-checkout, crypto-payment, elementor
 Requires at least: 6.2
-Tested up to: 7.1
+Tested up to: 7.2
 Requires PHP: 7.4
-Stable tag: 1.5.2
+Stable tag: 1.5.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -134,8 +134,19 @@ This is an occasional security firewall false-positive documented in [Freemius L
 6. Multi-gateway settings with encrypted credential storage (Stripe, PayPal, Crypto, etc.).
 7. Optional Elementor form integration with Actions After Submit.
 8. Pro features: Discount coupon management, analytics overview, and CSV export.
+9. Public receipt lookup — customers enter a receipt code to view their payment details.
+10. Drag-and-drop customer information fields in the form builder.
 
 == Changelog ==
+
+= 1.5.3 =
+
+* Tested with WordPress 7.2.
+* Improved the error message when a payment form cannot connect.
+
+= 1.5.2 =
+
+* Improved the discount field upgrade prompt in the form builder.
 
 = 1.5.1 =
 

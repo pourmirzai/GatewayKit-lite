@@ -1,11 +1,15 @@
 <?php
-// src/Gateways/NOWPayments/module.php — NOWPayments crypto gateway module (Lite).
+/**
+ * NOWPayments crypto gateway module.
+ *
+ * @package GatewayKit
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-require_once __DIR__ . '/class-nowpayments-gateway.php';
+require_once __DIR__ . '/class-gatewaykit-nowpayments-gateway.php';
 
 return array(
 	'id'    => 'nowpayments',

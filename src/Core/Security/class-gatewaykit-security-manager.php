@@ -17,7 +17,7 @@
  * @package GatewayKit
  */
 
-// Prevent direct access
+// Prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -29,11 +29,15 @@ class GatewayKit_Security_Manager {
 
 	/**
 	 * Single instance
+	 *
+	 * @var GatewayKit_Security_Manager|null
 	 */
 	private static $instance = null;
 
 	/**
 	 * Input validator instance
+	 *
+	 * @var GatewayKit_Input_Validator
 	 */
 	private $validator;
 
@@ -86,8 +90,8 @@ class GatewayKit_Security_Manager {
 	/**
 	 * Log security event
 	 *
-	 * @param string $event   Event type
-	 * @param array  $context Context data
+	 * @param string $event   Event type.
+	 * @param array  $context Context data.
 	 */
 	private function log_security_event( $event, $context = array() ) {
 		$logger = GatewayKit_Logger::get_instance();
@@ -100,7 +104,7 @@ class GatewayKit_Security_Manager {
 	/**
 	 * Validate nonce for all admin actions
 	 *
-	 * @param string $action Nonce action
+	 * @param string $action Nonce action.
 	 * @return bool True if valid
 	 */
 	public function verify_admin_nonce( $action ) {
@@ -138,7 +142,7 @@ class GatewayKit_Security_Manager {
 	/**
 	 * Validate CSRF token for AJAX requests
 	 *
-	 * @param string $action Action name
+	 * @param string $action Action name.
 	 * @return bool True if valid
 	 */
 	public function verify_ajax_nonce( $action ) {
@@ -176,23 +180,23 @@ class GatewayKit_Security_Manager {
 	/**
 	 * Sanitize and validate input data
 	 *
-	 * @param array $data Input data to sanitize
-	 * @param array $allowed_fields Allowed fields
+	 * @param array $data Input data to sanitize.
+	 * @param array $allowed_fields Allowed fields.
 	 * @return array Sanitized data
 	 */
 	public function sanitize_input_data( $data, $allowed_fields = array() ) {
 		$sanitized = array();
 
 		foreach ( $data as $key => $value ) {
-			// Only process allowed fields if specified
-			if ( ! empty( $allowed_fields ) && ! in_array( $key, $allowed_fields ) ) {
+			// Only process allowed fields if specified.
+			if ( ! empty( $allowed_fields ) && ! in_array( $key, $allowed_fields, true ) ) {
 				continue;
 			}
 
-			// Sanitize key
+			// Sanitize key.
 			$sanitized_key = sanitize_key( $key );
 
-			// Sanitize value based on type
+			// Sanitize value based on type.
 			if ( is_array( $value ) ) {
 				$sanitized[ $sanitized_key ] = $this->sanitize_input_data( $value, $allowed_fields );
 			} elseif ( is_string( $value ) ) {
@@ -212,7 +216,8 @@ class GatewayKit_Security_Manager {
 	/**
 	 * Validate payment data
 	 *
-	 * @param array $data Payment data
+	 * @param array $data Payment data.
+	 * @param array $context Validation context.
 	 * @return array|WP_Error Validated data or error
 	 */
 	public function validate_payment_data( $data, $context = array() ) {
@@ -230,7 +235,7 @@ class GatewayKit_Security_Manager {
 			}
 		}
 
-		// Validate gateway
+		// Validate gateway.
 		if ( isset( $data['gateway'] ) ) {
 			$validated_gateway = $this->validator->validate_gateway( $data['gateway'] );
 			if ( is_wp_error( $validated_gateway ) ) {
@@ -240,12 +245,12 @@ class GatewayKit_Security_Manager {
 			}
 		}
 
-		// Validate URLs
+		// Validate URLs.
 		$url_fields = array( 'callback_url', 'success_url', 'failure_url' );
 		foreach ( $url_fields as $field ) {
 			if ( isset( $data[ $field ] ) ) {
-				// For success_url, use required validation
-				if ( $field === 'success_url' ) {
+				// For success_url, use required validation.
+				if ( 'success_url' === $field ) {
 					$validated_url = $this->validator->validate_required_url( $data[ $field ] );
 				} else {
 					$validated_url = $this->validator->validate_url( $data[ $field ] );

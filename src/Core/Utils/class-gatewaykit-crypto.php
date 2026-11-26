@@ -109,6 +109,7 @@ class GatewayKit_Crypto {
 			return '';
 		}
 
+		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- Base64 encodes binary credentials or encrypted data for transport, not code.
 		return base64_encode( $iv . $encrypted );
 	}
 
@@ -141,6 +142,7 @@ class GatewayKit_Crypto {
 			return $bundle;
 		}
 
+		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode -- Base64 decodes the encrypted data bundle, not executable code.
 		$raw = base64_decode( $bundle, true );
 		if ( false === $raw ) {
 			return $bundle;

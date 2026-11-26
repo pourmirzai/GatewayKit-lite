@@ -7,7 +7,7 @@
  * @package GatewayKit
  */
 
-// Prevent direct access
+// Prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -73,12 +73,12 @@ class GatewayKit_Gateway_Manager {
 	/**
 	 * Register a gateway
 	 *
-	 * @param string $gateway_id Gateway ID
-	 * @param string $class_name Gateway class name
+	 * @param string $gateway_id Gateway ID.
+	 * @param string $class_name Gateway class name.
 	 * @return bool True if registered, false if invalid
 	 */
 	public function register_gateway( $gateway_id, $class_name ) {
-		// Skip if already registered
+		// Skip if already registered.
 		if ( isset( $this->gateways[ $gateway_id ] ) ) {
 			return true;
 		}
@@ -103,7 +103,7 @@ class GatewayKit_Gateway_Manager {
 	/**
 	 * Get gateway instance
 	 *
-	 * @param string $gateway_id Gateway ID
+	 * @param string $gateway_id Gateway ID.
 	 * @return GatewayKit_Payment_Gateway_Interface|null Gateway instance or null
 	 */
 	public function get_gateway( $gateway_id ) {
@@ -148,12 +148,12 @@ class GatewayKit_Gateway_Manager {
 	 * @return array Available gateways
 	 */
 	public function get_available_gateways() {
-		// Check cache first
+		// Check cache first.
 		$cache_key = 'gatewaykit_available_gateways';
 		$cache_ttl = 300; // 5 minutes cache
 
 		$cached_gateways = get_transient( $cache_key );
-		if ( $cached_gateways !== false ) {
+		if ( false !== $cached_gateways ) {
 			return $cached_gateways;
 		}
 
@@ -161,8 +161,8 @@ class GatewayKit_Gateway_Manager {
 		$enabled_gateways = get_option( 'gatewaykit_enabled_gateways', array() );
 
 		foreach ( $this->gateways as $gateway_id => $class_name ) {
-			// Only include enabled gateways
-			if ( ! isset( $enabled_gateways[ $gateway_id ] ) || $enabled_gateways[ $gateway_id ] !== '1' ) {
+			// Only include enabled gateways.
+			if ( ! isset( $enabled_gateways[ $gateway_id ] ) || '1' !== $enabled_gateways[ $gateway_id ] ) {
 				continue;
 			}
 
@@ -173,7 +173,7 @@ class GatewayKit_Gateway_Manager {
 			}
 		}
 
-		// Cache the result
+		// Cache the result.
 		set_transient( $cache_key, $available, $cache_ttl );
 
 		return $available;
@@ -182,7 +182,7 @@ class GatewayKit_Gateway_Manager {
 	/**
 	 * Check if gateway is available
 	 *
-	 * @param string $gateway_id Gateway ID
+	 * @param string $gateway_id Gateway ID.
 	 * @return bool True if available
 	 */
 	public function is_gateway_available( $gateway_id ) {
@@ -193,7 +193,7 @@ class GatewayKit_Gateway_Manager {
 	/**
 	 * Get gateway settings
 	 *
-	 * @param string $gateway_id Gateway ID
+	 * @param string $gateway_id Gateway ID.
 	 * @return array Gateway settings
 	 */
 	public function get_gateway_settings( $gateway_id ) {
@@ -209,8 +209,8 @@ class GatewayKit_Gateway_Manager {
 	/**
 	 * Update gateway settings
 	 *
-	 * @param string $gateway_id Gateway ID
-	 * @param array  $settings   Gateway settings
+	 * @param string $gateway_id Gateway ID.
+	 * @param array  $settings   Gateway settings.
 	 * @return bool True on success
 	 */
 	public function update_gateway_settings( $gateway_id, $settings ) {
@@ -220,7 +220,7 @@ class GatewayKit_Gateway_Manager {
 
 		$option_key = 'gatewaykit_' . $gateway_id . '_settings';
 
-		// Validate settings
+		// Validate settings.
 		$gateway = $this->get_gateway( $gateway_id );
 		if ( $gateway && method_exists( $gateway, 'validate_settings_input' ) ) {
 			$validated_settings = $gateway->validate_settings_input( $settings );
@@ -233,7 +233,7 @@ class GatewayKit_Gateway_Manager {
 						'error_message' => $error_message,
 					)
 				);
-				// Return false to indicate validation failure
+				// Return false to indicate validation failure.
 				return false;
 			}
 			$settings = $validated_settings;
@@ -242,7 +242,7 @@ class GatewayKit_Gateway_Manager {
 		$updated = update_option( $option_key, $settings );
 
 		if ( $updated ) {
-			// Clear gateway instance cache to reload settings
+			// Clear gateway instance cache to reload settings.
 			unset( $this->gateway_instances[ $gateway_id ] );
 
 			// PayPal: invalidate cached OAuth access token so the next request
@@ -277,7 +277,7 @@ class GatewayKit_Gateway_Manager {
 	/**
 	 * Get gateway performance stats
 	 *
-	 * @param string $gateway_id Gateway ID
+	 * @param string $gateway_id Gateway ID.
 	 * @return array Performance stats
 	 */
 	public function get_gateway_stats( $gateway_id ) {
@@ -309,7 +309,7 @@ class GatewayKit_Gateway_Manager {
 				: 0;
 		}
 
-		return $stats ?: array();
+		return $stats ? $stats : array();
 	}
 
 	/**
@@ -395,12 +395,12 @@ class GatewayKit_Gateway_Manager {
 	 * @return array Gateway stats
 	 */
 	public function get_all_gateway_stats() {
-		// Check cache first
+		// Check cache first.
 		$cache_key = 'gatewaykit_gateway_stats';
 		$cache_ttl = 300; // 5 minutes cache
 
 		$cached_stats = get_transient( $cache_key );
-		if ( $cached_stats !== false ) {
+		if ( false !== $cached_stats ) {
 			return $cached_stats;
 		}
 
@@ -412,7 +412,7 @@ class GatewayKit_Gateway_Manager {
 			$stats[ $gateway_id ]['name'] = $gateway->get_gateway_name();
 		}
 
-		// Cache the result
+		// Cache the result.
 		set_transient( $cache_key, $stats, $cache_ttl );
 
 		return $stats;

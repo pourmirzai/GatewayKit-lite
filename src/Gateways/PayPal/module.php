@@ -1,11 +1,15 @@
 <?php
-// src/Gateways/PayPal/module.php — PayPal gateway module.
+/**
+ * PayPal gateway module.
+ *
+ * @package GatewayKit
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-require_once __DIR__ . '/class-paypal-gateway.php';
+require_once __DIR__ . '/class-gatewaykit-paypal-gateway.php';
 
 // F5: warn the merchant when PayPal is enabled without a Webhook ID,
 // because inbound webhooks are rejected (HTTP 403) in that case.

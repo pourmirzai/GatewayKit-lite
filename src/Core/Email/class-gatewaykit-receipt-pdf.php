@@ -1,9 +1,15 @@
 <?php
+/**
+ * PDF receipt generation.
+ *
+ * @package GatewayKit
+ */
 
 declare(strict_types=1);
 
 defined( 'ABSPATH' ) || exit;
 
+/** Generates transaction receipt PDFs. */
 class GatewayKit_Receipt_PDF {
 
 	/**

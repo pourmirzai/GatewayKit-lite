@@ -7,7 +7,7 @@
  * @package GatewayKit
  */
 
-// Prevent direct access
+// Prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -16,7 +16,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Database Manager Class
  */
 class GatewayKit_Database_Manager {
-
 	/*
 	 * SECURITY MODEL (mandatory — see PRINCIPLE in docs/memory.md):
 	 * Every database call is wrapped in $wpdb->prepare(). Table, column and
@@ -37,6 +36,8 @@ class GatewayKit_Database_Manager {
 
 	/**
 	 * Single instance
+	 *
+	 * @var GatewayKit_Database_Manager|null
 	 */
 	private static $instance = null;
 
@@ -397,7 +398,7 @@ class GatewayKit_Database_Manager {
 			$result = $wpdb->query(
 				$wpdb->prepare( 'OPTIMIZE TABLE %i', $table )
 			);
-			if ( $result === false ) {
+			if ( false === $result ) {
 				GatewayKit_Logger::get_instance()->error(
 					'Failed to optimize table',
 					array(

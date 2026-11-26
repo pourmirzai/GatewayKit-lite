@@ -7,7 +7,7 @@
  * @package GatewayKit
  */
 
-// Prevent direct access
+// Prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 
@@ -48,11 +48,11 @@ class GatewayKit_Payment_Result_Shortcode {
 	/**
 	 * Render payment result shortcode
 	 *
-	 * @param array $atts Shortcode attributes
+	 * @param array $atts Shortcode attributes.
 	 * @return string HTML output
 	 */
 	public function render_payment_result( $atts ) {
-		// Default attributes
+		// Default attributes.
 		$atts = shortcode_atts(
 			array(
 				'receipt_code' => '',
@@ -73,45 +73,45 @@ class GatewayKit_Payment_Result_Shortcode {
 			$receipt_token = sanitize_text_field( wp_unslash( $_GET['gatewaykit_receipt'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- public read-only receipt lookup
 		}
 
-		// If no receipt token provided, show input form
+		// If no receipt token provided, show input form.
 		if ( empty( $receipt_token ) ) {
 			return $this->render_receipt_input_form();
 		}
 
-		// Validate token format (XXXXXX-YYYYYY, letters/numbers)
+		// Validate token format (XXXXXX-YYYYYY, letters/numbers).
 		if ( ! preg_match( '/^[A-Z0-9]{6}-[A-Z0-9]{6}$/i', $receipt_token ) ) {
 			return $this->render_error( __( 'Invalid receipt code format. Please use the format XXXXXX-YYYYYY', 'gatewaykit' ) );
 		}
 
-		// Apply rate limiting for failed lookups
+		// Apply rate limiting for failed lookups.
 		if ( $this->is_rate_limited() ) {
 			return $this->render_error( __( 'Too many failed attempts. Please try again later.', 'gatewaykit' ) );
 		}
 
-		// Convert to uppercase for consistency
+		// Convert to uppercase for consistency.
 		$receipt_token = strtoupper( $receipt_token );
 
-		// Get transaction by receipt token
+		// Get transaction by receipt token.
 		$transaction = GatewayKit_Transaction_Model::find_by_receipt_token( $receipt_token );
 
 		if ( ! $transaction ) {
-			// Log failed attempt for rate limiting
+			// Log failed attempt for rate limiting.
 			$this->log_failed_attempt();
 			return $this->render_error( __( 'Transaction not found with the provided receipt code.', 'gatewaykit' ) );
 		}
 
-		// Clear failed attempts on successful lookup
+		// Clear failed attempts on successful lookup.
 		$this->clear_failed_attempts();
 
-		// Render payment result
+		// Render payment result.
 		return $this->render_payment_result_content( $transaction, $atts );
 	}
 
 	/**
 	 * Render payment result content
 	 *
-	 * @param GatewayKit_Transaction_Model $transaction Transaction object
-	 * @param array                        $atts        Shortcode attributes
+	 * @param GatewayKit_Transaction_Model $transaction Transaction object.
+	 * @param array                        $atts        Shortcode attributes.
 	 * @return string HTML output
 	 */
 	private function render_payment_result_content( $transaction, $atts ) {
@@ -161,7 +161,7 @@ class GatewayKit_Payment_Result_Shortcode {
 		$html .= '<div class="gk-receipt-banner__actions">';
 
 		// Action buttons (completed only).
-		if ( $transaction->status === 'completed' ) {
+		if ( 'completed' === $transaction->status ) {
 			$html .= '<button class="gk-receipt-btn gk-receipt-btn--outline gatewaykit-print-receipt" onclick="window.print()">';
 			$html .= esc_html__( 'Print Receipt', 'gatewaykit' );
 			$html .= '</button>';
@@ -197,7 +197,7 @@ class GatewayKit_Payment_Result_Shortcode {
 	/**
 	 * Render payment receipt
 	 *
-	 * @param GatewayKit_Transaction_Model $transaction Transaction object
+	 * @param GatewayKit_Transaction_Model $transaction Transaction object.
 	 * @return string HTML output
 	 */
 	private function render_payment_receipt( $transaction ) {
@@ -291,7 +291,7 @@ class GatewayKit_Payment_Result_Shortcode {
 	/**
 	 * Render transaction details
 	 *
-	 * @param GatewayKit_Transaction_Model $transaction Transaction object
+	 * @param GatewayKit_Transaction_Model $transaction Transaction object.
 	 * @return string HTML output
 	 */
 	private function render_transaction_details( $transaction ) {
@@ -339,12 +339,12 @@ class GatewayKit_Payment_Result_Shortcode {
 	/**
 	 * Render unified receipt combining all fields
 	 *
-	 * @param GatewayKit_Transaction_Model $transaction Transaction object
-	 * @param bool                         $show_receipt Whether to show receipt-specific fields
-	 * @param bool                         $show_details Whether to show detail fields
+	 * @param GatewayKit_Transaction_Model $transaction Transaction object.
+	 * @param bool                         $show_receipt Whether to show receipt-specific fields.
+	 * @param bool                         $show_details Whether to show detail fields.
 	 * @return string HTML output
 	 */
-	private function render_unified_receipt( $transaction, $show_receipt = true, $show_details = true ) {
+	private function render_unified_receipt( $transaction, $show_receipt = true, $show_details = true ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- Retain display flags for the unified layout.
 		$html = '<table class="gk-receipt-table">';
 
 		// Receipt Code (always shown).
@@ -505,17 +505,6 @@ class GatewayKit_Payment_Result_Shortcode {
 	}
 
 	/**
-	 * Get print JavaScript and conditional print CSS
-	 *
-	 * @param string $mode Print mode option
-	 * @return string JavaScript/CSS for print functionality
-	 */
-	private function get_print_javascript( $mode = 'receipt_only' ) {
-		// Print CSS is now enqueued via enqueue_receipt_assets() as receipt.css.
-		return '';
-	}
-
-	/**
 	 * Render receipt input form for when no receipt code is provided
 	 *
 	 * @return string HTML output
@@ -599,7 +588,7 @@ class GatewayKit_Payment_Result_Shortcode {
 	/**
 	 * Render error message
 	 *
-	 * @param string $message Error message
+	 * @param string $message Error message.
 	 * @return string HTML output
 	 */
 	private function render_error( $message ) {
@@ -607,5 +596,5 @@ class GatewayKit_Payment_Result_Shortcode {
 	}
 }
 
-// Initialize shortcode
+// Initialize shortcode.
 new GatewayKit_Payment_Result_Shortcode();

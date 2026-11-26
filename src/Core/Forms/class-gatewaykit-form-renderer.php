@@ -579,6 +579,7 @@ class GatewayKit_Form_Renderer {
 				'i18n'           => array(
 					'processing'        => __( 'Processing...', 'gatewaykit' ),
 					'security_error'    => __( 'Security verification failed. Please refresh the page.', 'gatewaykit' ),
+					'network_error'     => __( 'Could not connect. Check your connection and try again.', 'gatewaykit' ),
 					'generic_error'     => __( 'An error occurred. Please try again.', 'gatewaykit' ),
 					'select_gateway'    => __( 'Please select a payment method.', 'gatewaykit' ),
 					'enter_amount'      => __( 'Please enter a valid amount.', 'gatewaykit' ),

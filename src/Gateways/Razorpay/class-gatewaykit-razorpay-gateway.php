@@ -183,6 +183,7 @@ class GatewayKit_Razorpay_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 	 */
 	private function get_auth_header() {
 		$credentials = $this->get_key_id() . ':' . $this->get_key_secret();
+		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- Base64 encodes binary credentials or encrypted data for transport, not code.
 		return 'Basic ' . base64_encode( $credentials );
 	}
 
@@ -438,8 +439,9 @@ class GatewayKit_Razorpay_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 	 * @return string
 	 */
 	public function get_redirect_url( $authority ) {
-		$authority = sanitize_text_field( (string) $authority );
-		return get_transient( 'gatewaykit_razorpay_redirect_' . $authority ) ?: '';
+		$authority    = sanitize_text_field( (string) $authority );
+		$redirect_url = get_transient( 'gatewaykit_razorpay_redirect_' . $authority );
+		return $redirect_url ? $redirect_url : '';
 	}
 
 	/**

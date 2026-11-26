@@ -404,8 +404,9 @@ class GatewayKit_MercadoPago_Gateway extends GatewayKit_Abstract_Payment_Gateway
 	 * @return string
 	 */
 	public function get_redirect_url( $authority ) {
-		$authority = sanitize_text_field( (string) $authority );
-		return get_transient( 'gatewaykit_mercadopago_pref_' . $authority ) ?: '';
+		$authority    = sanitize_text_field( (string) $authority );
+		$redirect_url = get_transient( 'gatewaykit_mercadopago_pref_' . $authority );
+		return $redirect_url ? $redirect_url : '';
 	}
 
 	/**
@@ -483,7 +484,8 @@ class GatewayKit_MercadoPago_Gateway extends GatewayKit_Abstract_Payment_Gateway
 		}
 		if ( '' === $preference_id ) {
 			// Try transient reverse lookup by payment_id.
-			$preference_id = get_transient( 'gatewaykit_mercadopago_payid_' . $data_id ) ?: '';
+			$preference_id = get_transient( 'gatewaykit_mercadopago_payid_' . $data_id );
+			$preference_id = $preference_id ? $preference_id : '';
 		}
 
 		$authority   = '' !== $preference_id ? $preference_id : $data_id;

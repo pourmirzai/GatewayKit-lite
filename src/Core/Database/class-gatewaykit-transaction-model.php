@@ -7,7 +7,7 @@
  * @package GatewayKit
  */
 
-// Prevent direct access
+// Prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -16,7 +16,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Transaction Model Class
  */
 class GatewayKit_Transaction_Model {
-
 	/*
 	 * This model performs direct database operations against the
 	 * gatewaykit_payment_transactions table. The table name is always the
@@ -30,13 +29,15 @@ class GatewayKit_Transaction_Model {
 
 	/**
 	 * Transaction data
+	 *
+	 * @var array
 	 */
 	private $data = array();
 
 	/**
 	 * Constructor
 	 *
-	 * @param array $data Transaction data
+	 * @param array $data Transaction data.
 	 */
 	public function __construct( $data = array() ) {
 		$this->data = $data;
@@ -45,7 +46,7 @@ class GatewayKit_Transaction_Model {
 	/**
 	 * Create new transaction
 	 *
-	 * @param array $data Transaction data
+	 * @param array $data Transaction data.
 	 * @return GatewayKit_Transaction_Model|WP_Error Transaction object or error
 	 */
 	public static function create( $data ) {
@@ -54,10 +55,10 @@ class GatewayKit_Transaction_Model {
 		$table_name = $wpdb->prefix . 'gatewaykit_payment_transactions';
 
 		// Generate a unique, uppercase alphanumeric receipt token in format XXXXXX-YYYYYY
-		// Optimized to prevent infinite loops with collision limit
+		// Optimized to prevent infinite loops with collision limit.
 		$chars        = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 		$chars_len    = strlen( $chars );
-		$max_attempts = 100; // Prevent infinite loops
+		$max_attempts = 100; // Prevent infinite loops.
 		$attempts     = 0;
 
 		do {
@@ -67,11 +68,11 @@ class GatewayKit_Transaction_Model {
 			}
 			$receipt_token = substr( $raw, 0, 6 ) . '-' . substr( $raw, 6, 6 );
 
-			// Check collision
+			// Check collision.
 			$exists = $wpdb->get_var( $wpdb->prepare( 'SELECT id FROM %i WHERE receipt_token = %s LIMIT 1', $table_name, $receipt_token ) );
 			++$attempts;
 
-			// Safety check to prevent infinite loops
+			// Safety check to prevent infinite loops.
 			if ( $attempts >= $max_attempts ) {
 				GatewayKit_Logger::get_instance()->error(
 					'Receipt token generation failed - too many collisions',
@@ -84,7 +85,7 @@ class GatewayKit_Transaction_Model {
 			}
 		} while ( ! empty( $exists ) );
 
-		// Prepare data
+		// Prepare data.
 		$currency    = isset( $data['currency'] ) ? sanitize_text_field( $data['currency'] ) : '';
 		$currency    = $currency ? strtoupper( $currency ) : GatewayKit_Gateway_Manager::get_instance()->get_default_currency();
 		$insert_data = array(
@@ -112,7 +113,7 @@ class GatewayKit_Transaction_Model {
 		);
 
 		// Adjust format array based on available columns
-		// Prepare format array dynamically based on data types
+		// Prepare format array dynamically based on data types.
 		$format = array();
 		foreach ( $insert_data as $key => $value ) {
 			if ( is_int( $value ) ) {
@@ -124,14 +125,14 @@ class GatewayKit_Transaction_Model {
 			}
 		}
 
-		// Insert into database
+		// Insert into database.
 		$result = $wpdb->insert(
 			$table_name,
 			$insert_data,
 			$format
 		);
 
-		if ( $result === false ) {
+		if ( false === $result ) {
 			GatewayKit_Logger::get_instance()->error(
 				'Failed to create transaction',
 				array(
@@ -145,7 +146,7 @@ class GatewayKit_Transaction_Model {
 
 		$transaction_id = $wpdb->insert_id;
 
-		// Log transaction creation
+		// Log transaction creation.
 		GatewayKit_Logger::get_instance()->info(
 			'Transaction created',
 			array(
@@ -155,13 +156,13 @@ class GatewayKit_Transaction_Model {
 			)
 		);
 
-		// Create transaction object
+		// Create transaction object.
 		$insert_data['id'] = $transaction_id;
 
-		// Clear relevant caches
+		// Clear relevant caches.
 		self::clear_cache();
 
-		// Trigger action for other cache clearing
+		// Trigger action for other cache clearing.
 		do_action( 'gatewaykit_transaction_created', $transaction_id );
 
 		return new self( $insert_data );
@@ -170,18 +171,18 @@ class GatewayKit_Transaction_Model {
 	/**
 	 * Find transaction by ID
 	 *
-	 * @param int $id Transaction ID
+	 * @param int $id Transaction ID.
 	 * @return GatewayKit_Transaction_Model|null Transaction object or null
 	 */
 	public static function find( $id ) {
 		global $wpdb;
 
-		// Check cache first
+		// Check cache first.
 		$cache_key = 'gatewaykit_transaction_' . $id;
 		$cache_ttl = 600; // 10 minutes cache
 
 		$cached_transaction = get_transient( $cache_key );
-		if ( $cached_transaction !== false ) {
+		if ( false !== $cached_transaction ) {
 			return new self( $cached_transaction );
 		}
 
@@ -193,7 +194,7 @@ class GatewayKit_Transaction_Model {
 		);
 
 		if ( $row ) {
-			// Cache the result
+			// Cache the result.
 			set_transient( $cache_key, $row, $cache_ttl );
 			return new self( $row );
 		}
@@ -204,18 +205,18 @@ class GatewayKit_Transaction_Model {
 	/**
 	 * Find transaction by authority
 	 *
-	 * @param string $authority Payment authority
+	 * @param string $authority Payment authority.
 	 * @return GatewayKit_Transaction_Model|null Transaction object or null
 	 */
 	public static function find_by_authority( $authority ) {
 		global $wpdb;
 
-		// Check cache first
+		// Check cache first.
 		$cache_key = 'gatewaykit_transaction_auth_' . md5( $authority );
 		$cache_ttl = 600; // 10 minutes cache
 
 		$cached_transaction = get_transient( $cache_key );
-		if ( $cached_transaction !== false ) {
+		if ( false !== $cached_transaction ) {
 			return new self( $cached_transaction );
 		}
 
@@ -227,7 +228,7 @@ class GatewayKit_Transaction_Model {
 		);
 
 		if ( $row ) {
-			// Cache the result
+			// Cache the result.
 			set_transient( $cache_key, $row, $cache_ttl );
 			return new self( $row );
 		}
@@ -238,18 +239,18 @@ class GatewayKit_Transaction_Model {
 	/**
 	 * Find transaction by receipt token
 	 *
-	 * @param string $token Receipt token in format XXXXXX-YYYYYY
+	 * @param string $token Receipt token in format XXXXXX-YYYYYY.
 	 * @return GatewayKit_Transaction_Model|null
 	 */
 	public static function find_by_receipt_token( $token ) {
 		global $wpdb;
 
-		// Check cache first
+		// Check cache first.
 		$cache_key = 'gatewaykit_transaction_receipt_' . md5( $token );
 		$cache_ttl = 600; // 10 minutes cache
 
 		$cached_transaction = get_transient( $cache_key );
-		if ( $cached_transaction !== false ) {
+		if ( false !== $cached_transaction ) {
 			return new self( $cached_transaction );
 		}
 
@@ -261,7 +262,7 @@ class GatewayKit_Transaction_Model {
 		);
 
 		if ( $row ) {
-			// Cache the result
+			// Cache the result.
 			set_transient( $cache_key, $row, $cache_ttl );
 			return new self( $row );
 		}
@@ -272,19 +273,19 @@ class GatewayKit_Transaction_Model {
 	/**
 	 * Get user transactions
 	 *
-	 * @param int $user_id User ID
-	 * @param int $limit   Number of transactions
+	 * @param int $user_id User ID.
+	 * @param int $limit   Number of transactions.
 	 * @return array Array of transaction objects
 	 */
 	public static function get_user_transactions( $user_id, $limit = 50 ) {
 		global $wpdb;
 
-		// Check cache first
+		// Check cache first.
 		$cache_key = 'gatewaykit_user_transactions_' . $user_id . '_' . $limit;
 		$cache_ttl = 300; // 5 minutes cache
 
 		$cached_transactions = get_transient( $cache_key );
-		if ( $cached_transactions !== false ) {
+		if ( false !== $cached_transactions ) {
 			$transactions = array();
 			foreach ( $cached_transactions as $row ) {
 				$transactions[] = new self( $row );
@@ -309,7 +310,7 @@ class GatewayKit_Transaction_Model {
 			$transactions[] = new self( $row );
 		}
 
-		// Cache the result
+		// Cache the result.
 		set_transient( $cache_key, $rows, $cache_ttl );
 
 		return $transactions;
@@ -318,7 +319,7 @@ class GatewayKit_Transaction_Model {
 	/**
 	 * Update transaction
 	 *
-	 * @param array $data Data to update
+	 * @param array $data Data to update.
 	 * @return bool True on success
 	 */
 	public function update( $data ) {
@@ -329,7 +330,7 @@ class GatewayKit_Transaction_Model {
 		$update_data = array();
 		$format      = array();
 
-		// Prepare update data
+		// Prepare update data.
 		if ( isset( $data['authority'] ) ) {
 			$update_data['authority'] = sanitize_text_field( $data['authority'] );
 			$format[]                 = '%s';
@@ -355,7 +356,7 @@ class GatewayKit_Transaction_Model {
 			$format[]                    = '%s';
 		}
 
-		// Error tracking fields
+		// Error tracking fields.
 		if ( isset( $data['error_message'] ) ) {
 			$update_data['error_message'] = sanitize_text_field( $data['error_message'] );
 			$format[]                     = '%s';
@@ -368,7 +369,7 @@ class GatewayKit_Transaction_Model {
 
 		if ( isset( $data['error_type'] ) ) {
 			$valid_error_types = array( 'license', 'gateway', 'configuration', 'network', 'validation', 'unknown' );
-			if ( in_array( $data['error_type'], $valid_error_types ) ) {
+			if ( in_array( $data['error_type'], $valid_error_types, true ) ) {
 				$update_data['error_type'] = $data['error_type'];
 				$format[]                  = '%s';
 			}
@@ -401,7 +402,7 @@ class GatewayKit_Transaction_Model {
 			return false;
 		}
 
-		// Update database
+		// Update database.
 		$result = $wpdb->update(
 			$table_name,
 			$update_data,
@@ -410,17 +411,17 @@ class GatewayKit_Transaction_Model {
 			array( '%d' )
 		);
 
-		if ( $result !== false ) {
-			// Update local data
+		if ( false !== $result ) {
+			// Update local data.
 			$this->data = array_merge( $this->data, $update_data );
 
-			// Clear relevant caches
+			// Clear relevant caches.
 			self::clear_cache( $this->data['id'] );
 
-			// Trigger action for other cache clearing
+			// Trigger action for other cache clearing.
 			do_action( 'gatewaykit_transaction_updated', $this->data['id'] );
 
-			// Log update
+			// Log update.
 			GatewayKit_Logger::get_instance()->info(
 				'Transaction updated',
 				array(
@@ -475,11 +476,11 @@ class GatewayKit_Transaction_Model {
 			array( '%d' )
 		);
 
-		if ( $result !== false ) {
-			// Clear relevant caches
+		if ( false !== $result ) {
+			// Clear relevant caches.
 			self::clear_cache( $this->data['id'] );
 
-			// Trigger action for other cache clearing
+			// Trigger action for other cache clearing.
 			do_action( 'gatewaykit_transaction_deleted', $this->data['id'] );
 
 			GatewayKit_Logger::get_instance()->info(
@@ -550,13 +551,13 @@ class GatewayKit_Transaction_Model {
 	/**
 	 * Get transaction data
 	 *
-	 * @param string $key Data key
+	 * @param string $key Data key.
 	 * @return mixed Data value
 	 */
 	public function get( $key ) {
 		if ( isset( $this->data[ $key ] ) ) {
-			// Decode JSON fields
-			if ( in_array( $key, array( 'form_data', 'user_data', 'gateway_response', 'error_details' ) ) ) {
+			// Decode JSON fields.
+			if ( in_array( $key, array( 'form_data', 'user_data', 'gateway_response', 'error_details' ), true ) ) {
 				return json_decode( $this->data[ $key ], true );
 			}
 
@@ -569,7 +570,7 @@ class GatewayKit_Transaction_Model {
 	/**
 	 * Magic getter
 	 *
-	 * @param string $key Property key
+	 * @param string $key Property key.
 	 * @return mixed Property value
 	 */
 	public function __get( $key ) {
@@ -581,7 +582,7 @@ class GatewayKit_Transaction_Model {
 	 * dynamic properties. Without this, isset($transaction->discount_id)
 	 * always returns false even when the data exists in $this->data.
 	 *
-	 * @param string $key Property key
+	 * @param string $key Property key.
 	 * @return bool
 	 */
 	public function __isset( $key ) {
@@ -618,10 +619,10 @@ class GatewayKit_Transaction_Model {
 	/**
 	 * Set error information for the transaction
 	 *
-	 * @param string $message   Error message
-	 * @param string $code      Error code (optional)
-	 * @param string $type      Error type (license, gateway, configuration, network, validation, unknown)
-	 * @param mixed  $details   Additional error details (array/object will be JSON encoded)
+	 * @param string $message   Error message.
+	 * @param string $code      Error code (optional).
+	 * @param string $type      Error type (license, gateway, configuration, network, validation, unknown).
+	 * @param mixed  $details   Additional error details (array/object will be JSON encoded).
 	 * @return bool True on success
 	 */
 	public function set_error( $message, $code = '', $type = 'unknown', $details = null ) {
@@ -634,11 +635,11 @@ class GatewayKit_Transaction_Model {
 			'error_timestamp' => current_time( 'mysql' ),
 		);
 
-		if ( $details !== null ) {
+		if ( null !== $details ) {
 			$error_data['error_details'] = $details;
 		}
 
-		// Suppress database errors to prevent AJAX response corruption
+		// Suppress database errors to prevent AJAX response corruption.
 		$wpdb->suppress_errors( true );
 		$result = $this->update( $error_data );
 		$wpdb->suppress_errors( false );
@@ -658,18 +659,19 @@ class GatewayKit_Transaction_Model {
 	/**
 	 * Get transaction statistics
 	 *
-	 * @param array $filters Filters array
+	 * @param array $filters Filters array.
 	 * @return array Statistics
 	 */
 	public static function get_statistics( $filters = array() ) {
 		global $wpdb;
 
-		// Create cache key based on filters
+		// Create cache key based on filters.
+		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize -- Serialization is used only to derive a deterministic cache key; no data is unserialized.
 		$cache_key = 'gatewaykit_transaction_stats_' . md5( serialize( $filters ) );
 		$cache_ttl = 600; // 10 minutes cache
 
 		$cached_stats = get_transient( $cache_key );
-		if ( $cached_stats !== false ) {
+		if ( false !== $cached_stats ) {
 			return $cached_stats;
 		}
 
@@ -678,7 +680,7 @@ class GatewayKit_Transaction_Model {
 		$where        = array();
 		$where_values = array();
 
-		// Apply filters
+		// Apply filters.
 		if ( ! empty( $filters['gateway'] ) ) {
 			$where[]        = 'gateway = %s';
 			$where_values[] = $filters['gateway'];
@@ -715,9 +717,9 @@ class GatewayKit_Transaction_Model {
 
 		$stats = $wpdb->get_row( $sql, ARRAY_A );
 
-		$result = $stats ?: array();
+		$result = $stats ? $stats : array();
 
-		// Cache the result
+		// Cache the result.
 		set_transient( $cache_key, $result, $cache_ttl );
 
 		return $result;
@@ -726,16 +728,16 @@ class GatewayKit_Transaction_Model {
 	/**
 	 * Clear transaction cache
 	 *
-	 * @param int $transaction_id Transaction ID (optional)
+	 * @param int $transaction_id Transaction ID (optional).
 	 * @return void
 	 */
 	public static function clear_cache( $transaction_id = null ) {
 		if ( $transaction_id ) {
-			// Clear specific transaction cache
+			// Clear specific transaction cache.
 			delete_transient( 'gatewaykit_transaction_' . $transaction_id );
 		}
 
-		// Clear user transactions cache (clear all since we don't know which users are affected)
+		// Clear user transactions cache (clear all since we don't know which users are affected).
 		global $wpdb;
 		$cache_keys = $wpdb->get_col( $wpdb->prepare( 'SELECT option_name FROM %i WHERE option_name LIKE %s', $wpdb->options, '_transient_gatewaykit_user_transactions_%' ) );
 		foreach ( $cache_keys as $key ) {
@@ -743,7 +745,7 @@ class GatewayKit_Transaction_Model {
 			delete_transient( $transient_key );
 		}
 
-		// Clear statistics cache
+		// Clear statistics cache.
 		$stats_cache_keys = $wpdb->get_col( $wpdb->prepare( 'SELECT option_name FROM %i WHERE option_name LIKE %s', $wpdb->options, '_transient_gatewaykit_transaction_stats_%' ) );
 		foreach ( $stats_cache_keys as $key ) {
 			$transient_key = str_replace( '_transient_', '', $key );

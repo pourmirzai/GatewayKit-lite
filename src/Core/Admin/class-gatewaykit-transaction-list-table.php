@@ -7,7 +7,7 @@
  * @package GatewayKit
  */
 
-// Prevent direct access
+// Prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -27,7 +27,7 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 	public function __construct() {
 		parent::__construct(
 			array(
-				// Use stable, non-translated slugs for WP_List_Table internal args (affects nonce action)
+				// Use stable, non-translated slugs for WP_List_Table internal args (affects nonce action).
 				'singular' => 'transaction',
 				'plural'   => 'transactions',
 				'ajax'     => false,
@@ -103,7 +103,7 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 
-		// Process bulk actions if any
+		// Process bulk actions if any.
 		$this->process_bulk_action();
 
 		// Get data
@@ -182,6 +182,8 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 
 	/**
 	 * Column ID — includes row actions (Refund, etc.).
+	 *
+	 * @param array $item Transaction data.
 	 */
 	public function column_id( $item ) {
 		$output = '<a href="#" class="button button-small gatewaykit-view-form-data" data-transaction-id="' . esc_attr( $item['id'] ) . '">' .
@@ -243,6 +245,9 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 
 	/**
 	 * Column default
+	 *
+	 * @param array  $item Transaction data.
+	 * @param string $column_name Column name.
 	 */
 	public function column_default( $item, $column_name ) {
 		switch ( $column_name ) {
@@ -315,6 +320,8 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 
 	/**
 	 * Column checkbox
+	 *
+	 * @param array $item Transaction data.
 	 */
 	public function column_cb( $item ) {
 		return sprintf(
@@ -325,6 +332,8 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 
 	/**
 	 * Get status badge
+	 *
+	 * @param string $status Transaction status.
 	 */
 	private function get_status_badge( $status ) {
 		$status_labels = array(
@@ -355,10 +364,12 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 
 	/**
 	 * Get error info display
+	 *
+	 * @param array $item Transaction data.
 	 */
 	private function get_error_info_display( $item ) {
-		// Only show error info for failed transactions
-		if ( $item['status'] !== 'failed' ) {
+		// Only show error info for failed transactions.
+		if ( 'failed' !== $item['status'] ) {
 			return '-';
 		}
 
@@ -370,7 +381,7 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 			return '<span class="gatewaykit-error-unknown">' . esc_html__( 'Unknown error', 'gatewaykit' ) . '</span>';
 		}
 
-		// Create tooltip content
+		// Create tooltip content.
 		$tooltip_content = '';
 		if ( ! empty( $error_message ) ) {
 			$tooltip_content .= '<strong>' . esc_html__( 'Error:', 'gatewaykit' ) . '</strong> ' . esc_html( $error_message ) . '<br>';
@@ -391,7 +402,7 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 			$tooltip_content .= '<strong>' . esc_html__( 'Code:', 'gatewaykit' ) . '</strong> ' . esc_html( $error_code ) . '<br>';
 		}
 
-		// Get error severity class
+		// Get error severity class.
 		$severity_class = $this->get_error_severity_class( $error_type );
 
 		// Create display text (truncate raw text, then escape once at output).
@@ -410,6 +421,8 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 
 	/**
 	 * Get error severity class
+	 *
+	 * @param string $error_type Error type.
 	 */
 	private function get_error_severity_class( $error_type ) {
 		$severity_classes = array(
@@ -497,8 +510,8 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 			);
 		}
 
-		if ( $current_action === 'delete' ) {
-			// Nonce and capability checks using WordPress core helper
+		if ( 'delete' === $current_action ) {
+			// Nonce and capability checks using WordPress core helper.
 			check_admin_referer( 'bulk-' . $this->_args['plural'] );
 			if ( ! current_user_can( 'manage_options' ) ) {
 				wp_die( esc_html__( 'You do not have permission to perform this action.', 'gatewaykit' ) );
@@ -506,15 +519,15 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 			// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- nonce verified by check_admin_referer() above; intval sanitizes each value
 			$transaction_ids = isset( $_POST['transaction_ids'] ) ? array_map( 'intval', wp_unslash( $_POST['transaction_ids'] ) ) : array();
 			if ( empty( $transaction_ids ) ) {
-				return; // No transactions selected
+				return; // No transactions selected.
 			}
 			$this->bulk_delete( $transaction_ids );
 			wp_safe_redirect( add_query_arg( 'deleted', count( $transaction_ids ), wp_get_referer() ) );
 			exit;
 		}
 
-		if ( $current_action === 'export' ) {
-			// Nonce and capability checks using WordPress core helper
+		if ( 'export' === $current_action ) {
+			// Nonce and capability checks using WordPress core helper.
 			check_admin_referer( 'bulk-' . $this->_args['plural'] );
 			if ( ! current_user_can( 'manage_options' ) ) {
 				wp_die( esc_html__( 'You do not have permission to perform this action.', 'gatewaykit' ) );
@@ -536,7 +549,7 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 			// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- nonce verified by check_admin_referer() above; intval sanitizes each value
 			$transaction_ids = isset( $_POST['transaction_ids'] ) ? array_map( 'intval', wp_unslash( $_POST['transaction_ids'] ) ) : array();
 			if ( empty( $transaction_ids ) ) {
-				// Redirect back with an error notice if no transactions are selected
+				// Redirect back with an error notice if no transactions are selected.
 				$referer = wp_get_referer();
 				if ( ! $referer ) {
 					$referer = admin_url( 'admin.php?page=gatewaykit-transactions' );
@@ -553,12 +566,14 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 				exit;
 			}
 			$this->bulk_export( $transaction_ids );
-			exit; // Exit after file download
+			exit; // Exit after file download.
 		}
 	}
 
 	/**
 	 * Bulk delete transactions
+	 *
+	 * @param array $transaction_ids Transaction IDs.
 	 */
 	private function bulk_delete( $transaction_ids ) {
 		if ( ! current_user_can( 'manage_options' ) ) {
@@ -575,6 +590,8 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 
 	/**
 	 * Bulk export transactions
+	 *
+	 * @param array $transaction_ids Transaction IDs.
 	 */
 	public function bulk_export( $transaction_ids ) {
 		$this->export_transactions( $transaction_ids );
@@ -582,11 +599,12 @@ class GatewayKit_Transaction_List_Table extends WP_List_Table {
 
 	/**
 	 * Extra table nav
+	 *
+	 * @param string $which Table navigation position.
 	 */
 	public function extra_tablenav( $which ) {
 		// Filters and search are rendered at the page level via a dedicated GET form
 		// in GatewayKit_Admin_Settings::transactions_page() to avoid duplicate UI and mixed form methods.
-		return;
 	}
 
 	/**

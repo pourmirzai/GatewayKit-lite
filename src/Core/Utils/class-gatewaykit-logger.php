@@ -7,7 +7,7 @@
  * @package GatewayKit
  */
 
-// Prevent direct access
+// Prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -16,7 +16,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Logger Class
  */
 class GatewayKit_Logger {
-
 	/*
 	 * This logger persists entries to the gatewaykit_payment_logs table. The
 	 * table name is always the hardcoded base 'gatewaykit_payment_logs'
@@ -31,6 +30,8 @@ class GatewayKit_Logger {
 
 	/**
 	 * Single instance
+	 *
+	 * @var GatewayKit_Logger|null
 	 */
 	private static $instance = null;
 
@@ -44,6 +45,8 @@ class GatewayKit_Logger {
 
 	/**
 	 * Minimum log level to write
+	 *
+	 * @var string
 	 */
 	private $min_level = self::LEVEL_INFO;
 
@@ -67,9 +70,9 @@ class GatewayKit_Logger {
 	/**
 	 * Log debug message
 	 *
-	 * @param string $message Log message
-	 * @param array  $context Context data
-	 * @param int    $transaction_id Transaction ID
+	 * @param string $message Log message.
+	 * @param array  $context Context data.
+	 * @param int    $transaction_id Transaction ID.
 	 */
 	public function debug( $message, $context = array(), $transaction_id = null ) {
 		$this->log( self::LEVEL_DEBUG, $message, $context, $transaction_id );
@@ -78,9 +81,9 @@ class GatewayKit_Logger {
 	/**
 	 * Log info message
 	 *
-	 * @param string $message Log message
-	 * @param array  $context Context data
-	 * @param int    $transaction_id Transaction ID
+	 * @param string $message Log message.
+	 * @param array  $context Context data.
+	 * @param int    $transaction_id Transaction ID.
 	 */
 	public function info( $message, $context = array(), $transaction_id = null ) {
 		$this->log( self::LEVEL_INFO, $message, $context, $transaction_id );
@@ -89,9 +92,9 @@ class GatewayKit_Logger {
 	/**
 	 * Log warning message
 	 *
-	 * @param string $message Log message
-	 * @param array  $context Context data
-	 * @param int    $transaction_id Transaction ID
+	 * @param string $message Log message.
+	 * @param array  $context Context data.
+	 * @param int    $transaction_id Transaction ID.
 	 */
 	public function warning( $message, $context = array(), $transaction_id = null ) {
 		$this->log( self::LEVEL_WARNING, $message, $context, $transaction_id );
@@ -100,9 +103,9 @@ class GatewayKit_Logger {
 	/**
 	 * Log error message
 	 *
-	 * @param string $message Log message
-	 * @param array  $context Context data
-	 * @param int    $transaction_id Transaction ID
+	 * @param string $message Log message.
+	 * @param array  $context Context data.
+	 * @param int    $transaction_id Transaction ID.
 	 */
 	public function error( $message, $context = array(), $transaction_id = null ) {
 		$this->log( self::LEVEL_ERROR, $message, $context, $transaction_id );
@@ -111,18 +114,18 @@ class GatewayKit_Logger {
 	/**
 	 * Log message
 	 *
-	 * @param string $level          Log level
-	 * @param string $message        Log message
-	 * @param array  $context        Context data
-	 * @param int    $transaction_id Transaction ID
+	 * @param string $level          Log level.
+	 * @param string $message        Log message.
+	 * @param array  $context        Context data.
+	 * @param int    $transaction_id Transaction ID.
 	 */
 	public function log( $level, $message, $context = array(), $transaction_id = null ) {
-		// Check if level should be logged
+		// Check if level should be logged.
 		if ( ! $this->should_log( $level ) ) {
 			return;
 		}
 
-		// Prepare log data
+		// Prepare log data.
 		$log_data = array(
 			'level'          => $level,
 			'message'        => $this->sanitize_message( $message ),
@@ -131,10 +134,10 @@ class GatewayKit_Logger {
 			'created_at'     => current_time( 'mysql' ),
 		);
 
-		// Write to database
+		// Write to database.
 		$this->write_to_database( $log_data );
 
-		// Also write to WordPress debug log if WP_DEBUG is enabled
+		// Also write to WordPress debug log if WP_DEBUG is enabled.
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 			$this->write_to_wp_debug( $level, $message, $context );
 		}
@@ -143,7 +146,7 @@ class GatewayKit_Logger {
 	/**
 	 * Check if level should be logged
 	 *
-	 * @param string $level Log level
+	 * @param string $level Log level.
 	 * @return bool True if should log
 	 */
 	private function should_log( $level ) {
@@ -163,7 +166,7 @@ class GatewayKit_Logger {
 	/**
 	 * Sanitize log message
 	 *
-	 * @param string $message Message to sanitize
+	 * @param string $message Message to sanitize.
 	 * @return string Sanitized message
 	 */
 	private function sanitize_message( $message ) {
@@ -173,11 +176,11 @@ class GatewayKit_Logger {
 	/**
 	 * Sanitize context data
 	 *
-	 * @param array $context Context data
+	 * @param array $context Context data.
 	 * @return string JSON encoded context
 	 */
 	private function sanitize_context( $context ) {
-		// Comprehensive sensitive data patterns for better security
+		// Comprehensive sensitive data patterns for better security.
 		$sensitive_patterns = array(
 			'password',
 			'token',
@@ -210,7 +213,7 @@ class GatewayKit_Logger {
 		foreach ( $context as $key => $value ) {
 			$key_lower = strtolower( $key );
 
-			// Check for sensitive patterns in key
+			// Check for sensitive patterns in key.
 			$is_sensitive = false;
 			foreach ( $sensitive_patterns as $pattern ) {
 				if ( strpos( $key_lower, $pattern ) !== false ) {
@@ -220,7 +223,7 @@ class GatewayKit_Logger {
 			}
 
 			if ( $is_sensitive ) {
-				// Partial redaction for debugging (show first/last few chars)
+				// Partial redaction for debugging (show first/last few chars).
 				if ( is_string( $value ) && strlen( $value ) > 8 ) {
 					$sanitized[ $key ] = substr( $value, 0, 4 ) . '[REDACTED]' . substr( $value, -4 );
 				} else {
@@ -229,10 +232,10 @@ class GatewayKit_Logger {
 			} elseif ( is_array( $value ) || is_object( $value ) ) {
 				$sanitized[ $key ] = $this->sanitize_context( (array) $value );
 			} elseif ( is_string( $value ) ) {
-				// Additional sanitization for string values
+				// Additional sanitization for string values.
 				$sanitized[ $key ] = sanitize_text_field( $value );
 			} else {
-				// Handle other data types safely
+				// Handle other data types safely.
 				$sanitized[ $key ] = $value;
 			}
 		}
@@ -243,7 +246,7 @@ class GatewayKit_Logger {
 	/**
 	 * Write log to database
 	 *
-	 * @param array $log_data Log data
+	 * @param array $log_data Log data.
 	 */
 	private function write_to_database( $log_data ) {
 		global $wpdb;
@@ -263,7 +266,7 @@ class GatewayKit_Logger {
 		);
 
 		if ( false === $result ) {
-			// Fallback to error_log if database insert fails
+			// Fallback to error_log if database insert fails.
 			error_log( 'gatewaykit Logger DB Error: ' . $wpdb->last_error );
 		}
 	}
@@ -271,16 +274,16 @@ class GatewayKit_Logger {
 	/**
 	 * Write to WordPress debug log
 	 *
-	 * @param string $level   Log level
-	 * @param string $message Log message
-	 * @param array  $context Context data
+	 * @param string $level   Log level.
+	 * @param string $message Log message.
+	 * @param array  $context Context data.
 	 */
 	private function write_to_wp_debug( $level, $message, $context ) {
 		$prefix      = 'gatewaykit [' . strtoupper( $level ) . '] ';
 		$log_message = $prefix . $message;
 
 		if ( ! empty( $context ) ) {
-			// Use sanitized context for public WP_DEBUG logs to prevent sensitive data exposure
+			// Use sanitized context for public WP_DEBUG logs to prevent sensitive data exposure.
 			$sanitized_context = $this->sanitize_context( $context );
 			$log_message      .= ' | Context: ' . $sanitized_context;
 		}
@@ -291,8 +294,8 @@ class GatewayKit_Logger {
 	/**
 	 * Get logs for transaction
 	 *
-	 * @param int $transaction_id Transaction ID
-	 * @param int $limit          Number of logs to retrieve
+	 * @param int $transaction_id Transaction ID.
+	 * @param int $limit          Number of logs to retrieve.
 	 * @return array Logs
 	 */
 	public function get_transaction_logs( $transaction_id, $limit = 50 ) {
@@ -315,8 +318,8 @@ class GatewayKit_Logger {
 	/**
 	 * Get logs by level
 	 *
-	 * @param string $level Log level
-	 * @param int    $limit Number of logs to retrieve
+	 * @param string $level Log level.
+	 * @param int    $limit Number of logs to retrieve.
 	 * @return array Logs
 	 */
 	public function get_logs_by_level( $level, $limit = 100 ) {
@@ -468,7 +471,7 @@ class GatewayKit_Logger {
 	/**
 	 * Clean old logs
 	 *
-	 * @param int $days Days to keep logs
+	 * @param int $days Days to keep logs.
 	 */
 	public function clean_old_logs( $days = 30 ) {
 		global $wpdb;
@@ -510,10 +513,10 @@ class GatewayKit_Logger {
 	/**
 	 * Set minimum log level
 	 *
-	 * @param string $level Log level
+	 * @param string $level Log level.
 	 */
 	public function set_min_level( $level ) {
-		if ( in_array( $level, array( self::LEVEL_DEBUG, self::LEVEL_INFO, self::LEVEL_WARNING, self::LEVEL_ERROR ) ) ) {
+		if ( in_array( $level, array( self::LEVEL_DEBUG, self::LEVEL_INFO, self::LEVEL_WARNING, self::LEVEL_ERROR ), true ) ) {
 			$this->min_level = $level;
 			update_option( 'gatewaykit_log_level', $level );
 		}

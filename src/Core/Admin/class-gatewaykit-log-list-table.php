@@ -14,7 +14,7 @@
  * @package GatewayKit
  */
 
-// Prevent direct access
+// Prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -308,7 +308,6 @@ class GatewayKit_Log_List_Table extends WP_List_Table {
 	 * @param string $which Top or bottom.
 	 */
 	public function extra_tablenav( $which ) {
-		return;
 	}
 
 	/**

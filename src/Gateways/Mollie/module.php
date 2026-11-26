@@ -1,11 +1,15 @@
 <?php
-// src/Gateways/Mollie/module.php — Mollie gateway module (Pro).
+/**
+ * Mollie gateway module.
+ *
+ * @package GatewayKit
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-require_once __DIR__ . '/class-mollie-gateway.php';
+require_once __DIR__ . '/class-gatewaykit-mollie-gateway.php';
 
 return array(
 	'id'    => 'mollie',

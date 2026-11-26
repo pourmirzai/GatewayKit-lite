@@ -11,7 +11,7 @@
  * @package GatewayKit
  */
 
-// Prevent direct access
+// Prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -181,6 +181,7 @@ class GatewayKit_PayPal_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 	}
 
 	/**
+	 * Format an amount for PayPal.
 	 *
 	 * @param float $amount Amount.
 	 * @return float
@@ -264,6 +265,7 @@ class GatewayKit_PayPal_Gateway extends GatewayKit_Abstract_Payment_Gateway {
 		$args = array(
 			'method'  => 'POST',
 			'headers' => array(
+				// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- Base64 encodes binary credentials or encrypted data for transport, not code.
 				'Authorization' => 'Basic ' . base64_encode( $client_id . ':' . $client_secret ),
 				'Content-Type'  => 'application/x-www-form-urlencoded',
 			),

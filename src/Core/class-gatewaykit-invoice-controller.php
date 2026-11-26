@@ -47,7 +47,7 @@ class GatewayKit_Invoice_Controller {
 		}
 
 		if ( ! class_exists( 'GatewayKit_Receipt_PDF' ) ) {
-			$pdf_path = GATEWAYKIT_PLUGIN_DIR . 'src/Core/Email/class-receipt-pdf.php';
+			$pdf_path = GATEWAYKIT_PLUGIN_DIR . 'src/Core/Email/class-gatewaykit-receipt-pdf.php';
 			if ( file_exists( $pdf_path ) ) {
 				require_once $pdf_path;
 			}

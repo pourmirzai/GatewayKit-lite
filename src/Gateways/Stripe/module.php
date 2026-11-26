@@ -1,11 +1,15 @@
 <?php
-// src/Gateways/Stripe/module.php — Stripe gateway module (Pro).
+/**
+ * Stripe gateway module.
+ *
+ * @package GatewayKit
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-require_once __DIR__ . '/class-stripe-gateway.php';
+require_once __DIR__ . '/class-gatewaykit-stripe-gateway.php';
 
 return array(
 	'id'    => 'stripe',

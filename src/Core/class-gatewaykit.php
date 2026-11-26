@@ -223,7 +223,7 @@ class GatewayKit {
 		require_once GATEWAYKIT_PLUGIN_DIR . 'src/Core/callback-handler.php';
 
 		// Initialize payment result shortcode (always needed).
-		require_once GATEWAYKIT_PLUGIN_DIR . 'src/Core/class-payment-result-shortcode.php';
+		require_once GATEWAYKIT_PLUGIN_DIR . 'src/Core/class-gatewaykit-payment-result-shortcode.php';
 
 		// Enqueue frontend styles and scripts.
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_frontend_assets' ) );

@@ -7,7 +7,7 @@
  * @package GatewayKit
  */
 
-// Prevent direct access
+// Prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -19,11 +19,15 @@ abstract class GatewayKit_Abstract_Payment_Gateway implements GatewayKit_Payment
 
 	/**
 	 * Gateway settings
+	 *
+	 * @var array
 	 */
 	protected $settings = array();
 
 	/**
 	 * Logger instance
+	 *
+	 * @var GatewayKit_Logger
 	 */
 	protected $logger;
 
@@ -52,22 +56,30 @@ abstract class GatewayKit_Abstract_Payment_Gateway implements GatewayKit_Payment
 
 	/**
 	 * Process payment request - must be implemented by child classes
+	 *
+	 * @param float  $amount Payment amount.
+	 * @param string $description Payment description.
+	 * @param string $callback_url Callback URL.
+	 * @param array  $user_data Customer data.
 	 */
 	abstract public function process_payment( $amount, $description, $callback_url, $user_data );
 
 	/**
 	 * Verify payment - must be implemented by child classes
+	 *
+	 * @param string $authority Payment authority.
+	 * @param float  $amount Expected amount.
 	 */
 	abstract public function verify_payment( $authority, $amount );
 
 	/**
 	 * Get payment redirect URL
 	 *
-	 * @param string $authority Payment authority
+	 * @param string $authority Payment authority.
 	 * @return string Redirect URL
 	 */
 	public function get_redirect_url( $authority ) {
-		// Default implementation - should be overridden if needed
+		// Default implementation - should be overridden if needed.
 		return '';
 	}
 
@@ -115,7 +127,7 @@ abstract class GatewayKit_Abstract_Payment_Gateway implements GatewayKit_Payment
 	 * @return bool True if settings are valid
 	 */
 	public function validate_settings() {
-		// Basic validation - check if required settings exist
+		// Basic validation - check if required settings exist.
 		$required_settings = $this->get_required_settings();
 
 		foreach ( $required_settings as $setting ) {
@@ -142,11 +154,11 @@ abstract class GatewayKit_Abstract_Payment_Gateway implements GatewayKit_Payment
 	 * This base implementation provides default validation that can be overridden
 	 * by specific gateway implementations for more complex validation.
 	 *
-	 * @param array $settings Settings to validate
+	 * @param array $settings Settings to validate.
 	 * @return array|WP_Error Validated settings or error
 	 */
 	public function validate_settings_input( $settings ) {
-		// Basic validation - sanitize all input fields
+		// Basic validation - sanitize all input fields.
 		$validated_settings = array();
 
 		foreach ( $settings as $key => $value ) {
@@ -157,7 +169,7 @@ abstract class GatewayKit_Abstract_Payment_Gateway implements GatewayKit_Payment
 			}
 		}
 
-		// Check required settings
+		// Check required settings.
 		$required_settings = $this->get_required_settings();
 		$errors            = array();
 
@@ -169,7 +181,7 @@ abstract class GatewayKit_Abstract_Payment_Gateway implements GatewayKit_Payment
 		}
 
 		if ( ! empty( $errors ) ) {
-			// Return error with specific error messages
+			// Return error with specific error messages.
 			$error_messages = array();
 			foreach ( $errors as $field => $message ) {
 				$error_messages[] = $field . ': ' . $message;
@@ -183,11 +195,11 @@ abstract class GatewayKit_Abstract_Payment_Gateway implements GatewayKit_Payment
 	/**
 	 * Get setting value
 	 *
-	 * @param string $key     Setting key
-	 * @param mixed  $default Default value
+	 * @param string $key     Setting key.
+	 * @param mixed  $default Default value.
 	 * @return mixed Setting value
 	 */
-	protected function get_setting( $key, $default = '' ) {
+	protected function get_setting( $key, $default = '' ) { // phpcs:ignore Universal.NamingConventions.NoReservedKeywordParameterNames.defaultFound -- Preserve the inherited parameter name for compatibility.
 		return isset( $this->settings[ $key ] ) ? $this->settings[ $key ] : $default;
 	}
 
@@ -197,15 +209,15 @@ abstract class GatewayKit_Abstract_Payment_Gateway implements GatewayKit_Payment
 	 * @return bool True if sandbox mode
 	 */
 	protected function is_sandbox() {
-		return isset( $this->settings['sandbox_mode'] ) && $this->settings['sandbox_mode'] === '1';
+		return isset( $this->settings['sandbox_mode'] ) && '1' === $this->settings['sandbox_mode'];
 	}
 
 	/**
 	 * Log message
 	 *
-	 * @param string $level   Log level
-	 * @param string $message Log message
-	 * @param array  $context Context data
+	 * @param string $level   Log level.
+	 * @param string $message Log message.
+	 * @param array  $context Context data.
 	 */
 	protected function log( $level, $message, $context = array() ) {
 		if ( $this->logger ) {
@@ -233,7 +245,7 @@ abstract class GatewayKit_Abstract_Payment_Gateway implements GatewayKit_Payment
 	/**
 	 * Format amount for gateway
 	 *
-	 * @param float $amount Amount
+	 * @param float $amount Amount.
 	 * @return int Formatted amount
 	 */
 	protected function format_amount( $amount ) {

@@ -7,7 +7,7 @@
  * @package GatewayKit
  */
 
-// Prevent direct access
+// Prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -20,10 +20,10 @@ interface GatewayKit_Payment_Gateway_Interface {
 	/**
 	 * Process payment request
 	 *
-	 * @param float  $amount       Payment amount
-	 * @param string $description  Payment description
-	 * @param string $callback_url Callback URL for verification
-	 * @param array  $user_data    User data array
+	 * @param float  $amount       Payment amount.
+	 * @param string $description  Payment description.
+	 * @param string $callback_url Callback URL for verification.
+	 * @param array  $user_data    User data array.
 	 * @return array Payment result with status, authority, redirect_url, etc.
 	 */
 	public function process_payment( $amount, $description, $callback_url, $user_data );
@@ -31,8 +31,8 @@ interface GatewayKit_Payment_Gateway_Interface {
 	/**
 	 * Verify payment after callback
 	 *
-	 * @param string $authority Payment authority/token
-	 * @param float  $amount    Expected payment amount
+	 * @param string $authority Payment authority/token.
+	 * @param float  $amount    Expected payment amount.
 	 * @return array Verification result with status, ref_id, etc.
 	 */
 	public function verify_payment( $authority, $amount );
@@ -40,7 +40,7 @@ interface GatewayKit_Payment_Gateway_Interface {
 	/**
 	 * Get payment redirect URL
 	 *
-	 * @param string $authority Payment authority
+	 * @param string $authority Payment authority.
 	 * @return string Redirect URL
 	 */
 	public function get_redirect_url( $authority );
@@ -83,7 +83,7 @@ interface GatewayKit_Payment_Gateway_Interface {
 	/**
 	 * Validate settings input
 	 *
-	 * @param array $settings Settings to validate
+	 * @param array $settings Settings to validate.
 	 * @return array|WP_Error Validated settings or error
 	 */
 	public function validate_settings_input( $settings );

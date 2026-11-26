@@ -1,11 +1,15 @@
 <?php
-// src/Gateways/MercadoPago/module.php — Mercado Pago gateway module.
+/**
+ * Mercado Pago gateway module.
+ *
+ * @package GatewayKit
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-require_once __DIR__ . '/class-mercadopago-gateway.php';
+require_once __DIR__ . '/class-gatewaykit-mercadopago-gateway.php';
 
 // N3: warn the merchant when Mercado Pago is enabled without a webhook
 // secret, because inbound webhooks fall back to the weaker API re-fetch

@@ -7,7 +7,7 @@
  * @package GatewayKit
  */
 
-// Prevent direct access
+// Prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -19,6 +19,8 @@ class GatewayKit_Input_Validator {
 
 	/**
 	 * Single instance
+	 *
+	 * @var GatewayKit_Input_Validator|null
 	 */
 	private static $instance = null;
 
@@ -35,19 +37,20 @@ class GatewayKit_Input_Validator {
 	/**
 	 * Validate amount
 	 *
-	 * @param mixed $amount Amount to validate
+	 * @param mixed $amount Amount to validate.
+	 * @param array $options Validation options.
 	 * @return float|WP_Error Validated amount or error
 	 */
 	public function validate_amount( $amount, $options = array() ) {
-		// Sanitize
+		// Sanitize.
 		$amount = $this->sanitize_amount( $amount );
 
-		// Check if numeric
+		// Check if numeric.
 		if ( ! is_numeric( $amount ) ) {
 			return new WP_Error( 'invalid_amount', __( 'Amount must be a valid number.', 'gatewaykit' ) );
 		}
 
-		// Convert to float
+		// Convert to float.
 		$amount = floatval( $amount );
 
 		// Check minimum amount (skippable for discounted orders where a code
@@ -61,7 +64,7 @@ class GatewayKit_Input_Validator {
 			}
 		}
 
-		// Check maximum amount
+		// Check maximum amount.
 		$default_max = 1000000;
 		$max_amount  = apply_filters( 'gatewaykit_max_amount', $default_max );
 		if ( $amount > $max_amount ) {
@@ -75,7 +78,7 @@ class GatewayKit_Input_Validator {
 	/**
 	 * Validate email
 	 *
-	 * @param string $email Email to validate
+	 * @param string $email Email to validate.
 	 * @return string|WP_Error Validated email or error
 	 */
 	public function validate_email( $email ) {
@@ -91,7 +94,7 @@ class GatewayKit_Input_Validator {
 	/**
 	 * Validate URL
 	 *
-	 * @param string $url URL to validate
+	 * @param string $url URL to validate.
 	 * @return string|WP_Error Validated URL or error
 	 */
 	public function validate_url( $url ) {
@@ -107,7 +110,7 @@ class GatewayKit_Input_Validator {
 	/**
 	 * Validate required URL
 	 *
-	 * @param string $url URL to validate
+	 * @param string $url URL to validate.
 	 * @return string|WP_Error Validated URL or error
 	 */
 	public function validate_required_url( $url ) {
@@ -168,7 +171,7 @@ class GatewayKit_Input_Validator {
 	/**
 	 * Validate gateway
 	 *
-	 * @param string $gateway Gateway ID
+	 * @param string $gateway Gateway ID.
 	 * @return string|WP_Error Validated gateway or error
 	 */
 	public function validate_gateway( $gateway ) {
@@ -191,7 +194,7 @@ class GatewayKit_Input_Validator {
 	/**
 	 * Validate form data
 	 *
-	 * @param array $form_data Form data to validate
+	 * @param array $form_data Form data to validate.
 	 * @return array|WP_Error Validated data or error
 	 */
 	public function validate_form_data( $form_data ) {
@@ -217,7 +220,7 @@ class GatewayKit_Input_Validator {
 	/**
 	 * Sanitize amount
 	 *
-	 * @param mixed $amount Amount to sanitize
+	 * @param mixed $amount Amount to sanitize.
 	 * @return string Sanitized amount
 	 */
 	public function sanitize_amount( $amount ) {
@@ -227,13 +230,13 @@ class GatewayKit_Input_Validator {
 	/**
 	 * Sanitize array recursively
 	 *
-	 * @param array $array Array to sanitize
+	 * @param array $values Values to sanitize.
 	 * @return array Sanitized array
 	 */
-	private function sanitize_array( $array ) {
+	private function sanitize_array( $values ) {
 		$sanitized = array();
 
-		foreach ( $array as $key => $value ) {
+		foreach ( $values as $key => $value ) {
 			$key = sanitize_key( $key );
 
 			if ( is_array( $value ) ) {
@@ -249,8 +252,8 @@ class GatewayKit_Input_Validator {
 	/**
 	 * Validate nonce
 	 *
-	 * @param string $nonce  Nonce value
-	 * @param string $action Nonce action
+	 * @param string $nonce  Nonce value.
+	 * @param string $action Nonce action.
 	 * @return bool True if valid
 	 */
 	public function validate_nonce( $nonce, $action ) {
@@ -260,7 +263,7 @@ class GatewayKit_Input_Validator {
 	/**
 	 * Check user capability
 	 *
-	 * @param string $capability Capability to check
+	 * @param string $capability Capability to check.
 	 * @return bool True if user has capability
 	 */
 	public function check_capability( $capability = 'manage_options' ) {
